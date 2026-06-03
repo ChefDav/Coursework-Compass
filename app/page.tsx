@@ -38,7 +38,7 @@ export default function Home(){
 
               <div className="flex flex-col gap-4 sm:flex-row">
                 <a
-                    href="#demo"
+                    href="/dashboard"
                     className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
                 >
                   Start Planning
