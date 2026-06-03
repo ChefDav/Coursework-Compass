@@ -1,12 +1,5 @@
 import AppNav from "@/components/AppNav";
-const projectTemplates = [
-    "Math IA",
-    "Computer Science IA",
-    "Extended Essay",
-    "TOK Essay",
-    "English Essay",
-    "Economics Commentary",
-];
+import { projectTemplates } from "@/lib/mockData";
 
 export default function ProjectsPage() {
     return (

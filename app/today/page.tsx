@@ -1,30 +1,5 @@
 import AppNav from "@/components/AppNav";
-const tasks = [
-    {
-        title: "Collect 3 data sources",
-        project: "Math IA",
-        priority: "High",
-        time: "45 min",
-    },
-    {
-        title: "Draft success criteria",
-        project: "Computer Science IA",
-        priority: "Medium",
-        time: "30 min",
-    },
-    {
-        title: "Annotate one TOK example",
-        project: "TOK Essay",
-        priority: "Medium",
-        time: "25 min",
-    },
-    {
-        title: "Review supervisor feedback",
-        project: "Extended Essay",
-        priority: "Low",
-        time: "20 min",
-    },
-];
+import { tasks } from "@/lib/mockData";
 
 export default function TodayPage() {
     return (
