@@ -1,3 +1,4 @@
+import AppNav from "@/components/AppNav";
 const projectTemplates = [
     "Math IA",
     "Computer Science IA",
@@ -11,23 +12,7 @@ export default function ProjectsPage() {
     return (
         <main className="min-h-screen bg-slate-950 text-white">
             <section className="mx-auto max-w-6xl px-6 py-8">
-                <nav className="mb-12 flex items-center justify-between">
-                    <a href="/" className="text-xl font-bold">
-                        Coursework Compass
-                    </a>
-
-                    <div className="flex gap-4 text-sm text-slate-300">
-                        <a href="/dashboard" className="hover:text-white">
-                            Dashboard
-                        </a>
-                        <a href="/projects" className="text-cyan-300">
-                            Projects
-                        </a>
-                        <a href="/today" className="hover:text-white">
-                            Today
-                        </a>
-                    </div>
-                </nav>
+                <AppNav />
 
                 <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
                     <div>
