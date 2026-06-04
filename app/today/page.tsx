@@ -1,4 +1,5 @@
 import AppNav from "@/components/AppNav";
+import TaskCard from "@/components/TaskCard";
 import { tasks } from "@/lib/mockData";
 
 export default function TodayPage() {
@@ -23,38 +24,7 @@ export default function TodayPage() {
                 <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
                     <div className="space-y-4">
                         {tasks.map((task) => (
-                            <div
-                                key={task.title}
-                                className="rounded-3xl border border-slate-800 bg-slate-900 p-6"
-                            >
-                                <div className="mb-4 flex items-start justify-between gap-4">
-                                    <div>
-                                        <h2 className="text-xl font-bold">{task.title}</h2>
-                                        <p className="mt-1 text-sm text-slate-400">
-                                            {task.project}
-                                        </p>
-                                    </div>
-
-                                    <span
-                                        className={`rounded-full px-4 py-2 text-sm font-bold ${
-                                            task.priority === "High"
-                                                ? "bg-red-400/10 text-red-300"
-                                                : task.priority === "Medium"
-                                                    ? "bg-amber-400/10 text-amber-300"
-                                                    : "bg-emerald-400/10 text-emerald-300"
-                                        }`}
-                                    >
-                    {task.priority}
-                  </span>
-                                </div>
-
-                                <div className="flex items-center justify-between text-sm text-slate-300">
-                                    <span>Estimated time: {task.time}</span>
-                                    <button className="rounded-xl bg-cyan-400 px-4 py-2 font-bold text-slate-950 hover:bg-cyan-300">
-                                        Mark done
-                                    </button>
-                                </div>
-                            </div>
+                            <TaskCard key={task.title} task={task} />
                         ))}
                     </div>
 
