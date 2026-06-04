@@ -5,6 +5,7 @@ import AppNav from "@/components/AppNav";
 import ProjectCard from "@/components/ProjectCard";
 import TemplateCard from "@/components/TemplateCard";
 import {
+    clearProjectPlans,
     deleteProjectPlan,
     loadProjectPlans,
 } from "@/lib/localStorage";
@@ -40,6 +41,20 @@ export default function ProjectsPage() {
         setStatusMessage(`${projectTitle} was deleted from local storage.`);
     }
 
+    function handleResetLocalData() {
+        const shouldReset = window.confirm(
+            "Reset all local Coursework Compass data in this browser? This will remove every saved project and generated task.",
+        );
+
+        if (!shouldReset) {
+            return;
+        }
+
+        clearProjectPlans();
+        setSavedPlans([]);
+        setStatusMessage("All local project data was reset in this browser.");
+    }
+
     return (
         <main className="min-h-screen bg-slate-950 text-white">
             <section className="mx-auto max-w-6xl px-6 py-8">
@@ -59,12 +74,22 @@ export default function ProjectsPage() {
                         </p>
                     </div>
 
-                    <a
-                        href="/projects/new"
-                        className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
-                    >
-                        New Project
-                    </a>
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                        <button
+                            type="button"
+                            onClick={handleResetLocalData}
+                            className="rounded-2xl border border-red-400/30 px-6 py-4 text-center font-bold text-red-300 transition hover:bg-red-400/10"
+                        >
+                            Reset local data
+                        </button>
+
+                        <a
+                            href="/projects/new"
+                            className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
+                        >
+                            New Project
+                        </a>
+                    </div>
                 </div>
 
                 {statusMessage ? (
