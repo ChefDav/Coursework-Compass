@@ -1,3 +1,4 @@
+import ExamCountdownCard from "@/components/ExamCountdownCard";
 import FeedbackLink from "@/components/FeedbackLink";
 
 export default function HomePage() {
@@ -62,6 +63,10 @@ export default function HomePage() {
                 >
                   Open dashboard
                 </a>
+              </div>
+
+              <div className="mt-8">
+                <ExamCountdownCard />
               </div>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">

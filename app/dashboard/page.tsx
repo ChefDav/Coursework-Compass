@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import AppNav from "@/components/AppNav";
+import ExamCountdownCard from "@/components/ExamCountdownCard";
 import ProjectCard from "@/components/ProjectCard";
 import {
     listenForProjectPlanUpdates,
@@ -72,6 +73,10 @@ export default function DashboardPage() {
                         Track your saved coursework projects, monitor progress, and decide
                         what deserves your attention next.
                     </p>
+                </div>
+
+                <div className="mb-8">
+                    <ExamCountdownCard />
                 </div>
 
                 <div className="mb-10 grid gap-6 md:grid-cols-4">
