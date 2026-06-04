@@ -1,12 +1,5 @@
 import RiskBadge from "@/components/RiskBadge";
-import type { PriorityLevel } from "@/lib/mockData";
-
-type Task = {
-    title: string;
-    project: string;
-    priority: PriorityLevel;
-    time: string;
-};
+import type { Task } from "@/types/coursework";
 
 type TaskCardProps = {
     task: Task;

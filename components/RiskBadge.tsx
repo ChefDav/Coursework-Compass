@@ -1,4 +1,4 @@
-import type { PriorityLevel, RiskLevel } from "@/lib/mockData";
+import type { PriorityLevel, RiskLevel } from "@/types/coursework";
 
 type BadgeLevel = RiskLevel | PriorityLevel;
 

@@ -1,14 +1,6 @@
 import ProgressBar from "@/components/ProgressBar";
 import RiskBadge from "@/components/RiskBadge";
-import type { RiskLevel } from "@/lib/mockData";
-
-type Project = {
-    title: string;
-    type: string;
-    progress: number;
-    daysLeft: number;
-    risk: RiskLevel;
-};
+import type { Project } from "@/types/coursework";
 
 type ProjectCardProps = {
     project: Project;
