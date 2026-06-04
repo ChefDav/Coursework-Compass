@@ -16,22 +16,30 @@ export default function TodayPage() {
         setSavedPlans(plans);
     }, []);
 
-    const savedTasks = useMemo(() => {
+    const hasSavedPlans = savedPlans.length > 0;
+
+    const visibleSavedTasks = useMemo(() => {
         return savedPlans.flatMap((plan) => plan.tasks);
     }, [savedPlans]);
 
-    const allTasks = useMemo(() => {
-        const savedTaskIds = new Set(savedTasks.map((task) => task.id));
+    const activeTasks = useMemo(() => {
+        if (hasSavedPlans) {
+            return visibleSavedTasks;
+        }
 
-        const mockTasksWithoutDuplicates = mockTasks.filter(
-            (task) => !savedTaskIds.has(task.id),
-        );
+        return mockTasks;
+    }, [hasSavedPlans, mockTasks, visibleSavedTasks]);
 
-        return [...savedTasks, ...mockTasksWithoutDuplicates];
-    }, [mockTasks, savedTasks]);
+    const todoTasks = activeTasks.filter((task) => task.status === "Todo");
+    const doneTasks = activeTasks.filter((task) => task.status === "Done");
 
-    const todoTasks = allTasks.filter((task) => task.status === "Todo");
-    const doneTasks = allTasks.filter((task) => task.status === "Done");
+    const archivedPlanCount = savedPlans.filter(
+        (plan) => Boolean(plan.tasksArchivedAt),
+    ).length;
+
+    const completedPlanCount = savedPlans.filter(
+        (plan) => plan.project.status === "Completed" || plan.tasksArchivedAt,
+    ).length;
 
     const highPriorityTaskCount = todoTasks.filter(
         (task) => task.priority === "High",
@@ -40,6 +48,8 @@ export default function TodayPage() {
     const firstHighPriorityTask = todoTasks.find(
         (task) => task.priority === "High",
     );
+
+    const firstTodoTask = todoTasks[0];
 
     function handleMarkTaskDone(taskId: string) {
         setMockTasks((currentTasks) =>
@@ -72,15 +82,15 @@ export default function TodayPage() {
                         What should I do today?
                     </h1>
                     <p className="mt-4 max-w-2xl text-slate-300">
-                        A focused list of tasks chosen from your saved projects, deadlines,
-                        project risks, and current progress.
+                        A focused list of visible tasks from your saved coursework plans.
+                        Archived completed tasks stay out of your daily workspace.
                     </p>
                 </div>
 
                 <div className="mb-8 grid gap-6 md:grid-cols-4">
                     <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
-                        <p className="text-sm text-slate-400">Tasks available</p>
-                        <p className="mt-2 text-4xl font-black">{allTasks.length}</p>
+                        <p className="text-sm text-slate-400">Visible tasks</p>
+                        <p className="mt-2 text-4xl font-black">{activeTasks.length}</p>
                     </div>
 
                     <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
@@ -95,39 +105,112 @@ export default function TodayPage() {
                         </p>
                     </div>
 
-                    <div className="rounded-3xl border border-red-400/30 bg-red-400/10 p-6">
-                        <p className="text-sm text-red-200">High priority</p>
-                        <p className="mt-2 text-4xl font-black text-red-200">
-                            {highPriorityTaskCount}
+                    <div className="rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-6">
+                        <p className="text-sm text-cyan-200">Archived plans</p>
+                        <p className="mt-2 text-4xl font-black text-cyan-200">
+                            {archivedPlanCount}
                         </p>
                     </div>
                 </div>
 
-                {savedTasks.length > 0 ? (
+                {!hasSavedPlans ? (
+                    <div className="mb-8 rounded-3xl border border-amber-400/30 bg-amber-400/10 p-6">
+                        <p className="mb-2 text-sm font-bold text-amber-300">
+                            Demo task mode
+                        </p>
+                        <h2 className="text-2xl font-black">
+                            These are sample tasks until you save your first project.
+                        </h2>
+                        <p className="mt-2 text-sm leading-6 text-slate-300">
+                            Create and save a coursework project to replace this demo list
+                            with your own generated plan.
+                        </p>
+                    </div>
+                ) : null}
+
+                {hasSavedPlans && visibleSavedTasks.length > 0 ? (
                     <div className="mb-8 rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-6">
                         <p className="mb-2 text-sm font-bold text-emerald-300">
                             Local tasks loaded
                         </p>
                         <h2 className="text-2xl font-black">
-                            {savedTasks.length} generated task
-                            {savedTasks.length === 1 ? "" : "s"} found in this browser.
+                            {visibleSavedTasks.length} visible generated task
+                            {visibleSavedTasks.length === 1 ? "" : "s"} found.
                         </h2>
                         <p className="mt-2 text-sm leading-6 text-slate-300">
-                            Click Mark done to update task status. Local generated tasks will
-                            stay completed after refresh.
+                            Completed archived tasks are hidden from Today. Your project
+                            history still stays available through Projects and Dashboard.
+                        </p>
+                    </div>
+                ) : null}
+
+                {hasSavedPlans && visibleSavedTasks.length === 0 ? (
+                    <div className="mb-8 rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-8">
+                        <p className="mb-2 text-sm font-bold text-cyan-300">
+                            Today is clean
+                        </p>
+                        <h2 className="text-3xl font-black">
+                            No visible tasks right now.
+                        </h2>
+                        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+                            Your saved tasks are either completed and archived, or you have
+                            not generated a new active project plan yet. Create another
+                            coursework plan when the next deadline monster appears.
+                        </p>
+
+                        <div className="mt-6 flex flex-col gap-4 sm:flex-row">
+                            <a
+                                href="/projects/new"
+                                className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
+                            >
+                                Create new project
+                            </a>
+
+                            <a
+                                href="/projects"
+                                className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
+                            >
+                                View projects
+                            </a>
+                        </div>
+                    </div>
+                ) : null}
+
+                {completedPlanCount > 0 ? (
+                    <div className="mb-8 rounded-3xl border border-slate-800 bg-slate-900 p-6">
+                        <p className="mb-2 text-sm font-bold text-slate-300">
+                            Completed project memory
+                        </p>
+                        <h2 className="text-2xl font-black">
+                            {completedPlanCount} completed project
+                            {completedPlanCount === 1 ? "" : "s"} recorded locally.
+                        </h2>
+                        <p className="mt-2 text-sm leading-6 text-slate-300">
+                            Completed projects stay visible in Dashboard and Projects even
+                            when their finished tasks are archived from Today.
                         </p>
                     </div>
                 ) : null}
 
                 <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
                     <div className="space-y-4">
-                        {allTasks.map((task) => (
-                            <TaskCard
-                                key={task.id}
-                                task={task}
-                                onMarkDone={handleMarkTaskDone}
-                            />
-                        ))}
+                        {activeTasks.length > 0 ? (
+                            activeTasks.map((task) => (
+                                <TaskCard
+                                    key={task.id}
+                                    task={task}
+                                    onMarkDone={handleMarkTaskDone}
+                                />
+                            ))
+                        ) : (
+                            <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
+                                <p className="mb-2 text-xl font-bold">No task cards to show.</p>
+                                <p className="text-sm leading-6 text-slate-300">
+                                    Your Today page is clear. That is rare. Guard it like a tiny
+                                    blue flame.
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     <aside className="rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-6">
@@ -141,21 +224,34 @@ export default function TodayPage() {
                                     Start with {firstHighPriorityTask.project}.
                                 </h2>
                                 <p className="text-sm leading-6 text-slate-300">
-                                    Your highest-priority task is{" "}
+                                    Your highest-priority visible task is{" "}
                                     <span className="font-bold text-white">
                     {firstHighPriorityTask.title}
                   </span>
-                                    . Finish this first before moving to lower-risk tasks.
+                                    . Finish this first before moving to lower-risk work.
+                                </p>
+                            </>
+                        ) : firstTodoTask ? (
+                            <>
+                                <h2 className="mb-4 text-2xl font-black">
+                                    Keep the pressure steady.
+                                </h2>
+                                <p className="text-sm leading-6 text-slate-300">
+                                    Start with{" "}
+                                    <span className="font-bold text-white">
+                    {firstTodoTask.title}
+                  </span>
+                                    . No high-priority visible task is currently detected.
                                 </p>
                             </>
                         ) : (
                             <>
                                 <h2 className="mb-4 text-2xl font-black">
-                                    Keep steady pressure.
+                                    The board is clear.
                                 </h2>
                                 <p className="text-sm leading-6 text-slate-300">
-                                    No high-priority tasks are currently detected. Use this time
-                                    to make calm, consistent progress before deadlines get teeth.
+                                    No visible Todo tasks remain. Review your completed projects
+                                    or create a fresh plan when a new assignment arrives.
                                 </p>
                             </>
                         )}
