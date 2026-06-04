@@ -11,6 +11,14 @@ export function calculateTaskProgress(tasks: Task[]) {
 }
 
 export function applyProgressToProject(plan: GeneratedProjectPlan): Project {
+    if (plan.project.status === "Completed" || plan.tasksArchivedAt) {
+        return {
+            ...plan.project,
+            progress: 100,
+            status: "Completed",
+        };
+    }
+
     return {
         ...plan.project,
         progress: calculateTaskProgress(plan.tasks),

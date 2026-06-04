@@ -55,4 +55,8 @@ export type GeneratedProjectPlan = {
     tasks: Task[];
     intensity: PlanningIntensity;
     createdAt: string;
+    completedAt?: string;
+    completionPromptShown?: boolean;
+    tasksArchivedAt?: string;
+    archivedTaskCount?: number;
 };

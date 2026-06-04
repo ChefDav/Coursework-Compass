@@ -1,6 +1,29 @@
 import type { GeneratedProjectPlan, TaskStatus } from "@/types/coursework";
 
 const PROJECT_PLANS_KEY = "coursework-compass-project-plans";
+const PROJECT_PLANS_UPDATED_EVENT = "coursework-compass-project-plans-updated";
+
+function notifyProjectPlansUpdated() {
+    if (typeof window === "undefined") {
+        return;
+    }
+
+    window.dispatchEvent(new Event(PROJECT_PLANS_UPDATED_EVENT));
+}
+
+export function listenForProjectPlanUpdates(callback: () => void) {
+    if (typeof window === "undefined") {
+        return () => {};
+    }
+
+    window.addEventListener(PROJECT_PLANS_UPDATED_EVENT, callback);
+    window.addEventListener("storage", callback);
+
+    return () => {
+        window.removeEventListener(PROJECT_PLANS_UPDATED_EVENT, callback);
+        window.removeEventListener("storage", callback);
+    };
+}
 
 export function loadProjectPlans(): GeneratedProjectPlan[] {
     if (typeof window === "undefined") {
@@ -26,6 +49,7 @@ export function saveProjectPlans(plans: GeneratedProjectPlan[]) {
     }
 
     window.localStorage.setItem(PROJECT_PLANS_KEY, JSON.stringify(plans));
+    notifyProjectPlansUpdated();
 
     return plans;
 }
@@ -75,6 +99,78 @@ export function updateTaskStatus(taskId: string, status: TaskStatus) {
             ...plan,
             tasks: updatedTasks,
         };
+    });
+
+    saveProjectPlans(updatedPlans);
+
+    return updatedPlans;
+}
+
+export function findCompletedPlanWaitingForPrompt() {
+    const existingPlans = loadProjectPlans();
+
+    return existingPlans.find((plan) => {
+        if (plan.completionPromptShown || plan.tasksArchivedAt) {
+            return false;
+        }
+
+        if (plan.tasks.length === 0) {
+            return false;
+        }
+
+        return plan.tasks.every((task) => task.status === "Done");
+    });
+}
+
+export function keepCompletedProjectTasks(projectId: string) {
+    const existingPlans = loadProjectPlans();
+    const completedAt = new Date().toISOString();
+
+    const updatedPlans = existingPlans.map((plan) => {
+        if (plan.project.id !== projectId) {
+            return plan;
+        }
+
+        return {
+            ...plan,
+            completedAt,
+            completionPromptShown: true,
+            project: {
+                ...plan.project,
+                progress: 100,
+                status: "Completed",
+            },
+        } satisfies GeneratedProjectPlan;
+    });
+
+    saveProjectPlans(updatedPlans);
+
+    return updatedPlans;
+}
+
+export function archiveCompletedProjectTasks(projectId: string) {
+    const existingPlans = loadProjectPlans();
+    const completedAt = new Date().toISOString();
+    const archivedAt = new Date().toISOString();
+
+    const updatedPlans = existingPlans.map((plan) => {
+        if (plan.project.id !== projectId) {
+            return plan;
+        }
+
+        return {
+            ...plan,
+            tasks: [],
+            completedAt,
+            completionPromptShown: true,
+            tasksArchivedAt: archivedAt,
+            archivedTaskCount: plan.tasks.length,
+            project: {
+                ...plan.project,
+                progress: 100,
+                status: "Completed",
+            },
+        } satisfies GeneratedProjectPlan;
     });
 
     saveProjectPlans(updatedPlans);
