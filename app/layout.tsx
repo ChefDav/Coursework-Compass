@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import CompletionWatcher from "@/components/CompletionWatcher";
+import GlobalClock from "@/components/GlobalClock";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -65,6 +66,7 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
         <CompletionWatcher />
+        <GlobalClock />
         {children}
         </body>
         </html>
