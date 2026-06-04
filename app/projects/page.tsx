@@ -101,7 +101,10 @@ export default function ProjectsPage() {
                                     key={project.id}
                                     className="rounded-3xl border border-slate-800 bg-slate-950 p-4"
                                 >
-                                    <ProjectCard project={project} />
+                                    <ProjectCard
+                                        project={project}
+                                        detailsHref={`/projects/${project.id}`}
+                                    />
 
                                     <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                         <p className="text-sm text-slate-400">

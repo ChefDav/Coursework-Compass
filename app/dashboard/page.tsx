@@ -23,21 +23,21 @@ export default function DashboardPage() {
         return savedPlans.map((plan) => applyProgressToProject(plan));
     }, [savedPlans]);
 
+    const savedProjectIds = useMemo(() => {
+        return new Set(savedProjects.map((project) => project.id));
+    }, [savedProjects]);
+
     const savedTasks = useMemo(() => {
         return savedPlans.flatMap((plan) => plan.tasks);
     }, [savedPlans]);
 
     const allProjects = useMemo(() => {
-        const savedProjectIds = new Set(
-            savedProjects.map((project) => project.id),
-        );
-
         const mockProjectsWithoutDuplicates = projects.filter(
             (project) => !savedProjectIds.has(project.id),
         );
 
         return [...savedProjects, ...mockProjectsWithoutDuplicates];
-    }, [savedProjects]);
+    }, [savedProjectIds, savedProjects]);
 
     const allTasks = useMemo(() => {
         return [...savedTasks, ...tasks];
@@ -104,16 +104,23 @@ export default function DashboardPage() {
                             {savedPlans.length === 1 ? "" : "s"} found in this browser.
                         </h2>
                         <p className="mt-2 text-sm leading-6 text-slate-300">
-                            Project progress is now calculated from completed tasks. Mark
-                            tasks done on the Today page, then return here to see progress
-                            move.
+                            Project progress is calculated from completed tasks. Mark tasks
+                            done on the Today page, then return here to see progress move.
                         </p>
                     </div>
                 ) : null}
 
                 <div className="grid gap-6">
                     {allProjects.map((project) => (
-                        <ProjectCard key={project.id} project={project} />
+                        <ProjectCard
+                            key={project.id}
+                            project={project}
+                            detailsHref={
+                                savedProjectIds.has(project.id)
+                                    ? `/projects/${project.id}`
+                                    : undefined
+                            }
+                        />
                     ))}
                 </div>
             </section>
