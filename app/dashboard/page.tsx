@@ -5,6 +5,10 @@ import AppNav from "@/components/AppNav";
 import ProjectCard from "@/components/ProjectCard";
 import { loadProjectPlans } from "@/lib/localStorage";
 import { projects, tasks } from "@/lib/mockData";
+import {
+    applyProgressToProject,
+    countDoneTasks,
+} from "@/lib/progressUtils";
 import type { GeneratedProjectPlan } from "@/types/coursework";
 
 export default function DashboardPage() {
@@ -15,8 +19,13 @@ export default function DashboardPage() {
         setSavedPlans(plans);
     }, []);
 
-    const savedProjects = savedPlans.map((plan) => plan.project);
-    const savedTasks = savedPlans.flatMap((plan) => plan.tasks);
+    const savedProjects = useMemo(() => {
+        return savedPlans.map((plan) => applyProgressToProject(plan));
+    }, [savedPlans]);
+
+    const savedTasks = useMemo(() => {
+        return savedPlans.flatMap((plan) => plan.tasks);
+    }, [savedPlans]);
 
     const allProjects = useMemo(() => {
         const savedProjectIds = new Set(
@@ -30,7 +39,12 @@ export default function DashboardPage() {
         return [...savedProjects, ...mockProjectsWithoutDuplicates];
     }, [savedProjects]);
 
-    const totalTaskCount = tasks.length + savedTasks.length;
+    const allTasks = useMemo(() => {
+        return [...savedTasks, ...tasks];
+    }, [savedTasks]);
+
+    const totalTaskCount = allTasks.length;
+    const doneTaskCount = countDoneTasks(allTasks);
 
     const highRiskProjectCount = allProjects.filter(
         (project) => project.risk === "High",
@@ -54,7 +68,7 @@ export default function DashboardPage() {
                     </p>
                 </div>
 
-                <div className="mb-10 grid gap-6 md:grid-cols-3">
+                <div className="mb-10 grid gap-6 md:grid-cols-4">
                     <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
                         <p className="text-sm text-slate-400">Active projects</p>
                         <p className="mt-2 text-4xl font-black">{allProjects.length}</p>
@@ -63,6 +77,13 @@ export default function DashboardPage() {
                     <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
                         <p className="text-sm text-slate-400">Total tasks</p>
                         <p className="mt-2 text-4xl font-black">{totalTaskCount}</p>
+                    </div>
+
+                    <div className="rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-6">
+                        <p className="text-sm text-emerald-200">Completed tasks</p>
+                        <p className="mt-2 text-4xl font-black text-emerald-200">
+                            {doneTaskCount}
+                        </p>
                     </div>
 
                     <div className="rounded-3xl border border-red-400/30 bg-red-400/10 p-6">
@@ -83,8 +104,9 @@ export default function DashboardPage() {
                             {savedPlans.length === 1 ? "" : "s"} found in this browser.
                         </h2>
                         <p className="mt-2 text-sm leading-6 text-slate-300">
-                            These projects are stored locally for now. Later, we will move
-                            this data into user accounts and cloud sync.
+                            Project progress is now calculated from completed tasks. Mark
+                            tasks done on the Today page, then return here to see progress
+                            move.
                         </p>
                     </div>
                 ) : null}
