@@ -3,6 +3,37 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { projectTemplates } from "@/lib/mockData";
+import type { Project, RiskLevel } from "@/types/coursework";
+
+function createProjectId(title: string) {
+    return title
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+}
+
+function calculateDaysLeft(deadline: string) {
+    const today = new Date();
+    const deadlineDate = new Date(`${deadline}T23:59:59`);
+
+    const differenceInMilliseconds = deadlineDate.getTime() - today.getTime();
+    const daysLeft = Math.ceil(differenceInMilliseconds / (1000 * 60 * 60 * 24));
+
+    return Math.max(daysLeft, 0);
+}
+
+function calculateRisk(daysLeft: number): RiskLevel {
+    if (daysLeft <= 14) {
+        return "High";
+    }
+
+    if (daysLeft <= 30) {
+        return "Medium";
+    }
+
+    return "Low";
+}
 
 export default function NewProjectForm() {
     const searchParams = useSearchParams();
@@ -15,6 +46,7 @@ export default function NewProjectForm() {
     const [intensity, setIntensity] = useState("balanced");
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+    const [previewProject, setPreviewProject] = useState<Project | null>(null);
 
     useEffect(() => {
         setSelectedTemplateId(templateFromUrl);
@@ -27,13 +59,14 @@ export default function NewProjectForm() {
     function handleCreateProject() {
         setErrorMessage("");
         setSuccessMessage("");
+        setPreviewProject(null);
 
         if (!projectTitle.trim()) {
             setErrorMessage("Please enter a project name.");
             return;
         }
 
-        if (!selectedTemplateId) {
+        if (!selectedTemplateId || !selectedTemplate) {
             setErrorMessage("Please choose a project type.");
             return;
         }
@@ -43,14 +76,27 @@ export default function NewProjectForm() {
             return;
         }
 
+        const daysLeft = calculateDaysLeft(deadline);
+        const risk = calculateRisk(daysLeft);
+
+        const newProject: Project = {
+            id: createProjectId(projectTitle),
+            title: projectTitle.trim(),
+            type: selectedTemplate.name,
+            progress: 0,
+            daysLeft,
+            risk,
+            deadline,
+            status: "Active",
+        };
+
+        setPreviewProject(newProject);
         setSuccessMessage(
-            `Project ready: ${projectTitle}. Next mission will turn this into a saved coursework plan.`,
+            `Project preview created. Next mission will generate tasks for ${newProject.title}.`,
         );
 
         console.log({
-            projectTitle,
-            selectedTemplateId,
-            deadline,
+            project: newProject,
             intensity,
         });
     }
@@ -179,9 +225,8 @@ export default function NewProjectForm() {
                         Coming next
                     </p>
                     <p className="text-sm leading-6 text-slate-300">
-                        Soon, clicking Create Project will build a real coursework plan
-                        from your template and deadline. This mission adds local form state
-                        and validation.
+                        Soon, Coursework Compass will turn this project preview into a real
+                        generated task plan.
                     </p>
                 </div>
 
@@ -201,6 +246,60 @@ export default function NewProjectForm() {
                         Back to Projects
                     </a>
                 </div>
+
+                {previewProject ? (
+                    <div className="mt-8 rounded-3xl border border-slate-700 bg-slate-950 p-6">
+                        <p className="mb-2 text-sm font-bold text-cyan-300">
+                            Project preview
+                        </p>
+
+                        <div className="mb-5 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+                            <div>
+                                <h2 className="text-2xl font-black">
+                                    {previewProject.title}
+                                </h2>
+                                <p className="text-sm text-slate-400">
+                                    {previewProject.type}
+                                </p>
+                            </div>
+
+                            <span
+                                className={`rounded-full px-4 py-2 text-sm font-bold ${
+                                    previewProject.risk === "High"
+                                        ? "bg-red-400/10 text-red-300"
+                                        : previewProject.risk === "Medium"
+                                            ? "bg-amber-400/10 text-amber-300"
+                                            : "bg-emerald-400/10 text-emerald-300"
+                                }`}
+                            >
+                {previewProject.risk} Risk
+              </span>
+                        </div>
+
+                        <div className="grid gap-4 md:grid-cols-3">
+                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                                <p className="text-sm text-slate-400">Progress</p>
+                                <p className="mt-2 text-2xl font-black">
+                                    {previewProject.progress}%
+                                </p>
+                            </div>
+
+                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                                <p className="text-sm text-slate-400">Days left</p>
+                                <p className="mt-2 text-2xl font-black">
+                                    {previewProject.daysLeft}
+                                </p>
+                            </div>
+
+                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                                <p className="text-sm text-slate-400">Deadline</p>
+                                <p className="mt-2 text-2xl font-black">
+                                    {previewProject.deadline}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                ) : null}
             </form>
         </div>
     );
