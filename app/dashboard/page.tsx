@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import AppNav from "@/components/AppNav";
 import ProjectCard from "@/components/ProjectCard";
-import { loadProjectPlans } from "@/lib/localStorage";
-import { projects, tasks } from "@/lib/mockData";
+import {
+    listenForProjectPlanUpdates,
+    loadProjectPlans,
+} from "@/lib/localStorage";
 import {
     applyProgressToProject,
     countDoneTasks,
@@ -15,8 +17,16 @@ export default function DashboardPage() {
     const [savedPlans, setSavedPlans] = useState<GeneratedProjectPlan[]>([]);
 
     useEffect(() => {
-        const plans = loadProjectPlans();
-        setSavedPlans(plans);
+        function refreshPlans() {
+            const plans = loadProjectPlans();
+            setSavedPlans(plans);
+        }
+
+        refreshPlans();
+
+        const unsubscribe = listenForProjectPlanUpdates(refreshPlans);
+
+        return unsubscribe;
     }, []);
 
     const savedProjects = useMemo(() => {
@@ -31,23 +41,19 @@ export default function DashboardPage() {
         return savedPlans.flatMap((plan) => plan.tasks);
     }, [savedPlans]);
 
-    const allProjects = useMemo(() => {
-        const mockProjectsWithoutDuplicates = projects.filter(
-            (project) => !savedProjectIds.has(project.id),
-        );
+    const activeProjects = savedProjects.filter(
+        (project) => project.status !== "Completed",
+    );
 
-        return [...savedProjects, ...mockProjectsWithoutDuplicates];
-    }, [savedProjectIds, savedProjects]);
+    const completedProjects = savedProjects.filter(
+        (project) => project.status === "Completed",
+    );
 
-    const allTasks = useMemo(() => {
-        return [...savedTasks, ...tasks];
-    }, [savedTasks]);
+    const totalTaskCount = savedTasks.length;
+    const doneTaskCount = countDoneTasks(savedTasks);
 
-    const totalTaskCount = allTasks.length;
-    const doneTaskCount = countDoneTasks(allTasks);
-
-    const highRiskProjectCount = allProjects.filter(
-        (project) => project.risk === "High",
+    const highRiskProjectCount = savedProjects.filter(
+        (project) => project.risk === "High" && project.status !== "Completed",
     ).length;
 
     return (
@@ -63,15 +69,15 @@ export default function DashboardPage() {
                         Your coursework dashboard.
                     </h1>
                     <p className="mt-4 max-w-2xl text-slate-300">
-                        Track every major assignment, spot risky deadlines, and decide what
-                        deserves your attention today.
+                        Track your saved coursework projects, monitor progress, and decide
+                        what deserves your attention next.
                     </p>
                 </div>
 
                 <div className="mb-10 grid gap-6 md:grid-cols-4">
                     <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
                         <p className="text-sm text-slate-400">Active projects</p>
-                        <p className="mt-2 text-4xl font-black">{allProjects.length}</p>
+                        <p className="mt-2 text-4xl font-black">{activeProjects.length}</p>
                     </div>
 
                     <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
@@ -105,24 +111,73 @@ export default function DashboardPage() {
                         </h2>
                         <p className="mt-2 text-sm leading-6 text-slate-300">
                             Project progress is calculated from completed tasks. Mark tasks
-                            done on the Today page, then return here to see progress move.
+                            done on the Today page or inside a project detail page to move
+                            the progress bar forward.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="mb-8 rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-8">
+                        <p className="mb-2 text-sm font-bold text-cyan-300">
+                            Empty dashboard
+                        </p>
+                        <h2 className="text-3xl font-black">
+                            No saved coursework projects yet.
+                        </h2>
+                        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+                            Your dashboard is clear. Create your first coursework plan from a
+                            template, then it will appear here with live progress, risk, and
+                            task statistics.
+                        </p>
+
+                        <div className="mt-6 flex flex-col gap-4 sm:flex-row">
+                            <a
+                                href="/projects/new"
+                                className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
+                            >
+                                Create first project
+                            </a>
+
+                            <a
+                                href="/projects"
+                                className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
+                            >
+                                Browse templates
+                            </a>
+                        </div>
+                    </div>
+                )}
+
+                {completedProjects.length > 0 ? (
+                    <div className="mb-8 rounded-3xl border border-slate-800 bg-slate-900 p-6">
+                        <p className="mb-2 text-sm font-bold text-slate-300">
+                            Completed projects
+                        </p>
+                        <h2 className="text-2xl font-black">
+                            {completedProjects.length} project
+                            {completedProjects.length === 1 ? "" : "s"} completed.
+                        </h2>
+                        <p className="mt-2 text-sm leading-6 text-slate-300">
+                            Completed projects stay visible here even if their tasks are
+                            archived from Today.
                         </p>
                     </div>
                 ) : null}
 
-                <div className="grid gap-6">
-                    {allProjects.map((project) => (
-                        <ProjectCard
-                            key={project.id}
-                            project={project}
-                            detailsHref={
-                                savedProjectIds.has(project.id)
-                                    ? `/projects/${project.id}`
-                                    : undefined
-                            }
-                        />
-                    ))}
-                </div>
+                {savedProjects.length > 0 ? (
+                    <div className="grid gap-6">
+                        {savedProjects.map((project) => (
+                            <ProjectCard
+                                key={project.id}
+                                project={project}
+                                detailsHref={
+                                    savedProjectIds.has(project.id)
+                                        ? `/projects/${project.id}`
+                                        : undefined
+                                }
+                            />
+                        ))}
+                    </div>
+                ) : null}
             </section>
         </main>
     );
