@@ -57,7 +57,7 @@ export default function ProjectsPage() {
 
     return (
         <main className="min-h-screen bg-slate-950 text-white">
-            <section className="mx-auto max-w-6xl px-6 py-8">
+            <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                 <AppNav />
 
                 <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
@@ -65,7 +65,7 @@ export default function ProjectsPage() {
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             Coursework library
                         </p>
-                        <h1 className="text-5xl font-black tracking-tight">
+                        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
                             Manage your projects.
                         </h1>
                         <p className="mt-4 max-w-2xl text-slate-300">
@@ -104,7 +104,7 @@ export default function ProjectsPage() {
                             <p className="mb-2 text-sm font-bold text-emerald-300">
                                 Saved projects
                             </p>
-                            <h2 className="text-3xl font-black">
+                            <h2 className="text-2xl font-black sm:text-3xl">
                                 Your local coursework plans.
                             </h2>
                             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
@@ -171,7 +171,7 @@ export default function ProjectsPage() {
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             Template library
                         </p>
-                        <h2 className="text-3xl font-black">
+                        <h2 className="text-2xl font-black sm:text-3xl">
                             Start from a coursework template.
                         </h2>
                         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">

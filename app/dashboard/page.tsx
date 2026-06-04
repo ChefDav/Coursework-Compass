@@ -58,14 +58,14 @@ export default function DashboardPage() {
 
     return (
         <main className="min-h-screen bg-slate-950 text-white">
-            <section className="mx-auto max-w-6xl px-6 py-8">
+            <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                 <AppNav />
 
                 <div className="mb-10">
                     <p className="mb-2 text-sm font-bold text-cyan-300">
                         Student command center
                     </p>
-                    <h1 className="text-5xl font-black tracking-tight">
+                    <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
                         Your coursework dashboard.
                     </h1>
                     <p className="mt-4 max-w-2xl text-slate-300">
@@ -75,26 +75,30 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="mb-10 grid gap-6 md:grid-cols-4">
-                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
+                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
                         <p className="text-sm text-slate-400">Active projects</p>
-                        <p className="mt-2 text-4xl font-black">{activeProjects.length}</p>
+                        <p className="mt-2 text-3xl font-black sm:text-4xl">
+                            {activeProjects.length}
+                        </p>
                     </div>
 
-                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
+                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
                         <p className="text-sm text-slate-400">Total tasks</p>
-                        <p className="mt-2 text-4xl font-black">{totalTaskCount}</p>
+                        <p className="mt-2 text-3xl font-black sm:text-4xl">
+                            {totalTaskCount}
+                        </p>
                     </div>
 
-                    <div className="rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-6">
+                    <div className="rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
                         <p className="text-sm text-emerald-200">Completed tasks</p>
-                        <p className="mt-2 text-4xl font-black text-emerald-200">
+                        <p className="mt-2 text-3xl font-black text-emerald-200 sm:text-4xl">
                             {doneTaskCount}
                         </p>
                     </div>
 
-                    <div className="rounded-3xl border border-red-400/30 bg-red-400/10 p-6">
+                    <div className="rounded-3xl border border-red-400/30 bg-red-400/10 p-5 sm:p-6">
                         <p className="text-sm text-red-200">High risk items</p>
-                        <p className="mt-2 text-4xl font-black text-red-200">
+                        <p className="mt-2 text-3xl font-black text-red-200 sm:text-4xl">
                             {highRiskProjectCount}
                         </p>
                     </div>
@@ -105,7 +109,7 @@ export default function DashboardPage() {
                         <p className="mb-2 text-sm font-bold text-emerald-300">
                             Local projects loaded
                         </p>
-                        <h2 className="text-2xl font-black">
+                        <h2 className="text-2xl font-black sm:text-3xl">
                             {savedPlans.length} saved project
                             {savedPlans.length === 1 ? "" : "s"} found in this browser.
                         </h2>
@@ -120,7 +124,7 @@ export default function DashboardPage() {
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             Empty dashboard
                         </p>
-                        <h2 className="text-3xl font-black">
+                        <h2 className="text-2xl font-black sm:text-3xl">
                             No saved coursework projects yet.
                         </h2>
                         <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
@@ -152,7 +156,7 @@ export default function DashboardPage() {
                         <p className="mb-2 text-sm font-bold text-slate-300">
                             Completed projects
                         </p>
-                        <h2 className="text-2xl font-black">
+                        <h2 className="text-2xl font-black sm:text-3xl">
                             {completedProjects.length} project
                             {completedProjects.length === 1 ? "" : "s"} completed.
                         </h2>

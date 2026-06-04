@@ -33,8 +33,8 @@ export default function TodayPage() {
     const todoTasks = activeTasks.filter((task) => task.status === "Todo");
     const doneTasks = activeTasks.filter((task) => task.status === "Done");
 
-    const archivedPlanCount = savedPlans.filter(
-        (plan) => Boolean(plan.tasksArchivedAt),
+    const archivedPlanCount = savedPlans.filter((plan) =>
+        Boolean(plan.tasksArchivedAt),
     ).length;
 
     const completedPlanCount = savedPlans.filter(
@@ -71,14 +71,14 @@ export default function TodayPage() {
 
     return (
         <main className="min-h-screen bg-slate-950 text-white">
-            <section className="mx-auto max-w-6xl px-6 py-8">
+            <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                 <AppNav />
 
                 <div className="mb-10">
                     <p className="mb-2 text-sm font-bold text-cyan-300">
                         Daily execution
                     </p>
-                    <h1 className="text-5xl font-black tracking-tight">
+                    <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
                         What should I do today?
                     </h1>
                     <p className="mt-4 max-w-2xl text-slate-300">
@@ -88,26 +88,30 @@ export default function TodayPage() {
                 </div>
 
                 <div className="mb-8 grid gap-6 md:grid-cols-4">
-                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
+                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
                         <p className="text-sm text-slate-400">Visible tasks</p>
-                        <p className="mt-2 text-4xl font-black">{activeTasks.length}</p>
+                        <p className="mt-2 text-3xl font-black sm:text-4xl">
+                            {activeTasks.length}
+                        </p>
                     </div>
 
-                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
+                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
                         <p className="text-sm text-slate-400">Todo</p>
-                        <p className="mt-2 text-4xl font-black">{todoTasks.length}</p>
+                        <p className="mt-2 text-3xl font-black sm:text-4xl">
+                            {todoTasks.length}
+                        </p>
                     </div>
 
-                    <div className="rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-6">
+                    <div className="rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
                         <p className="text-sm text-emerald-200">Done</p>
-                        <p className="mt-2 text-4xl font-black text-emerald-200">
+                        <p className="mt-2 text-3xl font-black text-emerald-200 sm:text-4xl">
                             {doneTasks.length}
                         </p>
                     </div>
 
-                    <div className="rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-6">
+                    <div className="rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-6">
                         <p className="text-sm text-cyan-200">Archived plans</p>
-                        <p className="mt-2 text-4xl font-black text-cyan-200">
+                        <p className="mt-2 text-3xl font-black text-cyan-200 sm:text-4xl">
                             {archivedPlanCount}
                         </p>
                     </div>
@@ -118,7 +122,7 @@ export default function TodayPage() {
                         <p className="mb-2 text-sm font-bold text-amber-300">
                             Demo task mode
                         </p>
-                        <h2 className="text-2xl font-black">
+                        <h2 className="text-2xl font-black sm:text-3xl">
                             These are sample tasks until you save your first project.
                         </h2>
                         <p className="mt-2 text-sm leading-6 text-slate-300">
@@ -133,7 +137,7 @@ export default function TodayPage() {
                         <p className="mb-2 text-sm font-bold text-emerald-300">
                             Local tasks loaded
                         </p>
-                        <h2 className="text-2xl font-black">
+                        <h2 className="text-2xl font-black sm:text-3xl">
                             {visibleSavedTasks.length} visible generated task
                             {visibleSavedTasks.length === 1 ? "" : "s"} found.
                         </h2>
@@ -149,7 +153,7 @@ export default function TodayPage() {
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             Today is clean
                         </p>
-                        <h2 className="text-3xl font-black">
+                        <h2 className="text-2xl font-black sm:text-3xl">
                             No visible tasks right now.
                         </h2>
                         <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
@@ -181,7 +185,7 @@ export default function TodayPage() {
                         <p className="mb-2 text-sm font-bold text-slate-300">
                             Completed project memory
                         </p>
-                        <h2 className="text-2xl font-black">
+                        <h2 className="text-2xl font-black sm:text-3xl">
                             {completedPlanCount} completed project
                             {completedPlanCount === 1 ? "" : "s"} recorded locally.
                         </h2>

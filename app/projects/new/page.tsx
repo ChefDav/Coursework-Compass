@@ -5,19 +5,19 @@ import NewProjectForm from "@/components/NewProjectForm";
 export default function NewProjectPage() {
     return (
         <main className="min-h-screen bg-slate-950 text-white">
-            <section className="mx-auto max-w-4xl px-6 py-8">
+            <section className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
                 <AppNav />
 
                 <div className="mb-10">
                     <p className="mb-2 text-sm font-bold text-cyan-300">
                         New coursework project
                     </p>
-                    <h1 className="text-5xl font-black tracking-tight">
+                    <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
                         Create a new project.
                     </h1>
                     <p className="mt-4 max-w-2xl text-slate-300">
-                        Set up your coursework goal, deadline, and planning style. In the
-                        next missions, this form will generate a real task plan.
+                        Set up your coursework goal, deadline, and planning style. This
+                        form can generate and save a real coursework task plan.
                     </p>
                 </div>
 
