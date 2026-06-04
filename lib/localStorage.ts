@@ -44,6 +44,18 @@ export function saveProjectPlan(plan: GeneratedProjectPlan) {
     return updatedPlans;
 }
 
+export function deleteProjectPlan(projectId: string) {
+    const existingPlans = loadProjectPlans();
+
+    const updatedPlans = existingPlans.filter(
+        (plan) => plan.project.id !== projectId,
+    );
+
+    saveProjectPlans(updatedPlans);
+
+    return updatedPlans;
+}
+
 export function updateTaskStatus(taskId: string, status: TaskStatus) {
     const existingPlans = loadProjectPlans();
 
