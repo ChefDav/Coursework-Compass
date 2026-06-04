@@ -6,6 +6,8 @@ export type ProjectStatus = "Active" | "Completed" | "Paused";
 
 export type TaskStatus = "Todo" | "Done";
 
+export type PlanningIntensity = "light" | "balanced" | "intense";
+
 export type User = {
     id: string;
     name: string;
@@ -31,6 +33,7 @@ export type Task = {
     priority: PriorityLevel;
     time: string;
     status: TaskStatus;
+    dueDate: string;
 };
 
 export type Milestone = {

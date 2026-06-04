@@ -80,6 +80,7 @@ export const tasks: Task[] = [
         priority: "High",
         time: "45 min",
         status: "Todo",
+        dueDate: "2026-06-05",
     },
     {
         id: "draft-success-criteria",
@@ -88,6 +89,7 @@ export const tasks: Task[] = [
         priority: "Medium",
         time: "30 min",
         status: "Todo",
+        dueDate: "2026-06-06",
     },
     {
         id: "annotate-tok-example",
@@ -96,6 +98,7 @@ export const tasks: Task[] = [
         priority: "Medium",
         time: "25 min",
         status: "Todo",
+        dueDate: "2026-06-07",
     },
     {
         id: "review-supervisor-feedback",
@@ -104,5 +107,6 @@ export const tasks: Task[] = [
         priority: "Low",
         time: "20 min",
         status: "Todo",
+        dueDate: "2026-06-08",
     },
 ];
