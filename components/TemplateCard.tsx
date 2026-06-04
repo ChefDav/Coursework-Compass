@@ -15,9 +15,12 @@ export default function TemplateCard({ template }: TemplateCardProps) {
                 {template.description}
             </p>
 
-            <button className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-bold hover:border-cyan-400 hover:text-cyan-300">
+            <a
+                href={`/projects/new?template=${template.id}`}
+                className="inline-block rounded-xl border border-slate-700 px-4 py-3 text-sm font-bold hover:border-cyan-400 hover:text-cyan-300"
+            >
                 Use template
-            </button>
+            </a>
         </div>
     );
 }

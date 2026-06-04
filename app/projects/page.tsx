@@ -22,9 +22,12 @@ export default function ProjectsPage() {
                         </p>
                     </div>
 
-                    <button className="rounded-2xl bg-cyan-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-cyan-300">
+                    <a
+                        href="/projects/new"
+                        className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
+                    >
                         New Project
-                    </button>
+                    </a>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-3">
