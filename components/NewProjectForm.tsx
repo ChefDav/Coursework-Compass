@@ -2,8 +2,15 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import TaskCard from "@/components/TaskCard";
 import { projectTemplates } from "@/lib/mockData";
-import type { Project, RiskLevel } from "@/types/coursework";
+import { generateTasksForProject } from "@/lib/taskGenerator";
+import type {
+    PlanningIntensity,
+    Project,
+    RiskLevel,
+    Task,
+} from "@/types/coursework";
 
 function createProjectId(title: string) {
     return title
@@ -74,10 +81,12 @@ export default function NewProjectForm() {
     const [selectedTemplateId, setSelectedTemplateId] =
         useState(templateFromUrl);
     const [deadline, setDeadline] = useState("");
-    const [intensity, setIntensity] = useState("balanced");
+    const [intensity, setIntensity] =
+        useState<PlanningIntensity>("balanced");
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [previewProject, setPreviewProject] = useState<Project | null>(null);
+    const [generatedTasks, setGeneratedTasks] = useState<Task[]>([]);
 
     useEffect(() => {
         setSelectedTemplateId(templateFromUrl);
@@ -91,6 +100,7 @@ export default function NewProjectForm() {
         setErrorMessage("");
         setSuccessMessage("");
         setPreviewProject(null);
+        setGeneratedTasks([]);
 
         if (!projectTitle.trim()) {
             setErrorMessage("Please enter a project name.");
@@ -115,6 +125,7 @@ export default function NewProjectForm() {
         }
 
         const cleanDeadline = deadline.trim();
+        const normalizedDeadline = normalizeDeadline(cleanDeadline);
         const daysLeft = calculateDaysLeft(cleanDeadline);
         const risk = calculateRisk(daysLeft);
 
@@ -125,17 +136,26 @@ export default function NewProjectForm() {
             progress: 0,
             daysLeft,
             risk,
-            deadline: normalizeDeadline(cleanDeadline),
+            deadline: normalizedDeadline,
             status: "Active",
         };
 
+        const taskPlan = generateTasksForProject({
+            projectTitle: newProject.title,
+            templateId: selectedTemplateId,
+            deadline: normalizedDeadline,
+            intensity,
+        });
+
         setPreviewProject(newProject);
+        setGeneratedTasks(taskPlan);
         setSuccessMessage(
-            `Project preview created. Next mission will generate tasks for ${newProject.title}.`,
+            `Project preview created with ${taskPlan.length} generated tasks.`,
         );
 
         console.log({
             project: newProject,
+            tasks: taskPlan,
             intensity,
         });
     }
@@ -255,7 +275,9 @@ export default function NewProjectForm() {
                         id="intensity"
                         name="intensity"
                         value={intensity}
-                        onChange={(event) => setIntensity(event.target.value)}
+                        onChange={(event) =>
+                            setIntensity(event.target.value as PlanningIntensity)
+                        }
                         className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-4 text-white outline-none transition focus:border-cyan-400"
                     >
                         <option value="light">Light: fewer tasks per week</option>
@@ -266,11 +288,11 @@ export default function NewProjectForm() {
 
                 <div className="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 p-5">
                     <p className="mb-2 text-sm font-bold text-cyan-300">
-                        Coming next
+                        Generation engine online
                     </p>
                     <p className="text-sm leading-6 text-slate-300">
-                        Soon, Coursework Compass will turn this project preview into a real
-                        generated task plan.
+                        Coursework Compass can now generate a first task plan from your
+                        chosen template, deadline, and planning intensity.
                     </p>
                 </div>
 
@@ -341,6 +363,29 @@ export default function NewProjectForm() {
                                     {previewProject.deadline}
                                 </p>
                             </div>
+                        </div>
+                    </div>
+                ) : null}
+
+                {generatedTasks.length > 0 ? (
+                    <div className="mt-8 rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-6">
+                        <div className="mb-6">
+                            <p className="mb-2 text-sm font-bold text-cyan-300">
+                                Generated task plan
+                            </p>
+                            <h2 className="text-2xl font-black">
+                                {generatedTasks.length} tasks created
+                            </h2>
+                            <p className="mt-2 text-sm leading-6 text-slate-300">
+                                This is the first automatically generated plan for your
+                                coursework. Later, these tasks will be saved and tracked.
+                            </p>
+                        </div>
+
+                        <div className="space-y-4">
+                            {generatedTasks.map((task) => (
+                                <TaskCard key={task.id} task={task} />
+                            ))}
                         </div>
                     </div>
                 ) : null}
