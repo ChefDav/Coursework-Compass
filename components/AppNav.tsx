@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import FeedbackLink from "@/components/FeedbackLink";
 
 const navItems = [
     {
@@ -46,6 +47,8 @@ export default function AppNav() {
                         </Link>
                     );
                 })}
+
+                <FeedbackLink />
             </div>
         </nav>
     );

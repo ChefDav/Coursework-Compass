@@ -1,3 +1,5 @@
+import FeedbackLink from "@/components/FeedbackLink";
+
 export default function HomePage() {
   return (
       <main className="min-h-screen bg-slate-950 text-white">
@@ -26,6 +28,7 @@ export default function HomePage() {
               >
                 Today
               </a>
+              <FeedbackLink />
             </div>
           </nav>
 
