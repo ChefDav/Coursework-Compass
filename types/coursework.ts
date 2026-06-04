@@ -49,3 +49,10 @@ export type ProjectTemplate = {
     name: string;
     description: string;
 };
+
+export type GeneratedProjectPlan = {
+    project: Project;
+    tasks: Task[];
+    intensity: PlanningIntensity;
+    createdAt: string;
+};

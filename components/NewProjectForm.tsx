@@ -11,8 +11,10 @@ import {
     isValidDeadlineFormat,
     normalizeDeadline,
 } from "@/lib/projectUtils";
+import { saveProjectPlan } from "@/lib/localStorage";
 import { generateTasksForProject } from "@/lib/taskGenerator";
 import type {
+    GeneratedProjectPlan,
     PlanningIntensity,
     Project,
     Task,
@@ -32,6 +34,7 @@ export default function NewProjectForm() {
     const [successMessage, setSuccessMessage] = useState("");
     const [previewProject, setPreviewProject] = useState<Project | null>(null);
     const [generatedTasks, setGeneratedTasks] = useState<Task[]>([]);
+    const [isSaved, setIsSaved] = useState(false);
 
     useEffect(() => {
         setSelectedTemplateId(templateFromUrl);
@@ -46,6 +49,7 @@ export default function NewProjectForm() {
         setSuccessMessage("");
         setPreviewProject(null);
         setGeneratedTasks([]);
+        setIsSaved(false);
 
         if (!projectTitle.trim()) {
             setErrorMessage("Please enter a project name.");
@@ -97,12 +101,28 @@ export default function NewProjectForm() {
         setSuccessMessage(
             `Project preview created with ${taskPlan.length} generated tasks.`,
         );
+    }
 
-        console.log({
-            project: newProject,
-            tasks: taskPlan,
+    function handleSaveProjectLocally() {
+        setErrorMessage("");
+
+        if (!previewProject || generatedTasks.length === 0) {
+            setErrorMessage("Please generate a project plan before saving.");
+            return;
+        }
+
+        const plan: GeneratedProjectPlan = {
+            project: previewProject,
+            tasks: generatedTasks,
             intensity,
-        });
+            createdAt: new Date().toISOString(),
+        };
+
+        saveProjectPlan(plan);
+        setIsSaved(true);
+        setSuccessMessage(
+            `${previewProject.title} has been saved locally in this browser.`,
+        );
     }
 
     return (
@@ -236,8 +256,8 @@ export default function NewProjectForm() {
                         Generation engine online
                     </p>
                     <p className="text-sm leading-6 text-slate-300">
-                        Coursework Compass can now generate a first task plan from your
-                        chosen template, deadline, and planning intensity.
+                        Coursework Compass can now generate and locally save a first task
+                        plan from your chosen template, deadline, and planning intensity.
                     </p>
                 </div>
 
@@ -323,8 +343,25 @@ export default function NewProjectForm() {
                             </h2>
                             <p className="mt-2 text-sm leading-6 text-slate-300">
                                 This is the first automatically generated plan for your
-                                coursework. Later, these tasks will be saved and tracked.
+                                coursework. Save it locally to keep it in this browser.
                             </p>
+                        </div>
+
+                        <div className="mb-6 flex flex-col gap-4 sm:flex-row">
+                            <button
+                                type="button"
+                                onClick={handleSaveProjectLocally}
+                                className="rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
+                            >
+                                {isSaved ? "Saved Locally" : "Save Project Locally"}
+                            </button>
+
+                            <a
+                                href="/dashboard"
+                                className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
+                            >
+                                Go to Dashboard
+                            </a>
                         </div>
 
                         <div className="space-y-4">
