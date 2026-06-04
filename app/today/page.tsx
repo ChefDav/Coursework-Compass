@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import AppNav from "@/components/AppNav";
 import TaskCard from "@/components/TaskCard";
-import { loadProjectPlans } from "@/lib/localStorage";
+import { loadProjectPlans, updateTaskStatus } from "@/lib/localStorage";
 import { tasks } from "@/lib/mockData";
-import type { GeneratedProjectPlan } from "@/types/coursework";
+import type { GeneratedProjectPlan, Task } from "@/types/coursework";
 
 export default function TodayPage() {
     const [savedPlans, setSavedPlans] = useState<GeneratedProjectPlan[]>([]);
+    const [mockTasks, setMockTasks] = useState<Task[]>(tasks);
 
     useEffect(() => {
         const plans = loadProjectPlans();
@@ -22,20 +23,41 @@ export default function TodayPage() {
     const allTasks = useMemo(() => {
         const savedTaskIds = new Set(savedTasks.map((task) => task.id));
 
-        const mockTasksWithoutDuplicates = tasks.filter(
+        const mockTasksWithoutDuplicates = mockTasks.filter(
             (task) => !savedTaskIds.has(task.id),
         );
 
         return [...savedTasks, ...mockTasksWithoutDuplicates];
-    }, [savedTasks]);
+    }, [mockTasks, savedTasks]);
 
-    const highPriorityTaskCount = allTasks.filter(
+    const todoTasks = allTasks.filter((task) => task.status === "Todo");
+    const doneTasks = allTasks.filter((task) => task.status === "Done");
+
+    const highPriorityTaskCount = todoTasks.filter(
         (task) => task.priority === "High",
     ).length;
 
-    const firstHighPriorityTask = allTasks.find(
+    const firstHighPriorityTask = todoTasks.find(
         (task) => task.priority === "High",
     );
+
+    function handleMarkTaskDone(taskId: string) {
+        setMockTasks((currentTasks) =>
+            currentTasks.map((task) => {
+                if (task.id !== taskId) {
+                    return task;
+                }
+
+                return {
+                    ...task,
+                    status: "Done",
+                };
+            }),
+        );
+
+        const updatedPlans = updateTaskStatus(taskId, "Done");
+        setSavedPlans(updatedPlans);
+    }
 
     return (
         <main className="min-h-screen bg-slate-950 text-white">
@@ -55,19 +77,26 @@ export default function TodayPage() {
                     </p>
                 </div>
 
-                <div className="mb-8 grid gap-6 md:grid-cols-3">
+                <div className="mb-8 grid gap-6 md:grid-cols-4">
                     <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
                         <p className="text-sm text-slate-400">Tasks available</p>
                         <p className="mt-2 text-4xl font-black">{allTasks.length}</p>
                     </div>
 
                     <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
-                        <p className="text-sm text-slate-400">Saved plans</p>
-                        <p className="mt-2 text-4xl font-black">{savedPlans.length}</p>
+                        <p className="text-sm text-slate-400">Todo</p>
+                        <p className="mt-2 text-4xl font-black">{todoTasks.length}</p>
+                    </div>
+
+                    <div className="rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-6">
+                        <p className="text-sm text-emerald-200">Done</p>
+                        <p className="mt-2 text-4xl font-black text-emerald-200">
+                            {doneTasks.length}
+                        </p>
                     </div>
 
                     <div className="rounded-3xl border border-red-400/30 bg-red-400/10 p-6">
-                        <p className="text-sm text-red-200">High priority tasks</p>
+                        <p className="text-sm text-red-200">High priority</p>
                         <p className="mt-2 text-4xl font-black text-red-200">
                             {highPriorityTaskCount}
                         </p>
@@ -84,8 +113,8 @@ export default function TodayPage() {
                             {savedTasks.length === 1 ? "" : "s"} found in this browser.
                         </h2>
                         <p className="mt-2 text-sm leading-6 text-slate-300">
-                            These tasks came from your locally saved project plans. Later,
-                            they will sync through user accounts.
+                            Click Mark done to update task status. Local generated tasks will
+                            stay completed after refresh.
                         </p>
                     </div>
                 ) : null}
@@ -93,7 +122,11 @@ export default function TodayPage() {
                 <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
                     <div className="space-y-4">
                         {allTasks.map((task) => (
-                            <TaskCard key={task.id} task={task} />
+                            <TaskCard
+                                key={task.id}
+                                task={task}
+                                onMarkDone={handleMarkTaskDone}
+                            />
                         ))}
                     </div>
 

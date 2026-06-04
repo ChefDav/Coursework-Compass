@@ -1,4 +1,4 @@
-import type { GeneratedProjectPlan } from "@/types/coursework";
+import type { GeneratedProjectPlan, TaskStatus } from "@/types/coursework";
 
 const PROJECT_PLANS_KEY = "coursework-compass-project-plans";
 
@@ -20,6 +20,16 @@ export function loadProjectPlans(): GeneratedProjectPlan[] {
     }
 }
 
+export function saveProjectPlans(plans: GeneratedProjectPlan[]) {
+    if (typeof window === "undefined") {
+        return [];
+    }
+
+    window.localStorage.setItem(PROJECT_PLANS_KEY, JSON.stringify(plans));
+
+    return plans;
+}
+
 export function saveProjectPlan(plan: GeneratedProjectPlan) {
     const existingPlans = loadProjectPlans();
 
@@ -29,7 +39,33 @@ export function saveProjectPlan(plan: GeneratedProjectPlan) {
 
     const updatedPlans = [plan, ...plansWithoutDuplicate];
 
-    window.localStorage.setItem(PROJECT_PLANS_KEY, JSON.stringify(updatedPlans));
+    saveProjectPlans(updatedPlans);
+
+    return updatedPlans;
+}
+
+export function updateTaskStatus(taskId: string, status: TaskStatus) {
+    const existingPlans = loadProjectPlans();
+
+    const updatedPlans = existingPlans.map((plan) => {
+        const updatedTasks = plan.tasks.map((task) => {
+            if (task.id !== taskId) {
+                return task;
+            }
+
+            return {
+                ...task,
+                status,
+            };
+        });
+
+        return {
+            ...plan,
+            tasks: updatedTasks,
+        };
+    });
+
+    saveProjectPlans(updatedPlans);
 
     return updatedPlans;
 }
