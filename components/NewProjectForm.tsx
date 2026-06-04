@@ -13,9 +13,40 @@ function createProjectId(title: string) {
         .replace(/(^-|-$)/g, "");
 }
 
+function isValidDeadlineFormat(deadline: string) {
+    const deadlinePattern = /^(\d{4})\/(\d{2})\/(\d{2})$/;
+    const match = deadline.match(deadlinePattern);
+
+    if (!match) {
+        return false;
+    }
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+
+    if (year < 2026) {
+        return false;
+    }
+
+    const date = new Date(year, month - 1, day);
+
+    const isRealDate =
+        date.getFullYear() === year &&
+        date.getMonth() === month - 1 &&
+        date.getDate() === day;
+
+    return isRealDate;
+}
+
+function normalizeDeadline(deadline: string) {
+    return deadline.replaceAll("/", "-");
+}
+
 function calculateDaysLeft(deadline: string) {
+    const normalizedDeadline = normalizeDeadline(deadline);
     const today = new Date();
-    const deadlineDate = new Date(`${deadline}T23:59:59`);
+    const deadlineDate = new Date(`${normalizedDeadline}T23:59:59`);
 
     const differenceInMilliseconds = deadlineDate.getTime() - today.getTime();
     const daysLeft = Math.ceil(differenceInMilliseconds / (1000 * 60 * 60 * 24));
@@ -71,12 +102,20 @@ export default function NewProjectForm() {
             return;
         }
 
-        if (!deadline) {
-            setErrorMessage("Please choose a deadline.");
+        if (!deadline.trim()) {
+            setErrorMessage("Please enter a deadline.");
             return;
         }
 
-        const daysLeft = calculateDaysLeft(deadline);
+        if (!isValidDeadlineFormat(deadline.trim())) {
+            setErrorMessage(
+                "Please enter a valid deadline in yyyy/mm/dd format. The year must be 2026 or later.",
+            );
+            return;
+        }
+
+        const cleanDeadline = deadline.trim();
+        const daysLeft = calculateDaysLeft(cleanDeadline);
         const risk = calculateRisk(daysLeft);
 
         const newProject: Project = {
@@ -86,7 +125,7 @@ export default function NewProjectForm() {
             progress: 0,
             daysLeft,
             risk,
-            deadline,
+            deadline: normalizeDeadline(cleanDeadline),
             status: "Active",
         };
 
@@ -193,11 +232,16 @@ export default function NewProjectForm() {
                     <input
                         id="deadline"
                         name="deadline"
-                        type="date"
+                        type="text"
                         value={deadline}
                         onChange={(event) => setDeadline(event.target.value)}
-                        className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-4 text-white outline-none transition focus:border-cyan-400"
+                        placeholder="yyyy/mm/dd"
+                        inputMode="numeric"
+                        className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-4 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400"
                     />
+                    <p className="mt-2 text-xs text-slate-500">
+                        Use yyyy/mm/dd format. Example: 2026/07/10.
+                    </p>
                 </div>
 
                 <div>
