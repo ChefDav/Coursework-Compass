@@ -11,44 +11,48 @@ export default function TaskCard({ task, onMarkDone }: TaskCardProps) {
 
     return (
         <div
-            className={`rounded-3xl border p-6 ${
+            className={`rounded-3xl border p-5 sm:p-6 ${
                 isDone
                     ? "border-emerald-400/30 bg-emerald-400/10"
                     : "border-slate-800 bg-slate-900"
             }`}
         >
-            <div className="mb-4 flex items-start justify-between gap-4">
-                <div>
+            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
                     <h2
-                        className={`text-xl font-bold ${
+                        className={`break-words text-xl font-bold leading-tight ${
                             isDone ? "text-emerald-200 line-through" : "text-white"
                         }`}
                     >
                         {task.title}
                     </h2>
-                    <p className="mt-1 text-sm text-slate-400">{task.project}</p>
+                    <p className="mt-1 break-words text-sm text-slate-400">
+                        {task.project}
+                    </p>
                 </div>
 
-                {isDone ? (
-                    <span className="rounded-full bg-emerald-400/10 px-4 py-2 text-sm font-bold text-emerald-300">
-            Done
-          </span>
-                ) : (
-                    <RiskBadge level={task.priority} />
-                )}
+                <div className="shrink-0">
+                    {isDone ? (
+                        <span className="rounded-full bg-emerald-400/10 px-4 py-2 text-sm font-bold text-emerald-300">
+              Done
+            </span>
+                    ) : (
+                        <RiskBadge level={task.priority} />
+                    )}
+                </div>
             </div>
 
-            <div className="flex flex-col gap-3 text-sm text-slate-300 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 text-sm text-slate-300 sm:flex-row sm:items-end sm:justify-between">
                 <div className="space-y-1">
                     <p>Estimated time: {task.time}</p>
-                    <p>Due date: {task.dueDate}</p>
+                    <p>Due date: {task.dueDate || "Not scheduled"}</p>
                 </div>
 
                 <button
                     type="button"
                     onClick={() => onMarkDone?.(task.id)}
                     disabled={isDone}
-                    className={`rounded-xl px-4 py-2 font-bold ${
+                    className={`w-full rounded-xl px-4 py-3 font-bold sm:w-auto ${
                         isDone
                             ? "cursor-not-allowed bg-emerald-400/20 text-emerald-200"
                             : "bg-cyan-400 text-slate-950 hover:bg-cyan-300"

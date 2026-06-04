@@ -60,13 +60,13 @@ export default function CompletionWatcher() {
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-6 backdrop-blur-sm">
-            <div className="w-full max-w-xl rounded-3xl border border-cyan-400/30 bg-slate-900 p-6 text-white shadow-2xl shadow-cyan-950/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/80 px-4 py-6 backdrop-blur-sm sm:px-6">
+            <div className="w-full max-w-xl rounded-3xl border border-cyan-400/30 bg-slate-900 p-5 text-white shadow-2xl shadow-cyan-950/50 sm:p-6">
                 <div className="mb-6">
                     <p className="mb-2 text-sm font-bold text-cyan-300">
                         Project completed
                     </p>
-                    <h2 className="text-3xl font-black">
+                    <h2 className="break-words text-3xl font-black leading-tight">
                         You finished {completedPlan.project.title}! 🎉
                     </h2>
                     <p className="mt-4 text-sm leading-6 text-slate-300">
@@ -77,7 +77,7 @@ export default function CompletionWatcher() {
 
                 <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-950 p-5">
                     <p className="text-sm text-slate-400">Completed project</p>
-                    <p className="mt-2 text-xl font-bold">
+                    <p className="mt-2 break-words text-xl font-bold">
                         {completedPlan.project.title}
                     </p>
                     <p className="mt-1 text-sm text-slate-400">
