@@ -5,7 +5,11 @@ import AppNav from "@/components/AppNav";
 import TaskCard from "@/components/TaskCard";
 import { loadProjectPlans, updateTaskStatus } from "@/lib/localStorage";
 import { tasks } from "@/lib/mockData";
-import type { GeneratedProjectPlan, Task } from "@/types/coursework";
+import type {
+    GeneratedProjectPlan,
+    Task,
+    TaskStatus,
+} from "@/types/coursework";
 
 export default function TodayPage() {
     const [savedPlans, setSavedPlans] = useState<GeneratedProjectPlan[]>([]);
@@ -51,7 +55,7 @@ export default function TodayPage() {
 
     const firstTodoTask = todoTasks[0];
 
-    function handleMarkTaskDone(taskId: string) {
+    function handleChangeTaskStatus(taskId: string, nextStatus: TaskStatus) {
         setMockTasks((currentTasks) =>
             currentTasks.map((task) => {
                 if (task.id !== taskId) {
@@ -60,12 +64,12 @@ export default function TodayPage() {
 
                 return {
                     ...task,
-                    status: "Done",
+                    status: nextStatus,
                 };
             }),
         );
 
-        const updatedPlans = updateTaskStatus(taskId, "Done");
+        const updatedPlans = updateTaskStatus(taskId, nextStatus);
         setSavedPlans(updatedPlans);
     }
 
@@ -203,7 +207,7 @@ export default function TodayPage() {
                                 <TaskCard
                                     key={task.id}
                                     task={task}
-                                    onMarkDone={handleMarkTaskDone}
+                                    onChangeStatus={handleChangeTaskStatus}
                                 />
                             ))
                         ) : (

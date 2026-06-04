@@ -7,7 +7,10 @@ import ProjectCard from "@/components/ProjectCard";
 import TaskCard from "@/components/TaskCard";
 import { loadProjectPlans, updateTaskStatus } from "@/lib/localStorage";
 import { applyProgressToProject, countDoneTasks } from "@/lib/progressUtils";
-import type { GeneratedProjectPlan } from "@/types/coursework";
+import type {
+    GeneratedProjectPlan,
+    TaskStatus,
+} from "@/types/coursework";
 
 export default function ProjectDetailPage() {
     const params = useParams<{ projectId: string }>();
@@ -30,8 +33,8 @@ export default function ProjectDetailPage() {
     const todoTaskCount = tasks.filter((task) => task.status === "Todo").length;
     const archivedTaskCount = currentPlan?.archivedTaskCount ?? 0;
 
-    function handleMarkTaskDone(taskId: string) {
-        const updatedPlans = updateTaskStatus(taskId, "Done");
+    function handleChangeTaskStatus(taskId: string, nextStatus: TaskStatus) {
+        const updatedPlans = updateTaskStatus(taskId, nextStatus);
         setSavedPlans(updatedPlans);
     }
 
@@ -190,7 +193,7 @@ export default function ProjectDetailPage() {
                                 <TaskCard
                                     key={task.id}
                                     task={task}
-                                    onMarkDone={handleMarkTaskDone}
+                                    onChangeStatus={handleChangeTaskStatus}
                                 />
                             ))}
                         </div>

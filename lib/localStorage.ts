@@ -246,16 +246,48 @@ export function updateTaskStatus(taskId: string, status: TaskStatus) {
     const existingPlans = loadProjectPlans();
 
     const updatedPlans = existingPlans.map((plan) => {
+        let changedTaskBelongsToThisPlan = false;
+
         const updatedTasks = plan.tasks.map((task) => {
             if (task.id !== taskId) {
                 return task;
             }
+
+            changedTaskBelongsToThisPlan = true;
 
             return {
                 ...task,
                 status,
             };
         });
+
+        if (!changedTaskBelongsToThisPlan) {
+            return plan;
+        }
+
+        const allTasksDone =
+            updatedTasks.length > 0 &&
+            updatedTasks.every((task) => task.status === "Done");
+
+        if (status === "Todo") {
+            return {
+                ...plan,
+                tasks: updatedTasks,
+                completedAt: undefined,
+                completionPromptShown: false,
+                project: {
+                    ...plan.project,
+                    status: "Active",
+                },
+            } satisfies GeneratedProjectPlan;
+        }
+
+        if (allTasksDone) {
+            return {
+                ...plan,
+                tasks: updatedTasks,
+            };
+        }
 
         return {
             ...plan,

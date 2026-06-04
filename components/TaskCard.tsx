@@ -1,13 +1,14 @@
 import RiskBadge from "@/components/RiskBadge";
-import type { Task } from "@/types/coursework";
+import type { Task, TaskStatus } from "@/types/coursework";
 
 type TaskCardProps = {
     task: Task;
-    onMarkDone?: (taskId: string) => void;
+    onChangeStatus?: (taskId: string, nextStatus: TaskStatus) => void;
 };
 
-export default function TaskCard({ task, onMarkDone }: TaskCardProps) {
+export default function TaskCard({ task, onChangeStatus }: TaskCardProps) {
     const isDone = task.status === "Done";
+    const nextStatus: TaskStatus = isDone ? "Todo" : "Done";
 
     return (
         <div
@@ -50,15 +51,14 @@ export default function TaskCard({ task, onMarkDone }: TaskCardProps) {
 
                 <button
                     type="button"
-                    onClick={() => onMarkDone?.(task.id)}
-                    disabled={isDone}
-                    className={`w-full rounded-xl px-4 py-3 font-bold sm:w-auto ${
+                    onClick={() => onChangeStatus?.(task.id, nextStatus)}
+                    className={`w-full rounded-xl px-4 py-3 font-bold transition sm:w-auto ${
                         isDone
-                            ? "cursor-not-allowed bg-emerald-400/20 text-emerald-200"
+                            ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-200 hover:bg-emerald-400/20"
                             : "bg-cyan-400 text-slate-950 hover:bg-cyan-300"
                     }`}
                 >
-                    {isDone ? "Done" : "Mark done"}
+                    {isDone ? "Mark as todo" : "Mark done"}
                 </button>
             </div>
         </div>
