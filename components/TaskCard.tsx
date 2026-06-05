@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import CalendarDateField from "@/components/CalendarDateField";
+import EstimatedTimeField, {
+    normaliseEstimatedTime,
+} from "@/components/EstimatedTimeField";
 import FancySelect from "@/components/FancySelect";
 import RiskBadge from "@/components/RiskBadge";
 import type { PriorityLevel, Task, TaskStatus } from "@/types/coursework";
@@ -62,7 +65,7 @@ export default function TaskCard({
         setEditTitle(task.title);
         setEditPriority(task.priority);
         setEditDueDate(task.dueDate ?? "");
-        setEditTime(task.time);
+        setEditTime(normaliseEstimatedTime(task.time));
     }, [isEditing, task]);
 
     if (!task) {
@@ -84,7 +87,7 @@ export default function TaskCard({
         setEditTitle(task.title);
         setEditPriority(task.priority);
         setEditDueDate(task.dueDate ?? "");
-        setEditTime(task.time);
+        setEditTime(normaliseEstimatedTime(task.time));
         setEditError("");
         setEditMessage("");
         setIsEditing(true);
@@ -98,7 +101,7 @@ export default function TaskCard({
         setEditTitle(task.title);
         setEditPriority(task.priority);
         setEditDueDate(task.dueDate ?? "");
-        setEditTime(task.time);
+        setEditTime(normaliseEstimatedTime(task.time));
         setEditError("");
         setEditMessage("");
         setIsEditing(false);
@@ -120,7 +123,7 @@ export default function TaskCard({
             title: trimmedTitle,
             priority: editPriority,
             dueDate: editDueDate,
-            time: editTime.trim() || "45 min",
+            time: normaliseEstimatedTime(editTime),
         });
 
         setEditMessage("Task updated.");
@@ -188,25 +191,16 @@ export default function TaskCard({
                         helperText="Optional. Use the calendar or double-click to type manually."
                     />
 
-                    <div>
-                        <label className="mb-2 block text-sm font-bold text-white">
-                            Estimated time
-                        </label>
-                        <input
-                            type="text"
-                            value={editTime}
-                            onChange={(event) => {
-                                setEditTime(event.target.value);
-                                setEditError("");
-                                setEditMessage("");
-                            }}
-                            placeholder="45 min"
-                            className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-lg focus:shadow-cyan-950/40"
-                        />
-                        <p className="mt-2 text-xs leading-5 text-slate-400">
-                            Examples: 30 min, 45 min, 1 hour, 2 hours.
-                        </p>
-                    </div>
+                    <EstimatedTimeField
+                        label="Estimated time"
+                        value={editTime}
+                        onChange={(nextValue) => {
+                            setEditTime(nextValue);
+                            setEditError("");
+                            setEditMessage("");
+                        }}
+                        helperText="Choose a number and unit. 60 min becomes 1 hour, 24 hours becomes 1 day."
+                    />
                 </div>
 
                 {editError ? (
@@ -277,7 +271,7 @@ export default function TaskCard({
 
             <div className="flex flex-col gap-4 text-sm text-slate-300 sm:flex-row sm:items-end sm:justify-between">
                 <div className="space-y-1">
-                    <p>Estimated time: {task.time}</p>
+                    <p>Estimated time: {normaliseEstimatedTime(task.time)}</p>
                     <p>Due date: {task.dueDate || "Not scheduled"}</p>
                 </div>
 

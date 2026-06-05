@@ -13,6 +13,104 @@ function notifyProjectPlanUpdates() {
     window.dispatchEvent(new Event(PROJECT_PLANS_UPDATED_EVENT));
 }
 
+function formatNumber(value: number) {
+    if (Number.isInteger(value)) {
+        return String(value);
+    }
+
+    return String(Number(value.toFixed(2)));
+}
+
+function formatEstimatedTimeFromMinutes(totalMinutes: number) {
+    if (!Number.isFinite(totalMinutes) || totalMinutes <= 0) {
+        return "45 min";
+    }
+
+    if (totalMinutes < 60) {
+        return `${formatNumber(totalMinutes)} min`;
+    }
+
+    if (totalMinutes < 24 * 60) {
+        const hours = totalMinutes / 60;
+        const unit = hours === 1 ? "hour" : "hours";
+
+        return `${formatNumber(hours)} ${unit}`;
+    }
+
+    const days = totalMinutes / (24 * 60);
+    const unit = days === 1 ? "day" : "days";
+
+    return `${formatNumber(days)} ${unit}`;
+}
+
+function parseEstimatedTime(value: string) {
+    const cleanedValue = value.trim().toLowerCase();
+
+    if (!cleanedValue) {
+        return {
+            amount: "45",
+            unit: "minutes",
+        };
+    }
+
+    const numberMatch = cleanedValue.match(/(\d+(\.\d+)?)/);
+    const amount = numberMatch?.[1] ?? "45";
+
+    if (
+        cleanedValue.includes("day") ||
+        cleanedValue.includes("days") ||
+        cleanedValue.includes("d")
+    ) {
+        return {
+            amount,
+            unit: "days",
+        };
+    }
+
+    if (
+        cleanedValue.includes("hour") ||
+        cleanedValue.includes("hours") ||
+        cleanedValue.includes("hr") ||
+        cleanedValue.includes("hrs") ||
+        cleanedValue.includes("h")
+    ) {
+        return {
+            amount,
+            unit: "hours",
+        };
+    }
+
+    return {
+        amount,
+        unit: "minutes",
+    };
+}
+
+function convertEstimatedTimeToMinutes(amount: number, unit: string) {
+    if (unit === "minutes") {
+        return amount;
+    }
+
+    if (unit === "hours") {
+        return amount * 60;
+    }
+
+    return amount * 24 * 60;
+}
+
+function normaliseStoredEstimatedTime(value: string) {
+    const parsedValue = parseEstimatedTime(value);
+    const amount = Number(parsedValue.amount);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        return "45 min";
+    }
+
+    return formatEstimatedTimeFromMinutes(
+        convertEstimatedTimeToMinutes(amount, parsedValue.unit),
+    );
+}
+
 export function loadProjectPlans(): GeneratedProjectPlan[] {
     if (typeof window === "undefined") {
         return [];
@@ -210,7 +308,7 @@ export function addCustomTask(
 ) {
     const existingPlans = loadProjectPlans();
     const trimmedTitle = taskInput.title.trim();
-    const trimmedTime = taskInput.time.trim() || "45 min";
+    const trimmedTime = normaliseStoredEstimatedTime(taskInput.time);
 
     if (!trimmedTitle) {
         return existingPlans;
@@ -270,7 +368,7 @@ export function updateTaskDetails(
 ) {
     const existingPlans = loadProjectPlans();
     const trimmedTitle = updates.title.trim();
-    const trimmedTime = updates.time.trim() || "45 min";
+    const trimmedTime = normaliseStoredEstimatedTime(updates.time);
 
     if (!trimmedTitle) {
         return existingPlans;
@@ -373,7 +471,11 @@ export function findCompletedPlanWaitingForPrompt() {
             const allTasksDone =
                 hasVisibleTasks && plan.tasks.every((task) => task.status === "Done");
 
-            return allTasksDone && !plan.completionPromptShown && !plan.tasksArchivedAt;
+            return (
+                allTasksDone &&
+                !plan.completionPromptShown &&
+                !plan.tasksArchivedAt
+            );
         }) ?? null
     );
 }

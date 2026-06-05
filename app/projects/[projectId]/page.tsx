@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import AppNav from "@/components/AppNav";
 import CalendarDateField from "@/components/CalendarDateField";
+import EstimatedTimeField, {
+    normaliseEstimatedTime,
+} from "@/components/EstimatedTimeField";
 import FancySelect from "@/components/FancySelect";
 import ProjectCard from "@/components/ProjectCard";
 import TaskCard from "@/components/TaskCard";
@@ -228,7 +231,7 @@ export default function ProjectDetailPage() {
             title: trimmedTitle,
             priority: newTaskPriority,
             dueDate: newTaskDueDate,
-            time: newTaskTime,
+            time: normaliseEstimatedTime(newTaskTime),
         });
 
         setSavedPlans(updatedPlans);
@@ -513,25 +516,16 @@ export default function ProjectDetailPage() {
                             helperText="Optional. Leave blank if this task is not scheduled yet."
                         />
 
-                        <div>
-                            <label className="mb-2 block text-sm font-bold text-white">
-                                Estimated time
-                            </label>
-                            <input
-                                type="text"
-                                value={newTaskTime}
-                                onChange={(event) => {
-                                    setNewTaskTime(event.target.value);
-                                    setNewTaskError("");
-                                    setNewTaskMessage("");
-                                }}
-                                placeholder="45 min"
-                                className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-300 focus:shadow-lg focus:shadow-emerald-950/40"
-                            />
-                            <p className="mt-2 text-xs leading-5 text-slate-400">
-                                Examples: 30 min, 45 min, 1 hour, 2 hours.
-                            </p>
-                        </div>
+                        <EstimatedTimeField
+                            label="Estimated time"
+                            value={newTaskTime}
+                            onChange={(nextValue) => {
+                                setNewTaskTime(nextValue);
+                                setNewTaskError("");
+                                setNewTaskMessage("");
+                            }}
+                            helperText="Choose a number and unit. 60 min becomes 1 hour, 24 hours becomes 1 day."
+                        />
                     </div>
 
                     {newTaskError ? (
