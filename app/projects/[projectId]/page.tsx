@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import AppNav from "@/components/AppNav";
+import CalendarDateField from "@/components/CalendarDateField";
 import ProjectCard from "@/components/ProjectCard";
 import TaskCard from "@/components/TaskCard";
 import {
@@ -349,26 +350,16 @@ export default function ProjectDetailPage() {
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
-                        <div>
-                            <label className="mb-2 block text-sm font-bold text-white">
-                                Deadline
-                            </label>
-                            <input
-                                type="text"
-                                value={editDeadline}
-                                onChange={(event) => {
-                                    setEditDeadline(event.target.value);
-                                    setDeadlineError("");
-                                    setDeadlineMessage("");
-                                }}
-                                placeholder="yyyy/mm/dd"
-                                className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-lg focus:shadow-cyan-950/40"
-                            />
-                            <p className="mt-2 text-xs leading-5 text-slate-400">
-                                Use yyyy/mm/dd. If an older project shows yyyy-mm-dd, it will be
-                                converted automatically.
-                            </p>
-                        </div>
+                        <CalendarDateField
+                            label="Deadline"
+                            value={editDeadline}
+                            onChange={(nextValue) => {
+                                setEditDeadline(nextValue);
+                                setDeadlineError("");
+                                setDeadlineMessage("");
+                            }}
+                            helperText="Click to choose from the calendar. Double-click to type manually."
+                        />
 
                         <button
                             type="button"

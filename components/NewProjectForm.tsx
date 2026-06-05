@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import CalendarDateField from "@/components/CalendarDateField";
 import FancySelect from "@/components/FancySelect";
 import { projectTemplates } from "@/lib/mockData";
 import { generateProjectPlan } from "@/lib/taskGenerator";
@@ -33,9 +34,14 @@ function isPlanningIntensity(value: string): value is PlanningIntensity {
     return value === "light" || value === "balanced" || value === "intense";
 }
 
+function normaliseDeadlineFormat(deadline: string) {
+    return deadline.trim().replaceAll("-", "/");
+}
+
 function validateDeadline(deadline: string) {
+    const normalisedDeadline = normaliseDeadlineFormat(deadline);
     const deadlinePattern = /^(\d{4})\/(\d{2})\/(\d{2})$/;
-    const match = deadline.match(deadlinePattern);
+    const match = normalisedDeadline.match(deadlinePattern);
 
     if (!match) {
         return "Use the format yyyy/mm/dd, for example 2026/07/10.";
@@ -119,7 +125,8 @@ export default function NewProjectForm() {
             return;
         }
 
-        const deadlineError = validateDeadline(deadline);
+        const normalisedDeadline = normaliseDeadlineFormat(deadline);
+        const deadlineError = validateDeadline(normalisedDeadline);
 
         if (deadlineError) {
             setFormError(deadlineError);
@@ -129,10 +136,11 @@ export default function NewProjectForm() {
         const plan = generateProjectPlan({
             projectName: trimmedProjectName,
             templateId: selectedTemplateId,
-            deadline,
+            deadline: normalisedDeadline,
             intensity: planningIntensity,
         });
 
+        setDeadline(normalisedDeadline);
         setGeneratedPlan(plan);
     }
 
@@ -184,25 +192,16 @@ export default function NewProjectForm() {
                     }
                 />
 
-                <div>
-                    <label className="mb-2 block text-sm font-bold text-white">
-                        Deadline
-                    </label>
-                    <input
-                        type="text"
-                        value={deadline}
-                        onChange={(event) => {
-                            setDeadline(event.target.value);
-                            setGeneratedPlan(null);
-                            setSaveMessage("");
-                        }}
-                        placeholder="yyyy/mm/dd"
-                        className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-lg focus:shadow-cyan-950/40"
-                    />
-                    <p className="mt-2 text-xs leading-5 text-slate-400">
-                        Use a 4-digit year. The date cannot be earlier than 2026.
-                    </p>
-                </div>
+                <CalendarDateField
+                    label="Deadline"
+                    value={deadline}
+                    onChange={(nextValue) => {
+                        setDeadline(nextValue);
+                        setGeneratedPlan(null);
+                        setSaveMessage("");
+                    }}
+                    helperText="Click to choose from the calendar. Double-click to type manually."
+                />
 
                 <FancySelect
                     label="Planning intensity"
