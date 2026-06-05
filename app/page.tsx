@@ -1,5 +1,6 @@
-import ExamCountdownCard from "@/components/ExamCountdownCard";
 import FeedbackLink from "@/components/FeedbackLink";
+import ExamCountdownCard from "@/components/ExamCountdownCard";
+import TestingGuideCard from "@/components/TestingGuideCard";
 
 export default function HomePage() {
   return (
@@ -143,6 +144,10 @@ export default function HomePage() {
             </div>
           </section>
 
+          <div className="mt-20">
+            <TestingGuideCard />
+          </div>
+
           <section className="mt-20">
             <div className="mb-8">
               <p className="mb-2 text-sm font-bold text-cyan-300">
@@ -159,7 +164,8 @@ export default function HomePage() {
                 <h3 className="mb-3 text-xl font-bold">Choose a template</h3>
                 <p className="text-sm leading-6 text-slate-300">
                   Start from Math IA, CS IA, TOK Essay, Extended Essay, English,
-                  or Economics templates.
+                  Economics, sciences, humanities, EPQ, or personal statement
+                  templates.
                 </p>
               </div>
 

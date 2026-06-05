@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import AppNav from "@/components/AppNav";
 import NewProjectForm from "@/components/NewProjectForm";
+import TestingGuideCard from "@/components/TestingGuideCard";
 
 export default function NewProjectPage() {
     return (
@@ -30,6 +31,10 @@ export default function NewProjectPage() {
                 >
                     <NewProjectForm />
                 </Suspense>
+
+                <div className="mt-8">
+                    <TestingGuideCard />
+                </div>
             </section>
         </main>
     );
