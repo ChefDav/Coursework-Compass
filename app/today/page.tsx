@@ -2,115 +2,138 @@
 
 import { useEffect, useMemo, useState } from "react";
 import AppNav from "@/components/AppNav";
-import TaskCard from "@/components/TaskCard";
-import {
-    deleteTask,
-    loadProjectPlans,
-    updateTaskDetails,
-    updateTaskStatus,
-} from "@/lib/localStorage";
-import { tasks } from "@/lib/mockData";
-import type {
-    GeneratedProjectPlan,
-    PriorityLevel,
-    Task,
-    TaskStatus,
-} from "@/types/coursework";
+import EmptyState from "@/components/EmptyState";
+import { loadProjectPlans, updateTaskStatus } from "@/lib/localStorage";
 
-export default function TodayPage() {
-    const [savedPlans, setSavedPlans] = useState<GeneratedProjectPlan[]>([]);
-    const [mockTasks, setMockTasks] = useState<Task[]>(tasks);
+type TaskStatus = "Todo" | "Done";
 
-    useEffect(() => {
-        const plans = loadProjectPlans();
-        setSavedPlans(plans);
-    }, []);
+type CourseworkTask = {
+    id: string;
+    title: string;
+    status: TaskStatus;
+    priority?: string;
+    dueDate?: string;
+    estimatedTime?: string;
+};
 
-    const hasSavedPlans = savedPlans.length > 0;
+type GeneratedProjectPlan = {
+    id?: string;
+    slug?: string;
+    projectId?: string;
+    project: {
+        id?: string;
+        slug?: string;
+        projectId?: string;
+        title: string;
+        deadline: string;
+        status?: string;
+        type?: string;
+    };
+    tasks: CourseworkTask[];
+    archivedTasks?: CourseworkTask[];
+    archivedTaskCount?: number;
+};
 
-    const visibleSavedTasks = useMemo(() => {
-        return savedPlans.flatMap((plan) => plan.tasks);
-    }, [savedPlans]);
+type TodayTask = CourseworkTask & {
+    projectId: string;
+    projectTitle: string;
+    projectDeadline: string;
+};
 
-    const activeTasks = useMemo(() => {
-        if (hasSavedPlans) {
-            return visibleSavedTasks;
+function slugifyTitle(title: string) {
+    return title
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+}
+
+function getProjectRouteId(plan: GeneratedProjectPlan, index: number) {
+    return (
+        plan.id ||
+        plan.slug ||
+        plan.projectId ||
+        plan.project.id ||
+        plan.project.slug ||
+        plan.project.projectId ||
+        slugifyTitle(plan.project.title) ||
+        `project-${index}`
+    );
+}
+
+function getPriorityClasses(priority?: string) {
+    if (priority === "High") {
+        return "border-red-400/30 bg-red-400/10 text-red-300";
+    }
+
+    if (priority === "Medium") {
+        return "border-amber-400/30 bg-amber-400/10 text-amber-300";
+    }
+
+    if (priority === "Low") {
+        return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
+    }
+
+    return "border-slate-700 bg-slate-900 text-slate-300";
+}
+
+function sortTodayTasks(tasks: TodayTask[]) {
+    return [...tasks].sort((a, b) => {
+        const priorityOrder: Record<string, number> = {
+            High: 0,
+            Medium: 1,
+            Low: 2,
+        };
+
+        const aPriority = priorityOrder[a.priority ?? "Medium"] ?? 1;
+        const bPriority = priorityOrder[b.priority ?? "Medium"] ?? 1;
+
+        if (aPriority !== bPriority) {
+            return aPriority - bPriority;
         }
 
-        return mockTasks;
-    }, [hasSavedPlans, mockTasks, visibleSavedTasks]);
+        const aDue = new Date(a.dueDate ?? a.projectDeadline).getTime();
+        const bDue = new Date(b.dueDate ?? b.projectDeadline).getTime();
 
-    const todoTasks = activeTasks.filter((task) => task.status === "Todo");
-    const doneTasks = activeTasks.filter((task) => task.status === "Done");
+        if (Number.isNaN(aDue) || Number.isNaN(bDue)) {
+            return a.title.localeCompare(b.title);
+        }
 
-    const archivedPlanCount = savedPlans.filter((plan) =>
-        Boolean(plan.tasksArchivedAt),
-    ).length;
+        return aDue - bDue;
+    });
+}
 
-    const completedPlanCount = savedPlans.filter(
-        (plan) => plan.project.status === "Completed" || plan.tasksArchivedAt,
-    ).length;
+export default function TodayPage() {
+    const [projectPlans, setProjectPlans] = useState<GeneratedProjectPlan[]>([]);
 
-    const firstHighPriorityTask = todoTasks.find(
-        (task) => task.priority === "High",
-    );
-
-    const firstTodoTask = todoTasks[0];
-
-    function handleChangeTaskStatus(taskId: string, nextStatus: TaskStatus) {
-        setMockTasks((currentTasks) =>
-            currentTasks.map((task) => {
-                if (task.id !== taskId) {
-                    return task;
-                }
-
-                return {
-                    ...task,
-                    status: nextStatus,
-                };
-            }),
-        );
-
-        const updatedPlans = updateTaskStatus(taskId, nextStatus);
-        setSavedPlans(updatedPlans);
+    function refreshPlans() {
+        setProjectPlans(loadProjectPlans() as GeneratedProjectPlan[]);
     }
 
-    function handleUpdateTaskDetails(
-        taskId: string,
-        updates: {
-            title: string;
-            priority: PriorityLevel;
-            dueDate: string;
-            time: string;
-        },
-    ) {
-        setMockTasks((currentTasks) =>
-            currentTasks.map((task) => {
-                if (task.id !== taskId) {
-                    return task;
-                }
+    useEffect(() => {
+        refreshPlans();
+    }, []);
 
-                return {
+    const todayTasks = useMemo(() => {
+        const activeTasks = projectPlans.flatMap((plan, index) => {
+            const projectRouteId = getProjectRouteId(plan, index);
+
+            return plan.tasks
+                .filter((task) => task.status !== "Done")
+                .map((task) => ({
                     ...task,
-                    title: updates.title,
-                    priority: updates.priority,
-                    dueDate: updates.dueDate,
-                    time: updates.time,
-                };
-            }),
-        );
+                    projectId: projectRouteId,
+                    projectTitle: plan.project.title,
+                    projectDeadline: plan.project.deadline,
+                }));
+        });
 
-        const updatedPlans = updateTaskDetails(taskId, updates);
-        setSavedPlans(updatedPlans);
-    }
+        return sortTodayTasks(activeTasks);
+    }, [projectPlans]);
 
-    function handleDeleteTask(taskId: string) {
-        setMockTasks((currentTasks) =>
-            currentTasks.filter((task) => task.id !== taskId),
-        );
-
-        const updatedPlans = deleteTask(taskId);
-        setSavedPlans(updatedPlans);
+    function handleMarkDone(taskId: string) {
+        updateTaskStatus(taskId, "Done");
+        refreshPlans();
     }
 
     return (
@@ -119,194 +142,120 @@ export default function TodayPage() {
                 <AppNav />
 
                 <div className="mb-10">
-                    <p className="mb-2 text-sm font-bold text-cyan-300">
-                        Daily execution
-                    </p>
+                    <p className="mb-2 text-sm font-bold text-cyan-300">Today</p>
                     <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
-                        What should I do today?
+                        Today&apos;s action list.
                     </h1>
-                    <p className="mt-4 max-w-2xl text-slate-300">
-                        A focused list of visible tasks from your saved coursework plans.
-                        Archived completed tasks stay out of your daily workspace.
+                    <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
+                        Focus on the next visible tasks from your active coursework
+                        projects. Today is for action, not storage.
                     </p>
                 </div>
 
-                <div className="mb-8 grid gap-6 md:grid-cols-4">
-                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
-                        <p className="text-sm text-slate-400">Visible tasks</p>
-                        <p className="mt-2 text-3xl font-black sm:text-4xl">
-                            {activeTasks.length}
-                        </p>
-                    </div>
-
-                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
-                        <p className="text-sm text-slate-400">Todo</p>
-                        <p className="mt-2 text-3xl font-black sm:text-4xl">
-                            {todoTasks.length}
-                        </p>
-                    </div>
-
-                    <div className="rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
-                        <p className="text-sm text-emerald-200">Done</p>
-                        <p className="mt-2 text-3xl font-black text-emerald-200 sm:text-4xl">
-                            {doneTasks.length}
-                        </p>
-                    </div>
-
-                    <div className="rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-6">
-                        <p className="text-sm text-cyan-200">Archived plans</p>
-                        <p className="mt-2 text-3xl font-black text-cyan-200 sm:text-4xl">
-                            {archivedPlanCount}
-                        </p>
-                    </div>
-                </div>
-
-                {!hasSavedPlans ? (
-                    <div className="mb-8 rounded-3xl border border-amber-400/30 bg-amber-400/10 p-6">
-                        <p className="mb-2 text-sm font-bold text-amber-300">
-                            Demo task mode
-                        </p>
-                        <h2 className="text-2xl font-black sm:text-3xl">
-                            These are sample tasks until you save your first project.
-                        </h2>
-                        <p className="mt-2 text-sm leading-6 text-slate-300">
-                            Create and save a coursework project to replace this demo list
-                            with your own generated plan.
-                        </p>
-                    </div>
-                ) : null}
-
-                {hasSavedPlans && visibleSavedTasks.length > 0 ? (
-                    <div className="mb-8 rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-6">
-                        <p className="mb-2 text-sm font-bold text-emerald-300">
-                            Local tasks loaded
-                        </p>
-                        <h2 className="text-2xl font-black sm:text-3xl">
-                            {visibleSavedTasks.length} visible generated task
-                            {visibleSavedTasks.length === 1 ? "" : "s"} found.
-                        </h2>
-                        <p className="mt-2 text-sm leading-6 text-slate-300">
-                            Completed archived tasks are hidden from Today. Your project
-                            history still stays available through Projects and Dashboard.
-                        </p>
-                    </div>
-                ) : null}
-
-                {hasSavedPlans && visibleSavedTasks.length === 0 ? (
-                    <div className="mb-8 rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-8">
-                        <p className="mb-2 text-sm font-bold text-cyan-300">
-                            Today is clean
-                        </p>
-                        <h2 className="text-2xl font-black sm:text-3xl">
-                            No visible tasks right now.
-                        </h2>
-                        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-                            Your saved tasks are either completed and archived, or you have
-                            not generated a new active project plan yet. Create another
-                            coursework plan when the next deadline monster appears.
-                        </p>
-
-                        <div className="mt-6 flex flex-col gap-4 sm:flex-row">
-                            <a
-                                href="/projects/new"
-                                className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
+                {projectPlans.length === 0 ? (
+                    <EmptyState
+                        eyebrow="No projects yet"
+                        title="Today has nothing to show because no project exists yet."
+                        description="Create your first coursework project and Today will start showing the next useful tasks to work on."
+                        icon="🌱"
+                        actions={[
+                            {
+                                label: "Create first project",
+                                href: "/projects/new",
+                            },
+                            {
+                                label: "Try guided tutorial",
+                                href: "/test",
+                                variant: "secondary",
+                            },
+                        ]}
+                        tips={[
+                            "Create one project first to activate your Today page.",
+                            "The tutorial lets you practise without saving real data.",
+                            "Today will become your daily action list once tasks exist.",
+                            "Your saved data stays in this browser during the beta.",
+                        ]}
+                    />
+                ) : todayTasks.length === 0 ? (
+                    <EmptyState
+                        eyebrow="Today is clear"
+                        title="No active tasks are waiting right now."
+                        description="You may have completed or archived your current work. Add a new custom task or open a project if you want to continue planning."
+                        icon="✨"
+                        actions={[
+                            {
+                                label: "View projects",
+                                href: "/projects",
+                            },
+                            {
+                                label: "Create new project",
+                                href: "/projects/new",
+                                variant: "secondary",
+                            },
+                        ]}
+                        tips={[
+                            "A clear Today page means there is no urgent visible task right now.",
+                            "Open a project to add new work if your plan has changed.",
+                            "Archived completed tasks stay hidden until new work is added.",
+                            "You can still use Dashboard to check overall progress.",
+                        ]}
+                    />
+                ) : (
+                    <section className="grid gap-5">
+                        {todayTasks.map((task) => (
+                            <div
+                                key={`${task.projectId}-${task.id}`}
+                                className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6"
                             >
-                                Create new project
-                            </a>
+                                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                                    <div>
+                                        <p className="mb-2 text-sm font-bold text-cyan-300">
+                                            {task.projectTitle}
+                                        </p>
+                                        <h2 className="text-2xl font-black text-white">
+                                            {task.title}
+                                        </h2>
 
-                            <a
-                                href="/projects"
-                                className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
-                            >
-                                View projects
-                            </a>
-                        </div>
-                    </div>
-                ) : null}
+                                        <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-slate-400">
+                      <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1">
+                        Due: {task.dueDate || task.projectDeadline}
+                      </span>
 
-                {completedPlanCount > 0 ? (
-                    <div className="mb-8 rounded-3xl border border-slate-800 bg-slate-900 p-6">
-                        <p className="mb-2 text-sm font-bold text-slate-300">
-                            Completed project memory
-                        </p>
-                        <h2 className="text-2xl font-black sm:text-3xl">
-                            {completedPlanCount} completed project
-                            {completedPlanCount === 1 ? "" : "s"} recorded locally.
-                        </h2>
-                        <p className="mt-2 text-sm leading-6 text-slate-300">
-                            Completed projects stay visible in Dashboard and Projects even
-                            when their finished tasks are archived from Today.
-                        </p>
-                    </div>
-                ) : null}
+                                            <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1">
+                        Time: {task.estimatedTime || "Not set"}
+                      </span>
 
-                <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
-                    <div className="space-y-4">
-                        {activeTasks.length > 0 ? (
-                            activeTasks.map((task) => (
-                                <TaskCard
-                                    key={task.id}
-                                    task={task}
-                                    onChangeStatus={handleChangeTaskStatus}
-                                    onUpdateTask={handleUpdateTaskDetails}
-                                    onDeleteTask={handleDeleteTask}
-                                />
-                            ))
-                        ) : (
-                            <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
-                                <p className="mb-2 text-xl font-bold">No task cards to show.</p>
-                                <p className="text-sm leading-6 text-slate-300">
-                                    Your Today page is clear. That is rare. Guard it like a tiny
-                                    blue flame.
-                                </p>
+                                            <span
+                                                className={`rounded-full border px-3 py-1 ${getPriorityClasses(
+                                                    task.priority,
+                                                )}`}
+                                            >
+                        {task.priority || "Medium"}
+                      </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleMarkDone(task.id)}
+                                            className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                                        >
+                                            Mark done
+                                        </button>
+
+                                        <a
+                                            href={`/projects/${task.projectId}`}
+                                            className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                                        >
+                                            Open project
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                        )}
-                    </div>
-
-                    <aside className="rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-6">
-                        <p className="mb-2 text-sm font-bold text-cyan-300">
-                            Today&apos;s strategy
-                        </p>
-
-                        {firstHighPriorityTask ? (
-                            <>
-                                <h2 className="mb-4 text-2xl font-black">
-                                    Start with {firstHighPriorityTask.project}.
-                                </h2>
-                                <p className="text-sm leading-6 text-slate-300">
-                                    Your highest-priority visible task is{" "}
-                                    <span className="font-bold text-white">
-                    {firstHighPriorityTask.title}
-                  </span>
-                                    . Finish this first before moving to lower-risk work.
-                                </p>
-                            </>
-                        ) : firstTodoTask ? (
-                            <>
-                                <h2 className="mb-4 text-2xl font-black">
-                                    Keep the pressure steady.
-                                </h2>
-                                <p className="text-sm leading-6 text-slate-300">
-                                    Start with{" "}
-                                    <span className="font-bold text-white">
-                    {firstTodoTask.title}
-                  </span>
-                                    . No high-priority visible task is currently detected.
-                                </p>
-                            </>
-                        ) : (
-                            <>
-                                <h2 className="mb-4 text-2xl font-black">
-                                    The board is clear.
-                                </h2>
-                                <p className="text-sm leading-6 text-slate-300">
-                                    No visible Todo tasks remain. Review your completed projects
-                                    or create a fresh plan when a new assignment arrives.
-                                </p>
-                            </>
-                        )}
-                    </aside>
-                </div>
+                        ))}
+                    </section>
+                )}
             </section>
         </main>
     );

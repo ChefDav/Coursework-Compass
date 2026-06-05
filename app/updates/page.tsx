@@ -15,6 +15,7 @@ const currentFeatures = [
     "Use draggable, collapsible world clock widget",
     "Use the isolated guided tutorial sandbox",
     "See the v1.2 onboarding popup on first visit",
+    "See clearer empty states on Dashboard, Projects, and Today",
     "Send structured student testing feedback",
 ];
 
@@ -28,6 +29,7 @@ const whatToTest = [
     "Return to the main menu from the completion screen",
     "Create a real project from the normal product flow",
     "Check that the test tutorial does not affect real saved project data",
+    "Clear browser data and check Dashboard, Projects, and Today empty states",
 ];
 
 const mobileChecklist = [
@@ -38,6 +40,7 @@ const mobileChecklist = [
     "Check whether the simulated task controls fit properly",
     "Check whether the feedback loading screen looks smooth",
     "Check whether the congrats screen is readable and not cramped",
+    "Check whether empty states are clear and not too long on mobile",
     "Check whether the clock widget blocks any important action",
     "Report any page that feels cramped or hard to use",
 ];
@@ -47,7 +50,7 @@ const recentUpdates = [
         version: "v1.2",
         title: "Student Testing Polish",
         description:
-            "Unified the current product version as v1.2, added the first-visit onboarding popup, updated testing guidance, improved the guided tutorial positioning, refreshed feedback wording, and prepared the product for a more stable student testing session.",
+            "Unified the current product version as v1.2, added the first-visit onboarding popup, improved empty states across Dashboard, Projects, and Today, updated testing guidance, refreshed feedback wording, and prepared the product for a more stable student testing session.",
     },
     {
         version: "v1.1.3",
@@ -160,9 +163,9 @@ export default function UpdatesPage() {
                     <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
                         The main goal of v1.2 is to make Coursework Compass clearer for
                         first-time student testers. This version unifies the product
-                        version, adds a first-visit onboarding popup, improves testing
-                        guidance, and keeps the guided tutorial separate from real saved
-                        project data.
+                        version, adds a first-visit onboarding popup, improves empty states,
+                        improves testing guidance, and keeps the guided tutorial separate
+                        from real saved project data.
                     </p>
                 </section>
 
@@ -187,6 +190,20 @@ export default function UpdatesPage() {
                             Open guided tutorial
                         </a>
                     </div>
+                </section>
+
+                <section className="mt-10 rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-8">
+                    <p className="mb-2 text-sm font-bold text-cyan-300">
+                        Better empty states
+                    </p>
+                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+                        Empty pages now guide the next action.
+                    </h2>
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                        Dashboard, Projects, and Today no longer feel like dead ends when no
+                        data exists. They explain what is missing, why the page matters, and
+                        where students can go next.
+                    </p>
                 </section>
 
                 <section className="mt-10 rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-8">

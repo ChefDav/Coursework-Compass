@@ -29,6 +29,16 @@ const navItems = [
     },
 ];
 
+const storageKeysToClear = [
+    "coursework-compass-projects",
+    "coursework-compass-plans",
+    "coursework-compass-project-plans",
+    "courseworkCompassProjects",
+    "courseworkCompassProjectPlans",
+    "generatedProjectPlans",
+    "projectPlans",
+];
+
 function isActivePath(pathname: string, href: string) {
     if (href === "/") {
         return pathname === "/";
@@ -39,6 +49,33 @@ function isActivePath(pathname: string, href: string) {
     }
 
     return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function clearCourseworkCompassData() {
+    const confirmed = window.confirm(
+        "Reset all local Coursework Compass data in this browser? This will remove saved projects and tasks.",
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    storageKeysToClear.forEach((key) => {
+        window.localStorage.removeItem(key);
+    });
+
+    Object.keys(window.localStorage).forEach((key) => {
+        const normalisedKey = key.toLowerCase();
+
+        if (
+            normalisedKey.includes("coursework-compass") ||
+            normalisedKey.includes("courseworkcompass")
+        ) {
+            window.localStorage.removeItem(key);
+        }
+    });
+
+    window.location.href = "/";
 }
 
 export default function AppNav() {
@@ -76,6 +113,14 @@ export default function AppNav() {
                             </a>
                         );
                     })}
+
+                    <button
+                        type="button"
+                        onClick={clearCourseworkCompassData}
+                        className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                    >
+                        Reset data
+                    </button>
                 </nav>
             </div>
         </header>
