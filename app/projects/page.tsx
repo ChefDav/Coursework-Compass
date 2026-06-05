@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import AppNav from "@/components/AppNav";
 import EmptyState from "@/components/EmptyState";
 import { loadProjectPlans } from "@/lib/localStorage";
@@ -33,6 +33,16 @@ type GeneratedProjectPlan = {
     archivedTasks?: CourseworkTask[];
     archivedTaskCount?: number;
 };
+
+const projectStorageKeys = [
+    "coursework-compass-projects",
+    "coursework-compass-plans",
+    "coursework-compass-project-plans",
+    "courseworkCompassProjects",
+    "courseworkCompassProjectPlans",
+    "generatedProjectPlans",
+    "projectPlans",
+];
 
 function calculateProgress(tasks: CourseworkTask[]) {
     if (tasks.length === 0) {
@@ -88,6 +98,14 @@ function getProjectRouteId(plan: GeneratedProjectPlan, index: number) {
     );
 }
 
+function saveProjectPlansToLocalStorage(projectPlans: GeneratedProjectPlan[]) {
+    const serialisedPlans = JSON.stringify(projectPlans);
+
+    projectStorageKeys.forEach((key) => {
+        window.localStorage.setItem(key, serialisedPlans);
+    });
+}
+
 export default function ProjectsPage() {
     const [projectPlans, setProjectPlans] = useState<GeneratedProjectPlan[]>([]);
 
@@ -108,6 +126,27 @@ export default function ProjectsPage() {
         });
     }, [projectPlans]);
 
+    function handleDeleteProject(
+        event: MouseEvent<HTMLButtonElement>,
+        planToDelete: GeneratedProjectPlan,
+    ) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const confirmed = window.confirm(
+            `Delete "${planToDelete.project.title}"? This will remove this project and its tasks from this browser.`,
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const nextPlans = projectPlans.filter((plan) => plan !== planToDelete);
+
+        setProjectPlans(nextPlans);
+        saveProjectPlansToLocalStorage(nextPlans);
+    }
+
     return (
         <main className="min-h-screen bg-slate-950 text-white">
             <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
@@ -120,8 +159,8 @@ export default function ProjectsPage() {
                             Your coursework library.
                         </h1>
                         <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
-                            Open saved projects, review progress, and return to long-term
-                            coursework plans whenever you need.
+                            Open saved projects, review progress, return to long-term
+                            coursework plans, or remove projects you no longer need.
                         </p>
                     </div>
 
@@ -171,9 +210,8 @@ export default function ProjectsPage() {
                             ).length;
 
                             return (
-                                <a
-                                    key={projectRouteId}
-                                    href={`/projects/${projectRouteId}`}
+                                <article
+                                    key={`${projectRouteId}-${index}`}
                                     className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 transition hover:border-cyan-400/60 hover:bg-slate-900/80 sm:p-6"
                                 >
                                     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -229,7 +267,24 @@ export default function ProjectsPage() {
                                             {plan.archivedTaskCount === 1 ? "" : "s"}
                                         </p>
                                     ) : null}
-                                </a>
+
+                                    <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                                        <a
+                                            href={`/projects/${projectRouteId}`}
+                                            className="rounded-2xl bg-cyan-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                                        >
+                                            Open project
+                                        </a>
+
+                                        <button
+                                            type="button"
+                                            onClick={(event) => handleDeleteProject(event, plan)}
+                                            className="rounded-2xl border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                                        >
+                                            Delete project
+                                        </button>
+                                    </div>
+                                </article>
                             );
                         })}
                     </section>
