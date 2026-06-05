@@ -14,13 +14,15 @@ const currentFeatures = [
     "Archive completed tasks and restore them when new work is added",
     "Use draggable, collapsible world clock widget",
     "Use the isolated guided tutorial sandbox",
+    "See the v1.2 onboarding popup on first visit",
     "Send structured student testing feedback",
 ];
 
 const whatToTest = [
+    "Open the website and read the v1.2 onboarding popup",
     "Open the guided tutorial from the homepage",
     "Choose a sample project inside the tutorial",
-    "Complete the simulated planner actions",
+    "Complete the hands-on simulated planner actions",
     "Watch the feedback loading screen reach 100%",
     "Send feedback through the structured feedback panel",
     "Return to the main menu from the completion screen",
@@ -30,6 +32,7 @@ const whatToTest = [
 
 const mobileChecklist = [
     "Open the website on a phone or small screen",
+    "Check whether the onboarding popup is readable",
     "Check whether buttons are easy to tap",
     "Check whether the guided tutorial cards are readable",
     "Check whether the simulated task controls fit properly",
@@ -40,6 +43,12 @@ const mobileChecklist = [
 ];
 
 const recentUpdates = [
+    {
+        version: "v1.2",
+        title: "Student Testing Polish",
+        description:
+            "Unified the current product version as v1.2, added the first-visit onboarding popup, updated testing guidance, improved the guided tutorial positioning, refreshed feedback wording, and prepared the product for a more stable student testing session.",
+    },
     {
         version: "v1.1.3",
         title: "Guided Test Flow + Homepage Restore",
@@ -62,7 +71,7 @@ const recentUpdates = [
         version: "v1.1",
         title: "Editable Planner",
         description:
-            "Coursework Compass now supports adding, editing, deleting, completing, restoring, and archiving tasks. This makes the app usable as a real planning workspace, not just a task generator.",
+            "Coursework Compass added support for adding, editing, deleting, completing, restoring, and archiving tasks. This made the app usable as a real planning workspace, not just a task generator.",
     },
     {
         version: "v1.0.x",
@@ -88,7 +97,7 @@ const currentLimitations = [
 ];
 
 const nextSteps = [
-    "Run full v1.1 testing with real students",
+    "Run full v1.2 testing with real students",
     "Improve mobile layout based on feedback",
     "Add more subject-specific templates",
     "Prepare Chinese language support",
@@ -108,7 +117,7 @@ export default function UpdatesPage() {
                     </div>
 
                     <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
-                        Coursework Compass v1.1.3 restores the homepage and upgrades testing.
+                        Coursework Compass v1.2 is ready for student testing polish.
                     </h1>
 
                     <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
@@ -146,14 +155,14 @@ export default function UpdatesPage() {
                         Current version
                     </p>
                     <h2 className="text-3xl font-black sm:text-4xl">
-                        v1.1.3: Guided Test Flow + Homepage Restore
+                        v1.2: Student Testing Polish
                     </h2>
                     <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
-                        The main goal of v1.1.3 is to keep the public homepage in its normal
-                        product form while giving student testers a separate, isolated,
-                        guided tutorial. Students can now complete a simulated workflow,
-                        reach a feedback loading screen, and finish on a congratulations
-                        screen without affecting real saved project data.
+                        The main goal of v1.2 is to make Coursework Compass clearer for
+                        first-time student testers. This version unifies the product
+                        version, adds a first-visit onboarding popup, improves testing
+                        guidance, and keeps the guided tutorial separate from real saved
+                        project data.
                     </p>
                 </section>
 
@@ -162,12 +171,12 @@ export default function UpdatesPage() {
                         Guided tutorial sandbox
                     </p>
                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                        The test flow is now separate from the real app.
+                        The test flow is separate from the real app.
                     </h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
                         The /test page uses simulated data only. It does not open Dashboard,
                         Projects, or Today, and it does not write to localStorage. This
-                        makes it safer and clearer for student testing.
+                        makes the testing route safer and clearer for students.
                     </p>
 
                     <div className="mt-6">
@@ -185,11 +194,11 @@ export default function UpdatesPage() {
                         What to test
                     </p>
                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                        Suggested testing flow for v1.1.3.
+                        Suggested testing flow for v1.2.
                     </h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        Students can now test the tutorial safely first, then explore the
-                        real planning tools afterwards if they want to create a real project.
+                        Students can test the tutorial safely first, then explore the real
+                        planning tools afterwards if they want to create a real project.
                     </p>
 
                     <div className="mt-6 grid gap-4 md:grid-cols-2">

@@ -14,7 +14,7 @@ function createFeedbackBody(feedbackType: string, pageUrl: string) {
     return [
         "Hi Zichuan,",
         "",
-        "I tested Coursework Compass v1.1.2 Student Testing Guide and would like to share some feedback.",
+        "I tested Coursework Compass v1.2 Student Testing Polish and would like to share some feedback.",
         "",
         `Feedback type: ${feedbackType}`,
         `Page tested: ${pageUrl}`,
@@ -54,7 +54,7 @@ export default function FeedbackPanel() {
 
     const feedbackMailto = useMemo(() => {
         const subject = encodeURIComponent(
-            `Coursework Compass v1.1.2 Student Testing Feedback - ${selectedType}`,
+            `Coursework Compass v1.2 Student Testing Feedback - ${selectedType}`,
         );
 
         const body = encodeURIComponent(createFeedbackBody(selectedType, pageUrl));
@@ -66,7 +66,7 @@ export default function FeedbackPanel() {
         <section className="rounded-[2rem] border border-fuchsia-400/30 bg-fuchsia-400/10 p-5 shadow-2xl shadow-fuchsia-950/20 sm:p-6">
             <div className="mb-5">
                 <p className="mb-2 text-sm font-bold text-fuchsia-300">
-                    Student testing feedback
+                    v1.2 student testing feedback
                 </p>
                 <h2 className="text-2xl font-black sm:text-3xl">
                     Help shape the next version.

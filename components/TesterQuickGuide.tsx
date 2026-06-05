@@ -7,35 +7,36 @@ export default function TesterQuickGuide() {
                         For student testers
                     </p>
                     <h2 className="text-2xl font-black sm:text-3xl">
-                        Use the guided student testing page.
+                        Use the guided v1.2 tutorial first.
                     </h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        v1.1.2 adds a dedicated testing route for students. It explains what
-                        to test, gives sample project ideas, and links directly to feedback.
+                        v1.2 includes a separate tutorial sandbox for student testing. It
+                        explains the product, lets students practise the planner controls,
+                        and keeps the test experience separate from real saved projects.
                     </p>
                 </div>
 
                 <span className="w-fit rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
-          v1.1.2
+          v1.2
         </span>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
                 <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
                     <p className="mb-2 text-sm font-black text-emerald-300">01</p>
-                    <h3 className="mb-2 font-bold text-white">Open testing page</h3>
+                    <h3 className="mb-2 font-bold text-white">Open tutorial</h3>
                     <p className="text-sm leading-6 text-slate-400">
-                        Start from the dedicated testing page instead of wandering through
-                        the site without a route.
+                        Start from the guided tutorial instead of entering the full product
+                        without context.
                     </p>
                 </div>
 
                 <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
                     <p className="mb-2 text-sm font-black text-emerald-300">02</p>
-                    <h3 className="mb-2 font-bold text-white">Use a sample project</h3>
+                    <h3 className="mb-2 font-bold text-white">Practise controls</h3>
                     <p className="text-sm leading-6 text-slate-400">
-                        Testers can use sample IA, EE, TOK, or essay projects if they do not
-                        want to enter a real one.
+                        Students can add, edit, complete, and delete simulated tasks inside
+                        the tutorial before using the real planner.
                     </p>
                 </div>
 
@@ -43,8 +44,8 @@ export default function TesterQuickGuide() {
                     <p className="mb-2 text-sm font-black text-emerald-300">03</p>
                     <h3 className="mb-2 font-bold text-white">Send feedback</h3>
                     <p className="text-sm leading-6 text-slate-400">
-                        The feedback email now clearly identifies student testing responses
-                        from v1.1.2.
+                        Feedback is short and structured, helping future versions become
+                        clearer for real students.
                     </p>
                 </div>
             </div>
@@ -54,14 +55,14 @@ export default function TesterQuickGuide() {
                     href="/test"
                     className="rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
                 >
-                    Open student testing page
+                    Open guided tutorial
                 </a>
 
                 <a
                     href="/projects/new"
                     className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
                 >
-                    Create a project
+                    Create a real project
                 </a>
             </div>
         </section>

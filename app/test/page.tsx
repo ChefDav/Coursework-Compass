@@ -371,7 +371,7 @@ export default function StudentTestingPage() {
                         </div>
 
                         <div className="rounded-full border border-cyan-400/30 bg-slate-950/70 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
-                            v1.1.3
+                            v1.2
                         </div>
                     </div>
 

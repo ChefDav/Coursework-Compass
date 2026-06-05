@@ -4,15 +4,16 @@ export default function BetaNotice() {
             <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                     <p className="mb-2 text-sm font-bold text-cyan-300">
-                        Coursework Compass v1.1 Beta
+                        Coursework Compass v1.2 Student Testing Polish
                     </p>
                     <h2 className="text-2xl font-black sm:text-3xl">
-                        Early testing version is now open.
+                        A clearer testing-ready version is now open.
                     </h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        This version is designed for real student testing. You can create
-                        coursework projects, generate plans, add your own tasks, edit task
-                        details, delete tasks, and track progress locally in your browser.
+                        This version focuses on making Coursework Compass easier for new
+                        students to understand, test, and use. You can create coursework
+                        projects, edit your plan, use the guided tutorial, and send short
+                        feedback after testing the workflow.
                     </p>
 
                     <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -24,16 +25,23 @@ export default function BetaNotice() {
                         </a>
 
                         <a
+                            href="/test"
+                            className="rounded-2xl bg-emerald-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
+                        >
+                            Join student test
+                        </a>
+
+                        <a
                             href="/projects/new"
                             className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-slate-400"
                         >
-                            Try the beta
+                            Start planning
                         </a>
                     </div>
                 </div>
 
                 <span className="w-fit rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
-          Beta
+          v1.2
         </span>
             </div>
 
@@ -58,10 +66,10 @@ export default function BetaNotice() {
 
                 <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
                     <p className="mb-2 text-sm font-black text-cyan-300">03</p>
-                    <h3 className="mb-2 font-bold text-white">Send feedback</h3>
+                    <h3 className="mb-2 font-bold text-white">Test safely</h3>
                     <p className="text-sm leading-6 text-slate-400">
-                        This beta is being improved through real student feedback. If
-                        something feels confusing, broken, or missing, please report it.
+                        The guided tutorial uses simulated data, so students can understand
+                        the workflow before creating a real project.
                     </p>
                 </div>
             </div>
@@ -72,9 +80,9 @@ export default function BetaNotice() {
                 </p>
                 <p className="text-sm leading-6 text-slate-300">
                     The current beta stores project data locally in your browser. You do
-                    not need an account, and you should not enter private or sensitive
-                    personal information. Cloud sync and accounts are planned for a later
-                    version.
+                    not need an account, and you should avoid entering private or
+                    sensitive personal information. Cloud sync and accounts are planned
+                    for a later version.
                 </p>
             </div>
         </section>
