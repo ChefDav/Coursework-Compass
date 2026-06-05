@@ -25,6 +25,28 @@ export default function NewProjectPage() {
                     </p>
                 </div>
 
+                <div className="mb-8 rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
+                    <p className="mb-2 text-sm font-bold text-emerald-300">
+                        Testing tip
+                    </p>
+                    <h2 className="text-2xl font-black sm:text-3xl">
+                        Use a real project or make a sample one.
+                    </h2>
+                    <p className="mt-3 text-sm leading-6 text-slate-300">
+                        For next week&apos;s student testing, you can enter a real
+                        coursework project, or simply create a sample project to explore the
+                        workflow. The current beta stores data locally in this browser, so
+                        please avoid entering private or sensitive personal information.
+                    </p>
+
+                    <div className="mt-4 grid gap-3 text-sm leading-6 text-slate-400 md:grid-cols-2">
+                        <p>• Try choosing a template</p>
+                        <p>• Try selecting a deadline</p>
+                        <p>• Create and save the generated plan</p>
+                        <p>• Then add, edit, delete, and complete a task</p>
+                    </div>
+                </div>
+
                 <div className="mb-8">
                     <BetaNotice />
                 </div>

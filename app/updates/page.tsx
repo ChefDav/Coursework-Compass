@@ -16,9 +16,39 @@ const currentFeatures = [
     "Send structured beta feedback",
 ];
 
+const whatToTest = [
+    "Create a new coursework project",
+    "Choose a subject template",
+    "Use the calendar to select a deadline",
+    "Create and save the generated task plan",
+    "Add a custom task",
+    "Edit an existing task",
+    "Delete a task",
+    "Mark a task as done and restore it back to todo",
+    "Check whether Today, Dashboard, and Project Detail stay in sync",
+    "Send short feedback through the feedback panel",
+];
+
+const mobileChecklist = [
+    "Open the website on a phone or small screen",
+    "Check whether buttons are easy to tap",
+    "Check whether the calendar picker is usable",
+    "Check whether task cards are readable",
+    "Check whether edit and delete buttons fit properly",
+    "Check whether the feedback panel is comfortable to use",
+    "Check whether the clock widget blocks any important action",
+    "Report any page that feels cramped or hard to use",
+];
+
 const recentUpdates = [
     {
-        version: "v1.1 Beta",
+        version: "v1.1.1",
+        title: "Pre-Test Polish",
+        description:
+            "Added clearer tester guidance, short feedback prompts, a focused What to test checklist, and mobile testing guidance before the Year 12 testing session.",
+    },
+    {
+        version: "v1.1",
         title: "Editable Planner",
         description:
             "Coursework Compass now supports adding, editing, deleting, completing, restoring, and archiving tasks. This makes the app usable as a real planning workspace, not just a task generator.",
@@ -66,13 +96,13 @@ export default function UpdatesPage() {
                     </div>
 
                     <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
-                        Coursework Compass v1.1 Beta is now in testing.
+                        Coursework Compass v1.1.1 is ready for student testing.
                     </h1>
 
                     <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
-                        This page explains what the current beta can do, what has recently
-                        changed, what is still limited, and what will come next. Coursework
-                        Compass is being shaped through real student feedback.
+                        This page explains what the current beta can do, what students
+                        should test, what is still limited, and what will come next.
+                        Coursework Compass is being shaped through real student feedback.
                     </p>
 
                     <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -97,17 +127,74 @@ export default function UpdatesPage() {
                         Current version
                     </p>
                     <h2 className="text-3xl font-black sm:text-4xl">
-                        v1.1 Beta: Editable Planner
+                        v1.1.1: Pre-Test Polish
                     </h2>
                     <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
-                        The main goal of v1.1 is to make plans maintainable after they are
-                        generated. Students can now add their own tasks, edit existing
-                        tasks, delete irrelevant tasks, and keep the plan aligned with real
-                        coursework changes.
+                        The main goal of v1.1.1 is to prepare the product for real student
+                        testing. The core v1.1 planning features are complete, and this
+                        update adds clearer guidance so testers know what to try and how to
+                        give useful feedback.
                     </p>
                 </section>
 
-                <section className="mt-10">
+                <section className="mt-10 rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-8">
+                    <p className="mb-2 text-sm font-bold text-emerald-300">
+                        What to test
+                    </p>
+                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+                        Suggested 5-minute testing flow.
+                    </h2>
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                        Students do not need to test everything perfectly. The most useful
+                        feedback comes from trying the core workflow and reporting what
+                        feels helpful, confusing, or missing.
+                    </p>
+
+                    <div className="mt-6 grid gap-4 md:grid-cols-2">
+                        {whatToTest.map((item, index) => (
+                            <div
+                                key={item}
+                                className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4"
+                            >
+                                <p className="mb-1 text-sm font-black text-emerald-300">
+                                    {String(index + 1).padStart(2, "0")}
+                                </p>
+                                <p className="text-sm font-bold leading-6 text-slate-200">
+                                    {item}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                <section className="mt-10 rounded-[2rem] border border-fuchsia-400/30 bg-fuchsia-400/10 p-5 sm:p-8">
+                    <p className="mb-2 text-sm font-bold text-fuchsia-300">
+                        Mobile testing checklist
+                    </p>
+                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+                        Please check the phone experience too.
+                    </h2>
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                        Many students may open Coursework Compass on a phone. If something
+                        feels cramped, blocked, or difficult to tap, that feedback is very
+                        valuable.
+                    </p>
+
+                    <div className="mt-6 grid gap-4 md:grid-cols-2">
+                        {mobileChecklist.map((item) => (
+                            <div
+                                key={item}
+                                className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4"
+                            >
+                                <p className="text-sm font-bold leading-6 text-slate-200">
+                                    {item}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                <section className="mt-16">
                     <div className="mb-6">
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             What works now

@@ -3,6 +3,7 @@ import BetaNotice from "@/components/BetaNotice";
 import ExamCountdownCard from "@/components/ExamCountdownCard";
 import FeedbackLink from "@/components/FeedbackLink";
 import FeedbackPanel from "@/components/FeedbackPanel";
+import TesterQuickGuide from "@/components/TesterQuickGuide";
 import TestingGuideCard from "@/components/TestingGuideCard";
 
 const templateHighlights = [
@@ -68,7 +69,7 @@ export default function HomePage() {
           <section className="grid gap-10 py-12 md:grid-cols-[1.2fr_0.8fr] md:items-center md:py-20">
             <div>
               <div className="mb-5 inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
-                Coursework Compass v1.1 Beta
+                Coursework Compass v1.1.1 Testing Polish
               </div>
 
               <h1 className="text-5xl font-black tracking-tight sm:text-6xl md:text-7xl">
@@ -90,10 +91,10 @@ export default function HomePage() {
                 </a>
 
                 <a
-                    href="/dashboard"
+                    href="/updates"
                     className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
                 >
-                  Open dashboard
+                  View testing guide
                 </a>
               </div>
 
@@ -175,6 +176,10 @@ export default function HomePage() {
           </div>
 
           <div className="mt-10">
+            <TesterQuickGuide />
+          </div>
+
+          <div className="mt-10">
             <TestingGuideCard />
           </div>
 
@@ -232,7 +237,7 @@ export default function HomePage() {
           <section className="mt-20">
             <div className="mb-8">
               <p className="mb-2 text-sm font-bold text-cyan-300">
-                v1.1 Beta features
+                v1.1 features
               </p>
               <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                 Built for real student workflows.
@@ -293,9 +298,9 @@ export default function HomePage() {
                   Create your first coursework plan.
                 </h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-                  This beta stores your data locally in your browser. Try it with
-                  a sample project first, then send feedback if something feels
-                  unclear, useful, broken, or missing.
+                  You can use a real coursework project or create a sample one.
+                  Try the core workflow, then send short feedback about what
+                  worked and what felt confusing.
                 </p>
               </div>
 
@@ -308,10 +313,10 @@ export default function HomePage() {
                 </a>
 
                 <a
-                    href="/projects"
+                    href="/updates"
                     className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
                 >
-                  View projects
+                  What should I test?
                 </a>
               </div>
             </div>

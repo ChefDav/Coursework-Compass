@@ -73,6 +73,14 @@ export default function FeedbackPanel() {
                     Useful feedback can be short, honest, and specific. Even one confusing
                     button is worth reporting.
                 </p>
+
+                <div className="mt-4 rounded-3xl border border-fuchsia-400/30 bg-slate-950/60 p-4">
+                    <p className="text-sm font-bold leading-6 text-fuchsia-200">
+                        Your feedback does not need to be long. One sentence is useful if it
+                        tells me what worked, what confused you, or what you would want
+                        next.
+                    </p>
+                </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
