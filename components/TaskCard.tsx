@@ -18,8 +18,16 @@ type TaskCardProps = {
 
 const priorityOptions: TaskPriority[] = ["Low", "Medium", "High"];
 
-function isTaskPriority(value: string): value is TaskPriority {
+function isTaskPriority(value: string | undefined): value is TaskPriority {
     return value === "Low" || value === "Medium" || value === "High";
+}
+
+function normalisePriority(value: string | undefined): TaskPriority {
+    if (isTaskPriority(value)) {
+        return value;
+    }
+
+    return "Medium";
 }
 
 function getPriorityClasses(priority?: string) {
@@ -149,7 +157,7 @@ export default function TaskCard({
 
     const [editTitle, setEditTitle] = useState(task.title);
     const [editPriority, setEditPriority] = useState<TaskPriority>(
-        isTaskPriority(task.priority || "") ? task.priority : "Medium",
+        normalisePriority(task.priority),
     );
     const [editDueDate, setEditDueDate] = useState(task.dueDate || "");
     const [editEstimatedTime, setEditEstimatedTime] = useState(
@@ -166,7 +174,7 @@ export default function TaskCard({
 
     useEffect(() => {
         setEditTitle(task.title);
-        setEditPriority(isTaskPriority(task.priority || "") ? task.priority : "Medium");
+        setEditPriority(normalisePriority(task.priority));
         setEditDueDate(task.dueDate || "");
         setEditEstimatedTime(getDisplayEstimatedTime(task.estimatedTime, task.priority));
     }, [task]);
@@ -193,7 +201,7 @@ export default function TaskCard({
 
     function handleCancelEdit() {
         setEditTitle(task.title);
-        setEditPriority(isTaskPriority(task.priority || "") ? task.priority : "Medium");
+        setEditPriority(normalisePriority(task.priority));
         setEditDueDate(task.dueDate || "");
         setEditEstimatedTime(getDisplayEstimatedTime(task.estimatedTime, task.priority));
         setEditError("");
@@ -250,11 +258,7 @@ export default function TaskCard({
                                 <select
                                     value={editPriority}
                                     onChange={(event) => {
-                                        if (!isTaskPriority(event.target.value)) {
-                                            return;
-                                        }
-
-                                        setEditPriority(event.target.value);
+                                        setEditPriority(normalisePriority(event.target.value));
                                     }}
                                     className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
                                 >

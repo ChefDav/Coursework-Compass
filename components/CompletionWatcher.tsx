@@ -6,8 +6,8 @@ import {
     findCompletedPlanWaitingForPrompt,
     keepCompletedProjectTasks,
     listenForProjectPlanUpdates,
+    type GeneratedProjectPlan,
 } from "@/lib/localStorage";
-import type { GeneratedProjectPlan } from "@/types/coursework";
 
 export default function CompletionWatcher() {
     const [completedPlan, setCompletedPlan] =
@@ -18,6 +18,8 @@ export default function CompletionWatcher() {
         const plan = findCompletedPlanWaitingForPrompt();
 
         if (!plan) {
+            setCompletedPlan(null);
+            setIsOpen(false);
             return;
         }
 
@@ -32,82 +34,125 @@ export default function CompletionWatcher() {
             checkForCompletedProject();
         });
 
-        return unsubscribe;
+        return () => {
+            unsubscribe();
+        };
     }, []);
 
-    function handleKeepTasksVisible() {
+    function handleArchiveCompletedTasks() {
         if (!completedPlan) {
             return;
         }
 
-        keepCompletedProjectTasks(completedPlan.project.id);
-        setIsOpen(false);
+        archiveCompletedProjectTasks(completedPlan.id);
         setCompletedPlan(null);
+        setIsOpen(false);
     }
 
-    function handleArchiveTasks() {
+    function handleKeepCompletedTasks() {
         if (!completedPlan) {
             return;
         }
 
-        archiveCompletedProjectTasks(completedPlan.project.id);
-        setIsOpen(false);
+        keepCompletedProjectTasks(completedPlan.id);
         setCompletedPlan(null);
+        setIsOpen(false);
+    }
+
+    function handleCloseTemporarily() {
+        setIsOpen(false);
     }
 
     if (!isOpen || !completedPlan) {
         return null;
     }
 
+    const completedTaskCount = completedPlan.tasks.filter(
+        (task) => task.status === "Done",
+    ).length;
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/80 px-4 py-6 backdrop-blur-sm sm:px-6">
-            <div className="w-full max-w-xl rounded-3xl border border-cyan-400/30 bg-slate-900 p-5 text-white shadow-2xl shadow-cyan-950/50 sm:p-6">
-                <div className="mb-6">
-                    <p className="mb-2 text-sm font-bold text-cyan-300">
+        <section className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/80 px-4 py-6 backdrop-blur-md">
+            <div className="relative w-full max-w-2xl overflow-hidden rounded-[2rem] border border-emerald-400/30 bg-slate-950 p-5 text-white shadow-2xl shadow-emerald-950/50 sm:p-8">
+                <div className="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-emerald-400/20 blur-3xl" />
+                <div className="absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
+
+                <div className="relative z-10">
+                    <div className="mb-5 inline-flex rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
                         Project completed
-                    </p>
-                    <h2 className="break-words text-3xl font-black leading-tight">
-                        You finished {completedPlan.project.title}! 🎉
+                    </div>
+
+                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+                        Nice work. This project looks complete.
                     </h2>
+
                     <p className="mt-4 text-sm leading-6 text-slate-300">
-                        Every task in this project is marked done. Would you like to keep
-                        those tasks visible, or archive them so your Today page stays clean?
+                        All active tasks in{" "}
+                        <span className="font-bold text-white">
+              {completedPlan.project.title}
+            </span>{" "}
+                        are marked as done. You can archive the completed tasks to keep the
+                        workspace clean, or keep them visible if you still want to review
+                        them.
                     </p>
+
+                    <div className="mt-5 grid gap-4 sm:grid-cols-3">
+                        <div className="rounded-3xl border border-slate-800 bg-slate-900 p-4">
+                            <p className="text-sm font-bold text-slate-400">Completed</p>
+                            <p className="mt-2 text-3xl font-black text-emerald-300">
+                                {completedTaskCount}
+                            </p>
+                        </div>
+
+                        <div className="rounded-3xl border border-slate-800 bg-slate-900 p-4">
+                            <p className="text-sm font-bold text-slate-400">Project</p>
+                            <p className="mt-2 text-lg font-black text-white">
+                                {completedPlan.project.title}
+                            </p>
+                        </div>
+
+                        <div className="rounded-3xl border border-slate-800 bg-slate-900 p-4">
+                            <p className="text-sm font-bold text-slate-400">Status</p>
+                            <p className="mt-2 text-lg font-black text-emerald-300">
+                                Ready to clean
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-4">
+                        <p className="text-sm font-bold leading-6 text-cyan-200">
+                            If you add new work later, archived tasks can be restored
+                            automatically so the project progress recalculates correctly.
+                        </p>
+                    </div>
+
+                    <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                        <button
+                            type="button"
+                            onClick={handleArchiveCompletedTasks}
+                            className="rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
+                        >
+                            Archive completed tasks
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={handleKeepCompletedTasks}
+                            className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-emerald-400 hover:text-emerald-300"
+                        >
+                            Keep tasks visible
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={handleCloseTemporarily}
+                            className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-slate-300 transition hover:border-slate-400 hover:text-white"
+                        >
+                            Decide later
+                        </button>
+                    </div>
                 </div>
-
-                <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-950 p-5">
-                    <p className="text-sm text-slate-400">Completed project</p>
-                    <p className="mt-2 break-words text-xl font-bold">
-                        {completedPlan.project.title}
-                    </p>
-                    <p className="mt-1 text-sm text-slate-400">
-                        {completedPlan.tasks.length} completed tasks
-                    </p>
-                </div>
-
-                <div className="flex flex-col gap-4 sm:flex-row">
-                    <button
-                        type="button"
-                        onClick={handleArchiveTasks}
-                        className="rounded-2xl bg-cyan-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-cyan-300"
-                    >
-                        Archive completed tasks
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={handleKeepTasksVisible}
-                        className="rounded-2xl border border-slate-700 px-6 py-4 font-bold text-white transition hover:border-slate-400"
-                    >
-                        Keep tasks visible
-                    </button>
-                </div>
-
-                <p className="mt-4 text-xs leading-5 text-slate-500">
-                    Archiving hides completed tasks from Today, but keeps the project as
-                    completed with 100% progress.
-                </p>
             </div>
-        </div>
+        </section>
     );
 }

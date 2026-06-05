@@ -13,7 +13,6 @@ import {
     addCustomTask,
     archiveCompletedTasks,
     deleteTask,
-    findProjectPlan,
     getProjectRouteId,
     loadProjectPlans,
     updateProjectDetails,
@@ -185,7 +184,9 @@ export default function ProjectDetailPage() {
     const params = useParams();
     const routeProjectId = getParamAsString(params.projectId);
 
+    const [hasMounted, setHasMounted] = useState(false);
     const [projectPlans, setProjectPlans] = useState<GeneratedProjectPlan[]>([]);
+
     const [isEditingProject, setIsEditingProject] = useState(false);
     const [projectTitle, setProjectTitle] = useState("");
     const [projectDeadline, setProjectDeadline] = useState("");
@@ -202,29 +203,27 @@ export default function ProjectDetailPage() {
     }
 
     useEffect(() => {
-        refreshProjectPlans();
+        setHasMounted(true);
+        setProjectPlans(loadProjectPlans());
     }, []);
 
     const projectInfo = useMemo(() => {
-        const directPlan = findProjectPlan(routeProjectId);
-
-        if (directPlan) {
-            const directIndex = projectPlans.findIndex(
-                (plan, index) =>
-                    getProjectRouteId(plan, index) === getProjectRouteId(directPlan, index),
-            );
-
-            return {
-                plan: directPlan,
-                index: directIndex >= 0 ? directIndex : 0,
-                routeId: getProjectRouteId(directPlan, directIndex >= 0 ? directIndex : 0),
-            };
+        if (!hasMounted) {
+            return null;
         }
 
         const foundIndex = projectPlans.findIndex((plan, index) => {
             const projectRouteId = getProjectRouteId(plan, index);
 
-            return projectRouteId === routeProjectId;
+            return (
+                projectRouteId === routeProjectId ||
+                plan.id === routeProjectId ||
+                plan.slug === routeProjectId ||
+                plan.projectId === routeProjectId ||
+                plan.project.id === routeProjectId ||
+                plan.project.slug === routeProjectId ||
+                plan.project.projectId === routeProjectId
+            );
         });
 
         if (foundIndex < 0) {
@@ -236,7 +235,7 @@ export default function ProjectDetailPage() {
             index: foundIndex,
             routeId: getProjectRouteId(projectPlans[foundIndex], foundIndex),
         };
-    }, [projectPlans, routeProjectId]);
+    }, [hasMounted, projectPlans, routeProjectId]);
 
     useEffect(() => {
         if (!projectInfo) {
@@ -246,6 +245,28 @@ export default function ProjectDetailPage() {
         setProjectTitle(projectInfo.plan.project.title);
         setProjectDeadline(projectInfo.plan.project.deadline);
     }, [projectInfo]);
+
+    if (!hasMounted) {
+        return (
+            <main className="min-h-screen bg-slate-950 text-white">
+                <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+                    <AppNav />
+
+                    <section className="rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-6 shadow-2xl shadow-cyan-950/20 sm:p-8">
+                        <p className="mb-2 text-sm font-bold text-cyan-300">
+                            Loading project
+                        </p>
+                        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
+                            Preparing your project workspace.
+                        </h1>
+                        <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
+                            Coursework Compass is loading the project saved in this browser.
+                        </p>
+                    </section>
+                </section>
+            </main>
+        );
+    }
 
     if (!projectInfo) {
         return (
