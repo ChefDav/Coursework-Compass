@@ -14,24 +14,27 @@ function createFeedbackBody(feedbackType: string, pageUrl: string) {
     return [
         "Hi Zichuan,",
         "",
-        "I tested Coursework Compass v1.1 Beta and would like to share some feedback.",
+        "I tested Coursework Compass v1.1.2 Student Testing Guide and would like to share some feedback.",
         "",
         `Feedback type: ${feedbackType}`,
         `Page tested: ${pageUrl}`,
         "",
-        "1. What I found useful:",
+        "1. What I tried to do:",
         "- ",
         "",
-        "2. What felt confusing or difficult:",
+        "2. What I found useful:",
         "- ",
         "",
-        "3. What I think should be improved or added:",
+        "3. What felt confusing or difficult:",
         "- ",
         "",
-        "4. Subject / coursework type I tested:",
+        "4. What I think should be improved or added:",
         "- ",
         "",
-        "5. Would I use this for real coursework? Why or why not?",
+        "5. Subject / coursework type I tested:",
+        "- ",
+        "",
+        "6. Would I use this for real coursework? Why or why not?",
         "- ",
         "",
         "Extra notes:",
@@ -51,7 +54,7 @@ export default function FeedbackPanel() {
 
     const feedbackMailto = useMemo(() => {
         const subject = encodeURIComponent(
-            `Coursework Compass v1.1 Beta Feedback - ${selectedType}`,
+            `Coursework Compass v1.1.2 Student Testing Feedback - ${selectedType}`,
         );
 
         const body = encodeURIComponent(createFeedbackBody(selectedType, pageUrl));
@@ -63,7 +66,7 @@ export default function FeedbackPanel() {
         <section className="rounded-[2rem] border border-fuchsia-400/30 bg-fuchsia-400/10 p-5 shadow-2xl shadow-fuchsia-950/20 sm:p-6">
             <div className="mb-5">
                 <p className="mb-2 text-sm font-bold text-fuchsia-300">
-                    Beta feedback
+                    Student testing feedback
                 </p>
                 <h2 className="text-2xl font-black sm:text-3xl">
                     Help shape the next version.

@@ -69,7 +69,7 @@ export default function HomePage() {
           <section className="grid gap-10 py-12 md:grid-cols-[1.2fr_0.8fr] md:items-center md:py-20">
             <div>
               <div className="mb-5 inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
-                Coursework Compass v1.1.1 Testing Polish
+                Coursework Compass v1.1.2 Student Testing Guide
               </div>
 
               <h1 className="text-5xl font-black tracking-tight sm:text-6xl md:text-7xl">
@@ -84,17 +84,17 @@ export default function HomePage() {
 
               <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                 <a
-                    href="/projects/new"
+                    href="/test"
                     className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
                 >
-                  Start planning
+                  Start student test
                 </a>
 
                 <a
-                    href="/updates"
+                    href="/projects/new"
                     className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
                 >
-                  View testing guide
+                  Create project directly
                 </a>
               </div>
 
@@ -295,28 +295,28 @@ export default function HomePage() {
                   Ready to test?
                 </p>
                 <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                  Create your first coursework plan.
+                  Start from the guided testing page.
                 </h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-                  You can use a real coursework project or create a sample one.
-                  Try the core workflow, then send short feedback about what
-                  worked and what felt confusing.
+                  For student testing, the dedicated test page gives a clearer
+                  route than the main site. Students can also enter the main menu
+                  or create a project directly.
                 </p>
               </div>
 
               <div className="flex flex-col gap-4">
                 <a
-                    href="/projects/new"
+                    href="/test"
                     className="rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
                 >
-                  Create project
+                  Open test page
                 </a>
 
                 <a
-                    href="/updates"
+                    href="/projects/new"
                     className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
                 >
-                  What should I test?
+                  Create project directly
                 </a>
               </div>
             </div>

@@ -13,7 +13,8 @@ const currentFeatures = [
     "Automatically normalise estimated time, such as 60 min to 1 hour",
     "Archive completed tasks and restore them when new work is added",
     "Use draggable, collapsible world clock widget",
-    "Send structured beta feedback",
+    "Use the dedicated student testing page",
+    "Send structured student testing feedback",
 ];
 
 const whatToTest = [
@@ -41,6 +42,12 @@ const mobileChecklist = [
 ];
 
 const recentUpdates = [
+    {
+        version: "v1.1.2",
+        title: "Student Testing Guide",
+        description:
+            "Added a dedicated /test student testing page, a three-step testing route, suggested sample projects, clearer feedback instructions, and student testing labels in feedback email subjects.",
+    },
     {
         version: "v1.1.1",
         title: "Pre-Test Polish",
@@ -96,7 +103,7 @@ export default function UpdatesPage() {
                     </div>
 
                     <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
-                        Coursework Compass v1.1.1 is ready for student testing.
+                        Coursework Compass v1.1.2 is ready for guided student testing.
                     </h1>
 
                     <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
@@ -106,6 +113,13 @@ export default function UpdatesPage() {
                     </p>
 
                     <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+                        <a
+                            href="/test"
+                            className="rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
+                        >
+                            Open student testing page
+                        </a>
+
                         <a
                             href="/projects/new"
                             className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
@@ -127,14 +141,36 @@ export default function UpdatesPage() {
                         Current version
                     </p>
                     <h2 className="text-3xl font-black sm:text-4xl">
-                        v1.1.1: Pre-Test Polish
+                        v1.1.2: Student Testing Guide
                     </h2>
                     <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
-                        The main goal of v1.1.1 is to prepare the product for real student
-                        testing. The core v1.1 planning features are complete, and this
-                        update adds clearer guidance so testers know what to try and how to
-                        give useful feedback.
+                        The main goal of v1.1.2 is to make the testing session easier to
+                        run and easier to understand. The product now includes a dedicated
+                        student testing page with a clear route, sample project ideas, and
+                        feedback guidance.
                     </p>
+                </section>
+
+                <section className="mt-10 rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-8">
+                    <p className="mb-2 text-sm font-bold text-emerald-300">
+                        Student testing page
+                    </p>
+                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+                        A dedicated route for next week&apos;s testing.
+                    </h2>
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                        Students can now start from one page that explains what to test,
+                        which sample projects to use, and how to send useful feedback.
+                    </p>
+
+                    <div className="mt-6">
+                        <a
+                            href="/test"
+                            className="inline-block rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
+                        >
+                            Open /test
+                        </a>
+                    </div>
                 </section>
 
                 <section className="mt-10 rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-8">
