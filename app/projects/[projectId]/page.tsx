@@ -4,9 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import AppNav from "@/components/AppNav";
 import CalendarDateField from "@/components/CalendarDateField";
+import FancySelect from "@/components/FancySelect";
 import ProjectCard from "@/components/ProjectCard";
 import TaskCard from "@/components/TaskCard";
 import {
+    addCustomTask,
     loadProjectPlans,
     updateProjectDetails,
     updateTaskStatus,
@@ -14,8 +16,31 @@ import {
 import { applyProgressToProject, countDoneTasks } from "@/lib/progressUtils";
 import type {
     GeneratedProjectPlan,
+    PriorityLevel,
     TaskStatus,
 } from "@/types/coursework";
+
+const priorityOptions = [
+    {
+        label: "Low",
+        value: "Low",
+        description: "Useful but not urgent.",
+    },
+    {
+        label: "Medium",
+        value: "Medium",
+        description: "Important work that should stay visible.",
+    },
+    {
+        label: "High",
+        value: "High",
+        description: "Urgent or high-impact task. Do this early.",
+    },
+];
+
+function isPriorityLevel(value: string): value is PriorityLevel {
+    return value === "Low" || value === "Medium" || value === "High";
+}
 
 function normaliseDeadlineFormat(deadline: string) {
     return deadline.trim().replaceAll("-", "/");
@@ -68,6 +93,14 @@ export default function ProjectDetailPage() {
     const [titleMessage, setTitleMessage] = useState("");
     const [deadlineError, setDeadlineError] = useState("");
     const [deadlineMessage, setDeadlineMessage] = useState("");
+
+    const [newTaskTitle, setNewTaskTitle] = useState("");
+    const [newTaskPriority, setNewTaskPriority] =
+        useState<PriorityLevel>("Medium");
+    const [newTaskDueDate, setNewTaskDueDate] = useState("");
+    const [newTaskTime, setNewTaskTime] = useState("45 min");
+    const [newTaskError, setNewTaskError] = useState("");
+    const [newTaskMessage, setNewTaskMessage] = useState("");
 
     useEffect(() => {
         const plans = loadProjectPlans();
@@ -171,6 +204,32 @@ export default function ProjectDetailPage() {
         setSavedPlans(updatedPlans);
         setEditDeadline(normalisedDeadline);
         setDeadlineMessage("Project deadline updated.");
+    }
+
+    function handleAddCustomTask() {
+        setNewTaskError("");
+        setNewTaskMessage("");
+
+        const trimmedTitle = newTaskTitle.trim();
+
+        if (!trimmedTitle) {
+            setNewTaskError("Please enter a task title.");
+            return;
+        }
+
+        const updatedPlans = addCustomTask(projectId, {
+            title: trimmedTitle,
+            priority: newTaskPriority,
+            dueDate: newTaskDueDate,
+            time: newTaskTime,
+        });
+
+        setSavedPlans(updatedPlans);
+        setNewTaskTitle("");
+        setNewTaskPriority("Medium");
+        setNewTaskDueDate("");
+        setNewTaskTime("45 min");
+        setNewTaskMessage("Custom task added.");
     }
 
     if (projectId === "new") {
@@ -319,7 +378,8 @@ export default function ProjectDetailPage() {
 
                         <p className="mt-4 max-w-2xl text-slate-300">
                             Review this coursework project, track generated tasks, rename the
-                            project directly from the title, and adjust the deadline below.
+                            project directly from the title, adjust the deadline, and add your
+                            own custom tasks.
                         </p>
                     </div>
 
@@ -383,6 +443,113 @@ export default function ProjectDetailPage() {
                     ) : null}
                 </section>
 
+                <section className="mb-8 rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
+                    <div className="mb-5">
+                        <p className="mb-2 text-sm font-bold text-emerald-300">
+                            Custom task
+                        </p>
+                        <h2 className="text-2xl font-black sm:text-3xl">
+                            Add your own task.
+                        </h2>
+                        <p className="mt-2 text-sm leading-6 text-slate-300">
+                            Generated tasks give you a starting plan. Add custom tasks for
+                            teacher feedback, extra research, presentation work, or anything
+                            specific to your real project.
+                        </p>
+                    </div>
+
+                    <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+                        <div>
+                            <label className="mb-2 block text-sm font-bold text-white">
+                                Task title
+                            </label>
+                            <input
+                                type="text"
+                                value={newTaskTitle}
+                                onChange={(event) => {
+                                    setNewTaskTitle(event.target.value);
+                                    setNewTaskError("");
+                                    setNewTaskMessage("");
+                                }}
+                                placeholder="e.g. Ask teacher for feedback"
+                                className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-300 focus:shadow-lg focus:shadow-emerald-950/40"
+                            />
+                        </div>
+
+                        <FancySelect
+                            label="Priority"
+                            value={newTaskPriority}
+                            placeholder="Choose priority"
+                            options={priorityOptions}
+                            onChange={(nextValue) => {
+                                if (!isPriorityLevel(nextValue)) {
+                                    return;
+                                }
+
+                                setNewTaskPriority(nextValue);
+                                setNewTaskError("");
+                                setNewTaskMessage("");
+                            }}
+                            helperText="Use High for urgent or high-impact work."
+                        />
+                    </div>
+
+                    <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_0.7fr]">
+                        <CalendarDateField
+                            label="Due date"
+                            value={newTaskDueDate}
+                            onChange={(nextValue) => {
+                                setNewTaskDueDate(nextValue);
+                                setNewTaskError("");
+                                setNewTaskMessage("");
+                            }}
+                            helperText="Optional. Leave blank if this task is not scheduled yet."
+                        />
+
+                        <div>
+                            <label className="mb-2 block text-sm font-bold text-white">
+                                Estimated time
+                            </label>
+                            <input
+                                type="text"
+                                value={newTaskTime}
+                                onChange={(event) => {
+                                    setNewTaskTime(event.target.value);
+                                    setNewTaskError("");
+                                    setNewTaskMessage("");
+                                }}
+                                placeholder="45 min"
+                                className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-300 focus:shadow-lg focus:shadow-emerald-950/40"
+                            />
+                            <p className="mt-2 text-xs leading-5 text-slate-400">
+                                Examples: 30 min, 45 min, 1 hour, 2 hours.
+                            </p>
+                        </div>
+                    </div>
+
+                    {newTaskError ? (
+                        <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
+                            {newTaskError}
+                        </div>
+                    ) : null}
+
+                    {newTaskMessage ? (
+                        <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm font-bold text-emerald-300">
+                            {newTaskMessage}
+                        </div>
+                    ) : null}
+
+                    <div className="mt-5">
+                        <button
+                            type="button"
+                            onClick={handleAddCustomTask}
+                            className="rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
+                        >
+                            Add custom task
+                        </button>
+                    </div>
+                </section>
+
                 <div className="mb-8 grid gap-6 md:grid-cols-4">
                     <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
                         <p className="text-sm text-slate-400">Total tasks</p>
@@ -423,7 +590,8 @@ export default function ProjectDetailPage() {
                         </h2>
                         <p className="mt-2 text-sm leading-6 text-slate-300">
                             This project remains completed at 100%, but its finished tasks
-                            are hidden from Today to keep your daily workspace clean.
+                            are hidden from Today to keep your daily workspace clean. Adding a
+                            custom task will reactivate the project.
                         </p>
                     </div>
                 ) : null}
@@ -432,11 +600,11 @@ export default function ProjectDetailPage() {
                     <div className="mb-6">
                         <p className="mb-2 text-sm font-bold text-cyan-300">Task list</p>
                         <h2 className="text-2xl font-black sm:text-3xl">
-                            Generated coursework tasks.
+                            Generated and custom coursework tasks.
                         </h2>
                         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-                            These tasks were generated from the original template and
-                            deadline. Task editing will come in a later version.
+                            These tasks include the original generated plan plus any custom
+                            tasks you add for your real workflow.
                         </p>
                     </div>
 
@@ -455,7 +623,7 @@ export default function ProjectDetailPage() {
                             <p className="mb-2 text-xl font-bold">No visible tasks.</p>
                             <p className="text-sm leading-6 text-slate-300">
                                 This usually means the completed tasks were archived after the
-                                project reached 100%.
+                                project reached 100%. Add a custom task if new work appears.
                             </p>
                         </div>
                     )}
