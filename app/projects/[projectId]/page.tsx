@@ -7,10 +7,12 @@ import CalendarDateField from "@/components/CalendarDateField";
 import FancySelect from "@/components/FancySelect";
 import ProjectCard from "@/components/ProjectCard";
 import TaskCard from "@/components/TaskCard";
+import type { TaskUpdateInput } from "@/components/TaskCard";
 import {
     addCustomTask,
     loadProjectPlans,
     updateProjectDetails,
+    updateTaskDetails,
     updateTaskStatus,
 } from "@/lib/localStorage";
 import { applyProgressToProject, countDoneTasks } from "@/lib/progressUtils";
@@ -128,6 +130,11 @@ export default function ProjectDetailPage() {
 
     function handleChangeTaskStatus(taskId: string, nextStatus: TaskStatus) {
         const updatedPlans = updateTaskStatus(taskId, nextStatus);
+        setSavedPlans(updatedPlans);
+    }
+
+    function handleUpdateTaskDetails(taskId: string, updates: TaskUpdateInput) {
+        const updatedPlans = updateTaskDetails(taskId, updates);
         setSavedPlans(updatedPlans);
     }
 
@@ -615,6 +622,7 @@ export default function ProjectDetailPage() {
                                     key={task.id}
                                     task={task}
                                     onChangeStatus={handleChangeTaskStatus}
+                                    onUpdateTask={handleUpdateTaskDetails}
                                 />
                             ))}
                         </div>

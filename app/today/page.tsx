@@ -3,10 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import AppNav from "@/components/AppNav";
 import TaskCard from "@/components/TaskCard";
-import { loadProjectPlans, updateTaskStatus } from "@/lib/localStorage";
+import {
+    loadProjectPlans,
+    updateTaskDetails,
+    updateTaskStatus,
+} from "@/lib/localStorage";
 import { tasks } from "@/lib/mockData";
 import type {
     GeneratedProjectPlan,
+    PriorityLevel,
     Task,
     TaskStatus,
 } from "@/types/coursework";
@@ -45,10 +50,6 @@ export default function TodayPage() {
         (plan) => plan.project.status === "Completed" || plan.tasksArchivedAt,
     ).length;
 
-    const highPriorityTaskCount = todoTasks.filter(
-        (task) => task.priority === "High",
-    ).length;
-
     const firstHighPriorityTask = todoTasks.find(
         (task) => task.priority === "High",
     );
@@ -70,6 +71,35 @@ export default function TodayPage() {
         );
 
         const updatedPlans = updateTaskStatus(taskId, nextStatus);
+        setSavedPlans(updatedPlans);
+    }
+
+    function handleUpdateTaskDetails(
+        taskId: string,
+        updates: {
+            title: string;
+            priority: PriorityLevel;
+            dueDate: string;
+            time: string;
+        },
+    ) {
+        setMockTasks((currentTasks) =>
+            currentTasks.map((task) => {
+                if (task.id !== taskId) {
+                    return task;
+                }
+
+                return {
+                    ...task,
+                    title: updates.title,
+                    priority: updates.priority,
+                    dueDate: updates.dueDate,
+                    time: updates.time,
+                };
+            }),
+        );
+
+        const updatedPlans = updateTaskDetails(taskId, updates);
         setSavedPlans(updatedPlans);
     }
 
@@ -208,6 +238,7 @@ export default function TodayPage() {
                                     key={task.id}
                                     task={task}
                                     onChangeStatus={handleChangeTaskStatus}
+                                    onUpdateTask={handleUpdateTaskDetails}
                                 />
                             ))
                         ) : (

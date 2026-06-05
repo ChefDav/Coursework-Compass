@@ -259,6 +259,53 @@ export function addCustomTask(
     return updatedPlans;
 }
 
+export function updateTaskDetails(
+    taskId: string,
+    updates: {
+        title: string;
+        priority: PriorityLevel;
+        dueDate: string;
+        time: string;
+    },
+) {
+    const existingPlans = loadProjectPlans();
+    const trimmedTitle = updates.title.trim();
+    const trimmedTime = updates.time.trim() || "45 min";
+
+    if (!trimmedTitle) {
+        return existingPlans;
+    }
+
+    function updateTask(task: Task) {
+        if (task.id !== taskId) {
+            return task;
+        }
+
+        return {
+            ...task,
+            title: trimmedTitle,
+            priority: updates.priority,
+            dueDate: updates.dueDate,
+            time: trimmedTime,
+        };
+    }
+
+    const updatedPlans = existingPlans.map((plan) => {
+        const updatedTasks = plan.tasks.map(updateTask);
+        const updatedArchivedTasks = plan.archivedTasks?.map(updateTask);
+
+        return {
+            ...plan,
+            tasks: updatedTasks,
+            archivedTasks: updatedArchivedTasks,
+        } satisfies GeneratedProjectPlan;
+    });
+
+    saveProjectPlans(updatedPlans);
+
+    return updatedPlans;
+}
+
 export function updateTaskStatus(taskId: string, status: TaskStatus) {
     const existingPlans = loadProjectPlans();
 
@@ -326,11 +373,7 @@ export function findCompletedPlanWaitingForPrompt() {
             const allTasksDone =
                 hasVisibleTasks && plan.tasks.every((task) => task.status === "Done");
 
-            return (
-                allTasksDone &&
-                !plan.completionPromptShown &&
-                !plan.tasksArchivedAt
-            );
+            return allTasksDone && !plan.completionPromptShown && !plan.tasksArchivedAt;
         }) ?? null
     );
 }
