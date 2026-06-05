@@ -2,6 +2,7 @@ import AppNav from "@/components/AppNav";
 import BetaNotice from "@/components/BetaNotice";
 import ExamCountdownCard from "@/components/ExamCountdownCard";
 import FeedbackLink from "@/components/FeedbackLink";
+import FeedbackPanel from "@/components/FeedbackPanel";
 import TestingGuideCard from "@/components/TestingGuideCard";
 
 const templateHighlights = [
@@ -175,6 +176,10 @@ export default function HomePage() {
 
           <div className="mt-10">
             <TestingGuideCard />
+          </div>
+
+          <div className="mt-10">
+            <FeedbackPanel />
           </div>
 
           <section className="mt-20">

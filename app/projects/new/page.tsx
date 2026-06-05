@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import AppNav from "@/components/AppNav";
 import BetaNotice from "@/components/BetaNotice";
+import FeedbackPanel from "@/components/FeedbackPanel";
 import NewProjectForm from "@/components/NewProjectForm";
 import TestingGuideCard from "@/components/TestingGuideCard";
 
@@ -40,6 +41,10 @@ export default function NewProjectPage() {
 
                 <div className="mt-8">
                     <TestingGuideCard />
+                </div>
+
+                <div className="mt-8">
+                    <FeedbackPanel />
                 </div>
             </section>
         </main>
