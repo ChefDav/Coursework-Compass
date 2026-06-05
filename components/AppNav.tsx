@@ -1,10 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import FeedbackLink from "@/components/FeedbackLink";
 
 const navItems = [
+    {
+        label: "Main menu",
+        href: "/",
+    },
     {
         label: "Dashboard",
         href: "/dashboard",
@@ -17,39 +19,65 @@ const navItems = [
         label: "Today",
         href: "/today",
     },
+    {
+        label: "New Project",
+        href: "/projects/new",
+    },
+    {
+        label: "Updates",
+        href: "/updates",
+    },
 ];
+
+function isActivePath(pathname: string, href: string) {
+    if (href === "/") {
+        return pathname === "/";
+    }
+
+    if (href === "/projects") {
+        return pathname === "/projects";
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export default function AppNav() {
     const pathname = usePathname();
 
     return (
-        <nav className="mb-10 flex flex-col gap-5 sm:mb-12 sm:flex-row sm:items-center sm:justify-between">
-            <Link href="/" className="text-xl font-black tracking-tight">
-                Coursework Compass
-            </Link>
+        <header className="mb-10 rounded-[2rem] border border-slate-800 bg-slate-900/80 p-4 shadow-2xl shadow-cyan-950/20 sm:p-5">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <a href="/" className="group">
+                    <p className="text-xl font-black tracking-tight text-white transition group-hover:text-cyan-300">
+                        Coursework Compass
+                    </p>
+                    <p className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 transition group-hover:text-cyan-400">
+                        v1.1 Editable Planner
+                    </p>
+                </a>
 
-            <div className="flex flex-wrap gap-3 text-sm text-slate-300">
-                {navItems.map((item) => {
-                    const isActive =
-                        pathname === item.href || pathname.startsWith(`${item.href}/`);
+                <nav className="flex flex-wrap gap-2">
+                    {navItems.map((item) => {
+                        const isActive = isActivePath(pathname, item.href);
 
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`rounded-full px-3 py-2 font-bold transition ${
-                                isActive
-                                    ? "bg-cyan-400/10 text-cyan-300"
-                                    : "hover:bg-slate-800 hover:text-white"
-                            }`}
-                        >
-                            {item.label}
-                        </Link>
-                    );
-                })}
-
-                <FeedbackLink />
+                        return (
+                            <a
+                                key={item.href}
+                                href={item.href}
+                                className={`rounded-2xl px-4 py-3 text-sm font-bold transition ${
+                                    isActive
+                                        ? "bg-cyan-400 text-slate-950"
+                                        : item.href === "/"
+                                            ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20"
+                                            : "border border-slate-800 bg-slate-950/70 text-slate-300 hover:border-cyan-400 hover:text-cyan-300"
+                                }`}
+                            >
+                                {item.label}
+                            </a>
+                        );
+                    })}
+                </nav>
             </div>
-        </nav>
+        </header>
     );
 }

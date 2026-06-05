@@ -13,35 +13,39 @@ const currentFeatures = [
     "Automatically normalise estimated time, such as 60 min to 1 hour",
     "Archive completed tasks and restore them when new work is added",
     "Use draggable, collapsible world clock widget",
-    "Use the dedicated student testing page",
+    "Use the isolated guided tutorial sandbox",
     "Send structured student testing feedback",
 ];
 
 const whatToTest = [
-    "Create a new coursework project",
-    "Choose a subject template",
-    "Use the calendar to select a deadline",
-    "Create and save the generated task plan",
-    "Add a custom task",
-    "Edit an existing task",
-    "Delete a task",
-    "Mark a task as done and restore it back to todo",
-    "Check whether Today, Dashboard, and Project Detail stay in sync",
-    "Send short feedback through the feedback panel",
+    "Open the guided tutorial from the homepage",
+    "Choose a sample project inside the tutorial",
+    "Complete the simulated planner actions",
+    "Watch the feedback loading screen reach 100%",
+    "Send feedback through the structured feedback panel",
+    "Return to the main menu from the completion screen",
+    "Create a real project from the normal product flow",
+    "Check that the test tutorial does not affect real saved project data",
 ];
 
 const mobileChecklist = [
     "Open the website on a phone or small screen",
     "Check whether buttons are easy to tap",
-    "Check whether the calendar picker is usable",
-    "Check whether task cards are readable",
-    "Check whether edit and delete buttons fit properly",
-    "Check whether the feedback panel is comfortable to use",
+    "Check whether the guided tutorial cards are readable",
+    "Check whether the simulated task controls fit properly",
+    "Check whether the feedback loading screen looks smooth",
+    "Check whether the congrats screen is readable and not cramped",
     "Check whether the clock widget blocks any important action",
     "Report any page that feels cramped or hard to use",
 ];
 
 const recentUpdates = [
+    {
+        version: "v1.1.3",
+        title: "Guided Test Flow + Homepage Restore",
+        description:
+            "Restored the homepage to a normal product entry, added a larger Join student test button, redesigned /test as an isolated tutorial sandbox, added a feedback loading screen, and added a final congratulations screen after testing.",
+    },
     {
         version: "v1.1.2",
         title: "Student Testing Guide",
@@ -78,6 +82,7 @@ const currentLimitations = [
     "Project data is currently stored locally in the browser.",
     "There is no account system yet.",
     "Cloud sync across devices is planned for a later version.",
+    "The guided test tutorial uses simulated data and does not save real project data.",
     "Feedback is currently collected through email templates.",
     "AI-generated adaptive planning is not included yet.",
 ];
@@ -103,7 +108,7 @@ export default function UpdatesPage() {
                     </div>
 
                     <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
-                        Coursework Compass v1.1.2 is ready for guided student testing.
+                        Coursework Compass v1.1.3 restores the homepage and upgrades testing.
                     </h1>
 
                     <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
@@ -117,7 +122,7 @@ export default function UpdatesPage() {
                             href="/test"
                             className="rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
                         >
-                            Open student testing page
+                            Join student test
                         </a>
 
                         <a
@@ -141,26 +146,28 @@ export default function UpdatesPage() {
                         Current version
                     </p>
                     <h2 className="text-3xl font-black sm:text-4xl">
-                        v1.1.2: Student Testing Guide
+                        v1.1.3: Guided Test Flow + Homepage Restore
                     </h2>
                     <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
-                        The main goal of v1.1.2 is to make the testing session easier to
-                        run and easier to understand. The product now includes a dedicated
-                        student testing page with a clear route, sample project ideas, and
-                        feedback guidance.
+                        The main goal of v1.1.3 is to keep the public homepage in its normal
+                        product form while giving student testers a separate, isolated,
+                        guided tutorial. Students can now complete a simulated workflow,
+                        reach a feedback loading screen, and finish on a congratulations
+                        screen without affecting real saved project data.
                     </p>
                 </section>
 
                 <section className="mt-10 rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-8">
                     <p className="mb-2 text-sm font-bold text-emerald-300">
-                        Student testing page
+                        Guided tutorial sandbox
                     </p>
                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                        A dedicated route for next week&apos;s testing.
+                        The test flow is now separate from the real app.
                     </h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        Students can now start from one page that explains what to test,
-                        which sample projects to use, and how to send useful feedback.
+                        The /test page uses simulated data only. It does not open Dashboard,
+                        Projects, or Today, and it does not write to localStorage. This
+                        makes it safer and clearer for student testing.
                     </p>
 
                     <div className="mt-6">
@@ -168,7 +175,7 @@ export default function UpdatesPage() {
                             href="/test"
                             className="inline-block rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
                         >
-                            Open /test
+                            Open guided tutorial
                         </a>
                     </div>
                 </section>
@@ -178,12 +185,11 @@ export default function UpdatesPage() {
                         What to test
                     </p>
                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                        Suggested 5-minute testing flow.
+                        Suggested testing flow for v1.1.3.
                     </h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        Students do not need to test everything perfectly. The most useful
-                        feedback comes from trying the core workflow and reporting what
-                        feels helpful, confusing, or missing.
+                        Students can now test the tutorial safely first, then explore the
+                        real planning tools afterwards if they want to create a real project.
                     </p>
 
                     <div className="mt-6 grid gap-4 md:grid-cols-2">
