@@ -51,12 +51,12 @@ const featureCards = [
   {
     title: "Editable task workspace",
     description:
-        "Add, edit, delete, complete, and restore tasks. The v1.1 beta is designed for real coursework changes.",
+        "Add, edit, delete, complete, and restore tasks. The v1.2 beta is designed for real coursework changes.",
   },
   {
-    title: "Student-first interface",
+    title: "Student-first testing flow",
     description:
-        "Built for students managing IA, EE, TOK, essays, mock season, revision pressure, and shifting teacher feedback.",
+        "The guided tutorial helps new testers understand the product before using the real planner.",
   },
 ];
 
@@ -69,7 +69,7 @@ export default function HomePage() {
           <section className="grid gap-10 py-12 md:grid-cols-[1.2fr_0.8fr] md:items-center md:py-20">
             <div>
               <div className="mb-5 inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
-                Coursework Compass v1.1 Editable Planner
+                Coursework Compass v1.2 Student Testing Polish
               </div>
 
               <h1 className="text-5xl font-black tracking-tight sm:text-6xl md:text-7xl">
@@ -182,7 +182,7 @@ export default function HomePage() {
                 </h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
                   The main website stays as the normal product experience. The
-                  test route is now separated into an independent tutorial, so
+                  test route is separated into an independent tutorial, so
                   students can try the workflow safely without touching real
                   project data.
                 </p>
@@ -272,7 +272,7 @@ export default function HomePage() {
           <section className="mt-20">
             <div className="mb-8">
               <p className="mb-2 text-sm font-bold text-cyan-300">
-                v1.1 features
+                v1.2 features
               </p>
               <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                 Built for real student workflows.

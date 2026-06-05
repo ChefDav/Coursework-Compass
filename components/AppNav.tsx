@@ -52,7 +52,7 @@ export default function AppNav() {
                         Coursework Compass
                     </p>
                     <p className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 transition group-hover:text-cyan-400">
-                        v1.1 Editable Planner
+                        v1.2 Student Testing Polish
                     </p>
                 </a>
 
