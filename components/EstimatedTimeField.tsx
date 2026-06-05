@@ -31,7 +31,11 @@ const unitOptions: { label: string; value: TimeUnit }[] = [
     },
 ];
 
-function safeString(value: string | null | undefined) {
+function safeString(value: string | number | null | undefined) {
+    if (typeof value === "number") {
+        return String(value);
+    }
+
     if (typeof value !== "string") {
         return "";
     }
@@ -48,7 +52,7 @@ function removeTrailingZero(value: number) {
 }
 
 export function parseEstimatedTime(
-    value: string | null | undefined,
+    value: string | number | null | undefined,
 ): ParsedEstimatedTime {
     const cleanedValue = safeString(value).trim().toLowerCase();
 
@@ -65,7 +69,7 @@ export function parseEstimatedTime(
     if (
         cleanedValue.includes("day") ||
         cleanedValue.includes("days") ||
-        cleanedValue === "d"
+        cleanedValue.endsWith(" d")
     ) {
         return {
             amount,
@@ -78,7 +82,7 @@ export function parseEstimatedTime(
         cleanedValue.includes("hours") ||
         cleanedValue.includes("hr") ||
         cleanedValue.includes("hrs") ||
-        cleanedValue === "h"
+        cleanedValue.endsWith(" h")
     ) {
         return {
             amount,
@@ -93,12 +97,12 @@ export function parseEstimatedTime(
 }
 
 export function normaliseEstimatedTime(
-    value: string | null | undefined,
+    value: string | number | null | undefined,
     fallbackUnit: TimeUnit = "min",
 ) {
     const cleanedValue = safeString(value).trim();
 
-    if (!cleanedValue) {
+    if (!cleanedValue || cleanedValue.toLowerCase() === "not set") {
         return "Not set";
     }
 
@@ -112,12 +116,12 @@ export function normaliseEstimatedTime(
     const unit = parsed.unit || fallbackUnit;
 
     if (unit === "min") {
-        if (amountNumber >= 1440 && amountNumber % 1440 === 0) {
+        if (amountNumber >= 1440) {
             const days = amountNumber / 1440;
             return `${removeTrailingZero(days)} ${days === 1 ? "day" : "days"}`;
         }
 
-        if (amountNumber >= 60 && amountNumber % 60 === 0) {
+        if (amountNumber >= 60) {
             const hours = amountNumber / 60;
             return `${removeTrailingZero(hours)} ${
                 hours === 1 ? "hour" : "hours"
@@ -128,7 +132,7 @@ export function normaliseEstimatedTime(
     }
 
     if (unit === "hours") {
-        if (amountNumber >= 24 && amountNumber % 24 === 0) {
+        if (amountNumber >= 24) {
             const days = amountNumber / 24;
             return `${removeTrailingZero(days)} ${days === 1 ? "day" : "days"}`;
         }
@@ -203,6 +207,11 @@ export default function EstimatedTimeField({
                     disabled={disabled}
                     onChange={(event) => handleAmountChange(event.target.value)}
                     onBlur={handleAmountBlur}
+                    onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                            commitValue(amount, unit);
+                        }
+                    }}
                     placeholder="e.g. 60"
                     className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
                 />

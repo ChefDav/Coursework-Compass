@@ -3,310 +3,354 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import AppNav from "@/components/AppNav";
+import EmptyState from "@/components/EmptyState";
+import TaskCard from "@/components/TaskCard";
 import CalendarDateField from "@/components/CalendarDateField";
 import EstimatedTimeField, {
     normaliseEstimatedTime,
 } from "@/components/EstimatedTimeField";
-import FancySelect from "@/components/FancySelect";
-import ProjectCard from "@/components/ProjectCard";
-import TaskCard from "@/components/TaskCard";
-import type { TaskUpdateInput } from "@/components/TaskCard";
 import {
     addCustomTask,
+    archiveCompletedTasks,
     deleteTask,
+    findProjectPlan,
+    getProjectRouteId,
     loadProjectPlans,
     updateProjectDetails,
     updateTaskDetails,
     updateTaskStatus,
+    type CourseworkTask,
+    type GeneratedProjectPlan,
+    type TaskStatus,
 } from "@/lib/localStorage";
-import { applyProgressToProject, countDoneTasks } from "@/lib/progressUtils";
-import type {
-    GeneratedProjectPlan,
-    PriorityLevel,
-    TaskStatus,
-} from "@/types/coursework";
 
-const priorityOptions = [
-    {
-        label: "Low",
-        value: "Low",
-        description: "Useful but not urgent.",
-    },
-    {
-        label: "Medium",
-        value: "Medium",
-        description: "Important work that should stay visible.",
-    },
-    {
-        label: "High",
-        value: "High",
-        description: "Urgent or high-impact task. Do this early.",
-    },
-];
+type TaskPriority = "Low" | "Medium" | "High";
 
-function isPriorityLevel(value: string): value is PriorityLevel {
+const priorityOptions: TaskPriority[] = ["Low", "Medium", "High"];
+
+function getParamAsString(value: string | string[] | undefined) {
+    if (Array.isArray(value)) {
+        return value[0] || "";
+    }
+
+    return value || "";
+}
+
+function isTaskPriority(value: string): value is TaskPriority {
     return value === "Low" || value === "Medium" || value === "High";
 }
 
-function normaliseDeadlineFormat(deadline: string) {
-    return deadline.trim().replaceAll("-", "/");
+function getDefaultEstimatedTime(priority?: string) {
+    if (priority === "High") {
+        return "1 hour";
+    }
+
+    if (priority === "Low") {
+        return "30 min";
+    }
+
+    return "45 min";
 }
 
-function validateDeadline(deadline: string) {
-    const normalisedDeadline = normaliseDeadlineFormat(deadline);
-    const deadlinePattern = /^(\d{4})\/(\d{2})\/(\d{2})$/;
-    const match = normalisedDeadline.match(deadlinePattern);
+function getDisplayEstimatedTime(value?: string, priority?: string) {
+    const normalisedValue = normaliseEstimatedTime(value);
 
-    if (!match) {
-        return "Use the format yyyy/mm/dd, for example 2026/07/10.";
+    if (!normalisedValue || normalisedValue === "Not set") {
+        return getDefaultEstimatedTime(priority);
     }
 
-    const year = Number(match[1]);
-    const month = Number(match[2]);
-    const day = Number(match[3]);
+    return normalisedValue;
+}
 
-    if (year < 2026) {
-        return "The year cannot be earlier than 2026.";
+function calculateProgress(tasks: CourseworkTask[]) {
+    if (tasks.length === 0) {
+        return 0;
     }
 
-    if (month < 1 || month > 12) {
-        return "The month must be between 01 and 12.";
+    const doneCount = tasks.filter((task) => task.status === "Done").length;
+    return Math.round((doneCount / tasks.length) * 100);
+}
+
+function parseDateValue(value?: string) {
+    if (!value) {
+        return null;
     }
 
-    const parsedDate = new Date(year, month - 1, day);
+    const cleanedValue = value.trim().replaceAll("/", "-");
+    const parts = cleanedValue.split("-").map((part) => Number(part));
 
-    const isRealDate =
-        parsedDate.getFullYear() === year &&
-        parsedDate.getMonth() === month - 1 &&
-        parsedDate.getDate() === day;
-
-    if (!isRealDate) {
-        return "Enter a real calendar date.";
+    if (parts.length < 3 || parts.some((part) => Number.isNaN(part))) {
+        return null;
     }
 
-    return "";
+    const [year, month, day] = parts;
+
+    return new Date(year, month - 1, day);
+}
+
+function getDaysLeftLabel(dateValue?: string) {
+    const targetDate = parseDateValue(dateValue);
+
+    if (!targetDate) {
+        return "Days left: unknown";
+    }
+
+    const today = new Date();
+    const todayDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+    );
+
+    const diffMs = targetDate.getTime() - todayDate.getTime();
+    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (daysLeft < 0) {
+        const overdueDays = Math.abs(daysLeft);
+        return `${overdueDays} day${overdueDays === 1 ? "" : "s"} overdue`;
+    }
+
+    if (daysLeft === 0) {
+        return "Due today";
+    }
+
+    if (daysLeft === 1) {
+        return "1 day left";
+    }
+
+    return `${daysLeft} days left`;
+}
+
+function getDeadlineClasses(dateValue?: string) {
+    const targetDate = parseDateValue(dateValue);
+
+    if (!targetDate) {
+        return "border-slate-700 bg-slate-900 text-slate-300";
+    }
+
+    const today = new Date();
+    const todayDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+    );
+
+    const diffMs = targetDate.getTime() - todayDate.getTime();
+    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (daysLeft < 0 || daysLeft <= 3) {
+        return "border-red-400/30 bg-red-400/10 text-red-300";
+    }
+
+    if (daysLeft <= 10) {
+        return "border-amber-400/30 bg-amber-400/10 text-amber-300";
+    }
+
+    return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
+}
+
+function getProjectStatus(progress: number) {
+    if (progress >= 100) {
+        return "Complete";
+    }
+
+    if (progress >= 60) {
+        return "In progress";
+    }
+
+    return "Active";
+}
+
+function getStatusClasses(status: string) {
+    if (status === "Complete") {
+        return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
+    }
+
+    if (status === "In progress") {
+        return "border-cyan-400/30 bg-cyan-400/10 text-cyan-300";
+    }
+
+    return "border-amber-400/30 bg-amber-400/10 text-amber-300";
+}
+
+function repairTaskForDisplay(task: CourseworkTask) {
+    return {
+        ...task,
+        priority: task.priority || "Medium",
+        estimatedTime: getDisplayEstimatedTime(task.estimatedTime, task.priority),
+    };
 }
 
 export default function ProjectDetailPage() {
-    const params = useParams<{ projectId: string }>();
-    const projectId = params.projectId;
+    const params = useParams();
+    const routeProjectId = getParamAsString(params.projectId);
 
-    const [savedPlans, setSavedPlans] = useState<GeneratedProjectPlan[]>([]);
-    const [isEditingTitle, setIsEditingTitle] = useState(false);
-    const [editTitle, setEditTitle] = useState("");
-    const [editDeadline, setEditDeadline] = useState("");
-    const [titleError, setTitleError] = useState("");
-    const [titleMessage, setTitleMessage] = useState("");
-    const [deadlineError, setDeadlineError] = useState("");
-    const [deadlineMessage, setDeadlineMessage] = useState("");
+    const [projectPlans, setProjectPlans] = useState<GeneratedProjectPlan[]>([]);
+    const [isEditingProject, setIsEditingProject] = useState(false);
+    const [projectTitle, setProjectTitle] = useState("");
+    const [projectDeadline, setProjectDeadline] = useState("");
 
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [newTaskPriority, setNewTaskPriority] =
-        useState<PriorityLevel>("Medium");
+        useState<TaskPriority>("Medium");
     const [newTaskDueDate, setNewTaskDueDate] = useState("");
-    const [newTaskTime, setNewTaskTime] = useState("45 min");
+    const [newTaskEstimatedTime, setNewTaskEstimatedTime] = useState("45 min");
     const [newTaskError, setNewTaskError] = useState("");
-    const [newTaskMessage, setNewTaskMessage] = useState("");
+
+    function refreshProjectPlans() {
+        setProjectPlans(loadProjectPlans());
+    }
 
     useEffect(() => {
-        const plans = loadProjectPlans();
-        setSavedPlans(plans);
+        refreshProjectPlans();
     }, []);
 
-    const currentPlan = useMemo(() => {
-        return savedPlans.find((plan) => plan.project.id === projectId) ?? null;
-    }, [projectId, savedPlans]);
+    const projectInfo = useMemo(() => {
+        const directPlan = findProjectPlan(routeProjectId);
 
-    const project = currentPlan ? applyProgressToProject(currentPlan) : null;
-    const tasks = currentPlan?.tasks ?? [];
-    const doneTaskCount = countDoneTasks(tasks);
-    const todoTaskCount = tasks.filter((task) => task.status === "Todo").length;
-    const archivedTaskCount = currentPlan?.archivedTaskCount ?? 0;
+        if (directPlan) {
+            const directIndex = projectPlans.findIndex(
+                (plan, index) =>
+                    getProjectRouteId(plan, index) === getProjectRouteId(directPlan, index),
+            );
+
+            return {
+                plan: directPlan,
+                index: directIndex >= 0 ? directIndex : 0,
+                routeId: getProjectRouteId(directPlan, directIndex >= 0 ? directIndex : 0),
+            };
+        }
+
+        const foundIndex = projectPlans.findIndex((plan, index) => {
+            const projectRouteId = getProjectRouteId(plan, index);
+
+            return projectRouteId === routeProjectId;
+        });
+
+        if (foundIndex < 0) {
+            return null;
+        }
+
+        return {
+            plan: projectPlans[foundIndex],
+            index: foundIndex,
+            routeId: getProjectRouteId(projectPlans[foundIndex], foundIndex),
+        };
+    }, [projectPlans, routeProjectId]);
 
     useEffect(() => {
-        if (!project) {
+        if (!projectInfo) {
             return;
         }
 
-        setEditTitle(project.title);
-        setEditDeadline(normaliseDeadlineFormat(project.deadline));
-    }, [project?.id, project?.title, project?.deadline]);
+        setProjectTitle(projectInfo.plan.project.title);
+        setProjectDeadline(projectInfo.plan.project.deadline);
+    }, [projectInfo]);
 
-    function handleChangeTaskStatus(taskId: string, nextStatus: TaskStatus) {
-        const updatedPlans = updateTaskStatus(taskId, nextStatus);
-        setSavedPlans(updatedPlans);
+    if (!projectInfo) {
+        return (
+            <main className="min-h-screen bg-slate-950 text-white">
+                <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+                    <AppNav />
+
+                    <EmptyState
+                        eyebrow="Project not found"
+                        title="This project is not saved here."
+                        description="This project could not be found in this browser. It may have been deleted, reset, or saved in another browser or device."
+                        icon="🗂️"
+                        actions={[
+                            {
+                                label: "Back to projects",
+                                href: "/projects",
+                            },
+                            {
+                                label: "Create new project",
+                                href: "/projects/new",
+                                variant: "secondary",
+                            },
+                        ]}
+                        tips={[
+                            "The current beta stores project data locally in this browser.",
+                            "If you reset local data, old project links will no longer open.",
+                            "Create a new project to start a fresh saved plan.",
+                            "Cloud sync is planned for a later version.",
+                        ]}
+                    />
+                </section>
+            </main>
+        );
     }
 
-    function handleUpdateTaskDetails(taskId: string, updates: TaskUpdateInput) {
-        const updatedPlans = updateTaskDetails(taskId, updates);
-        setSavedPlans(updatedPlans);
+    const projectPlan = projectInfo.plan;
+    const projectRouteId = projectInfo.routeId;
+    const repairedTasks = projectPlan.tasks.map(repairTaskForDisplay);
+
+    const progress = calculateProgress(repairedTasks);
+    const status = getProjectStatus(progress);
+    const todoCount = repairedTasks.filter((task) => task.status !== "Done").length;
+    const doneCount = repairedTasks.filter((task) => task.status === "Done").length;
+    const completedTasksCount = repairedTasks.filter(
+        (task) => task.status === "Done",
+    ).length;
+
+    function handleSaveProjectDetails() {
+        const trimmedTitle = projectTitle.trim();
+
+        if (!trimmedTitle) {
+            return;
+        }
+
+        updateProjectDetails(projectRouteId, {
+            title: trimmedTitle,
+            deadline: projectDeadline,
+        });
+
+        setIsEditingProject(false);
+        refreshProjectPlans();
+    }
+
+    function handleUpdateTask(taskId: string, updates: Partial<CourseworkTask>) {
+        updateTaskDetails(projectRouteId, taskId, updates);
+        refreshProjectPlans();
+    }
+
+    function handleUpdateStatus(taskId: string, nextStatus: TaskStatus) {
+        updateTaskStatus(projectRouteId, taskId, nextStatus);
+        refreshProjectPlans();
     }
 
     function handleDeleteTask(taskId: string) {
-        const updatedPlans = deleteTask(taskId);
-        setSavedPlans(updatedPlans);
-    }
-
-    function handleStartTitleEdit() {
-        if (!project) {
-            return;
-        }
-
-        setEditTitle(project.title);
-        setTitleError("");
-        setTitleMessage("");
-        setIsEditingTitle(true);
-    }
-
-    function handleCancelTitleEdit() {
-        if (!project) {
-            return;
-        }
-
-        setEditTitle(project.title);
-        setTitleError("");
-        setIsEditingTitle(false);
-    }
-
-    function handleSaveTitle() {
-        if (!project) {
-            return;
-        }
-
-        setTitleError("");
-        setTitleMessage("");
-
-        const trimmedTitle = editTitle.trim();
-
-        if (!trimmedTitle) {
-            setTitleError("Please enter a project name.");
-            return;
-        }
-
-        const safeDeadline = normaliseDeadlineFormat(project.deadline);
-
-        const updatedPlans = updateProjectDetails(projectId, {
-            title: trimmedTitle,
-            deadline: safeDeadline,
-        });
-
-        setSavedPlans(updatedPlans);
-        setEditDeadline(safeDeadline);
-        setIsEditingTitle(false);
-        setTitleMessage("Project title updated.");
-    }
-
-    function handleSaveDeadline() {
-        if (!project) {
-            return;
-        }
-
-        setDeadlineError("");
-        setDeadlineMessage("");
-
-        const normalisedDeadline = normaliseDeadlineFormat(editDeadline);
-        const deadlineValidationError = validateDeadline(normalisedDeadline);
-
-        if (deadlineValidationError) {
-            setDeadlineError(deadlineValidationError);
-            return;
-        }
-
-        const updatedPlans = updateProjectDetails(projectId, {
-            title: project.title,
-            deadline: normalisedDeadline,
-        });
-
-        setSavedPlans(updatedPlans);
-        setEditDeadline(normalisedDeadline);
-        setDeadlineMessage("Project deadline updated.");
+        deleteTask(projectRouteId, taskId);
+        refreshProjectPlans();
     }
 
     function handleAddCustomTask() {
-        setNewTaskError("");
-        setNewTaskMessage("");
-
         const trimmedTitle = newTaskTitle.trim();
 
         if (!trimmedTitle) {
-            setNewTaskError("Please enter a task title.");
+            setNewTaskError("Please type a task title first.");
             return;
         }
 
-        const updatedPlans = addCustomTask(projectId, {
+        addCustomTask(projectRouteId, {
             title: trimmedTitle,
+            status: "Todo",
             priority: newTaskPriority,
             dueDate: newTaskDueDate,
-            time: normaliseEstimatedTime(newTaskTime),
+            estimatedTime: normaliseEstimatedTime(newTaskEstimatedTime),
         });
 
-        setSavedPlans(updatedPlans);
         setNewTaskTitle("");
         setNewTaskPriority("Medium");
         setNewTaskDueDate("");
-        setNewTaskTime("45 min");
-        setNewTaskMessage("Custom task added.");
+        setNewTaskEstimatedTime("45 min");
+        setNewTaskError("");
+        refreshProjectPlans();
     }
 
-    if (projectId === "new") {
-        return (
-            <main className="min-h-screen bg-slate-950 text-white">
-                <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-                    <AppNav />
-
-                    <div className="rounded-3xl border border-red-400/30 bg-red-400/10 p-8">
-                        <p className="mb-2 text-sm font-bold text-red-300">
-                            Route issue detected
-                        </p>
-                        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
-                            The new project page was not reached.
-                        </h1>
-                        <p className="mt-4 max-w-2xl text-slate-300">
-                            The app tried to treat /projects/new as a project detail route.
-                            Please check that app/projects/new/page.tsx exists in the correct
-                            folder.
-                        </p>
-
-                        <a
-                            href="/projects/new"
-                            className="mt-6 inline-block rounded-2xl bg-cyan-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-cyan-300"
-                        >
-                            Try New Project again
-                        </a>
-                    </div>
-                </section>
-            </main>
-        );
-    }
-
-    if (!project || !currentPlan) {
-        return (
-            <main className="min-h-screen bg-slate-950 text-white">
-                <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-                    <AppNav />
-
-                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8">
-                        <p className="mb-2 text-sm font-bold text-red-300">
-                            Project not found
-                        </p>
-                        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
-                            This project is not saved here.
-                        </h1>
-                        <p className="mt-4 max-w-2xl text-slate-300">
-                            This project may have been deleted, archived in another browser,
-                            or never saved locally on this device.
-                        </p>
-
-                        <a
-                            href="/projects"
-                            className="mt-6 inline-block rounded-2xl bg-cyan-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-cyan-300"
-                        >
-                            Back to Projects
-                        </a>
-                    </div>
-                </section>
-            </main>
-        );
+    function handleArchiveCompletedTasks() {
+        archiveCompletedTasks(projectRouteId);
+        refreshProjectPlans();
     }
 
     return (
@@ -314,169 +358,176 @@ export default function ProjectDetailPage() {
             <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                 <AppNav />
 
-                <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-                    <div className="min-w-0">
-                        <p className="mb-2 text-sm font-bold text-cyan-300">
-                            Project details
-                        </p>
+                <section className="mb-10 rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 shadow-2xl shadow-cyan-950/20 sm:p-8">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                        <div className="min-w-0">
+                            <p className="mb-2 text-sm font-bold text-cyan-300">
+                                Project details
+                            </p>
 
-                        {isEditingTitle ? (
-                            <div className="max-w-3xl">
-                                <input
-                                    type="text"
-                                    value={editTitle}
-                                    onChange={(event) => {
-                                        setEditTitle(event.target.value);
-                                        setTitleError("");
-                                        setTitleMessage("");
-                                    }}
-                                    onKeyDown={(event) => {
-                                        if (event.key === "Enter") {
-                                            handleSaveTitle();
-                                        }
+                            {isEditingProject ? (
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="mb-2 block text-xs font-bold text-slate-300">
+                                            Project title
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={projectTitle}
+                                            onChange={(event) => setProjectTitle(event.target.value)}
+                                            className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
+                                        />
+                                    </div>
 
-                                        if (event.key === "Escape") {
-                                            handleCancelTitleEdit();
-                                        }
-                                    }}
-                                    autoFocus
-                                    className="w-full rounded-3xl border border-cyan-400/50 bg-slate-950/80 px-4 py-4 text-4xl font-black tracking-tight text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-2xl focus:shadow-cyan-950/50 sm:text-5xl"
-                                />
+                                    <CalendarDateField
+                                        label="Project deadline"
+                                        value={projectDeadline}
+                                        onChange={setProjectDeadline}
+                                    />
 
-                                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-                                    <button
-                                        type="button"
-                                        onClick={handleSaveTitle}
-                                        className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
-                                    >
-                                        Save title
-                                    </button>
+                                    <div className="flex flex-col gap-3 sm:flex-row">
+                                        <button
+                                            type="button"
+                                            onClick={handleSaveProjectDetails}
+                                            className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                                        >
+                                            Save project details
+                                        </button>
 
-                                    <button
-                                        type="button"
-                                        onClick={handleCancelTitleEdit}
-                                        className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
-                                    >
-                                        Cancel
-                                    </button>
-
-                                    <p className="text-xs text-slate-400">
-                                        Press Enter to save or Esc to cancel.
-                                    </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setProjectTitle(projectPlan.project.title);
+                                                setProjectDeadline(projectPlan.project.deadline);
+                                                setIsEditingProject(false);
+                                            }}
+                                            className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ) : (
+                            ) : (
+                                <>
+                                    <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
+                                        {projectPlan.project.title}
+                                    </h1>
+
+                                    <div className="mt-5 flex flex-wrap gap-2 text-xs font-bold">
+                    <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1 text-slate-300">
+                      Deadline: {projectPlan.project.deadline || "Not set"}
+                    </span>
+
+                                        <span
+                                            className={`rounded-full border px-3 py-1 ${getDeadlineClasses(
+                                                projectPlan.project.deadline,
+                                            )}`}
+                                        >
+                      {getDaysLeftLabel(projectPlan.project.deadline)}
+                    </span>
+
+                                        <span
+                                            className={`rounded-full border px-3 py-1 ${getStatusClasses(
+                                                status,
+                                            )}`}
+                                        >
+                      {status}
+                    </span>
+
+                                        {projectPlan.archivedTaskCount ? (
+                                            <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-emerald-300">
+                        {projectPlan.archivedTaskCount} archived
+                      </span>
+                                        ) : null}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        {!isEditingProject ? (
                             <button
                                 type="button"
-                                onClick={handleStartTitleEdit}
-                                className="group max-w-4xl text-left"
+                                onClick={() => setIsEditingProject(true)}
+                                className="w-fit rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
                             >
-                                <h1 className="break-words text-4xl font-black tracking-tight transition group-hover:text-cyan-300 sm:text-5xl">
-                                    {project.title}
-                                </h1>
-                                <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 transition group-hover:text-cyan-400">
-                                    Click title to rename
-                                </p>
+                                Edit project
                             </button>
-                        )}
-
-                        {titleError ? (
-                            <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
-                                {titleError}
-                            </div>
                         ) : null}
-
-                        {titleMessage ? (
-                            <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm font-bold text-emerald-300">
-                                {titleMessage}
-                            </div>
-                        ) : null}
-
-                        <p className="mt-4 max-w-2xl text-slate-300">
-                            Review this coursework project, track generated tasks, rename the
-                            project directly from the title, adjust the deadline, and add your
-                            own custom tasks.
-                        </p>
                     </div>
 
-                    <a
-                        href="/projects"
-                        className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
-                    >
-                        Back to Projects
-                    </a>
-                </div>
-
-                <div className="mb-8">
-                    <ProjectCard project={project} />
-                </div>
-
-                <section className="mb-8 rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-6">
-                    <div className="mb-5">
-                        <p className="mb-2 text-sm font-bold text-cyan-300">
-                            Deadline control
-                        </p>
-                        <h2 className="text-2xl font-black sm:text-3xl">
-                            Update the project deadline.
-                        </h2>
-                        <p className="mt-2 text-sm leading-6 text-slate-300">
-                            Change the deadline if your teacher updates the schedule. Days
-                            left and risk level will be recalculated automatically.
-                        </p>
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
-                        <CalendarDateField
-                            label="Deadline"
-                            value={editDeadline}
-                            onChange={(nextValue) => {
-                                setEditDeadline(nextValue);
-                                setDeadlineError("");
-                                setDeadlineMessage("");
-                            }}
-                            helperText="Click to choose from the calendar. Double-click to type manually."
-                        />
-
-                        <button
-                            type="button"
-                            onClick={handleSaveDeadline}
-                            className="rounded-2xl bg-cyan-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-cyan-300"
-                        >
-                            Save deadline
-                        </button>
-                    </div>
-
-                    {deadlineError ? (
-                        <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
-                            {deadlineError}
+                    <div className="mt-8">
+                        <div className="mb-3 flex items-center justify-between gap-4">
+                            <p className="text-sm font-bold text-slate-300">
+                                Project progress
+                            </p>
+                            <p className="text-sm font-black text-cyan-300">{progress}%</p>
                         </div>
-                    ) : null}
 
-                    {deadlineMessage ? (
-                        <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm font-bold text-emerald-300">
-                            {deadlineMessage}
+                        <div className="h-4 overflow-hidden rounded-full bg-slate-800">
+                            <div
+                                className="h-full rounded-full bg-cyan-400 transition-all"
+                                style={{ width: `${progress}%` }}
+                            />
+                        </div>
+
+                        <div className="mt-4 grid gap-3 text-sm text-slate-400 sm:grid-cols-3">
+                            <p>
+                                <span className="font-bold text-slate-200">{todoCount}</span>{" "}
+                                todo
+                            </p>
+                            <p>
+                                <span className="font-bold text-slate-200">{doneCount}</span>{" "}
+                                done
+                            </p>
+                            <p>
+                <span className="font-bold text-slate-200">
+                  {repairedTasks.length}
+                </span>{" "}
+                                total
+                            </p>
+                        </div>
+                    </div>
+
+                    {completedTasksCount > 0 ? (
+                        <div className="mt-6 rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-4">
+                            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                                <div>
+                                    <p className="mb-1 text-sm font-bold text-emerald-300">
+                                        Completed task cleanup
+                                    </p>
+                                    <p className="text-sm leading-6 text-slate-300">
+                                        Archive completed tasks to keep this project focused on
+                                        active work.
+                                    </p>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={handleArchiveCompletedTasks}
+                                    className="rounded-2xl bg-emerald-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
+                                >
+                                    Archive completed tasks
+                                </button>
+                            </div>
                         </div>
                     ) : null}
                 </section>
 
-                <section className="mb-8 rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
-                    <div className="mb-5">
-                        <p className="mb-2 text-sm font-bold text-emerald-300">
-                            Custom task
-                        </p>
-                        <h2 className="text-2xl font-black sm:text-3xl">
-                            Add your own task.
-                        </h2>
-                        <p className="mt-2 text-sm leading-6 text-slate-300">
-                            Generated tasks give you a starting plan. Add custom tasks for
-                            teacher feedback, extra research, presentation work, or anything
-                            specific to your real project.
-                        </p>
-                    </div>
+                <section className="mb-10 rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6">
+                    <p className="mb-2 text-sm font-bold text-emerald-300">
+                        Add custom task
+                    </p>
+                    <h2 className="text-3xl font-black tracking-tight">
+                        Add work that belongs to this project.
+                    </h2>
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                        Use this when your real coursework changes, your teacher gives new
+                        advice, or you need to add a task that the template did not include.
+                    </p>
 
-                    <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+                    <div className="mt-6 grid gap-4">
                         <div>
-                            <label className="mb-2 block text-sm font-bold text-white">
+                            <label className="mb-2 block text-xs font-bold text-slate-300">
                                 Task title
                             </label>
                             <input
@@ -485,53 +536,48 @@ export default function ProjectDetailPage() {
                                 onChange={(event) => {
                                     setNewTaskTitle(event.target.value);
                                     setNewTaskError("");
-                                    setNewTaskMessage("");
                                 }}
                                 placeholder="e.g. Ask teacher for feedback"
-                                className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-300 focus:shadow-lg focus:shadow-emerald-950/40"
+                                className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-300"
                             />
                         </div>
 
-                        <FancySelect
-                            label="Priority"
-                            value={newTaskPriority}
-                            placeholder="Choose priority"
-                            options={priorityOptions}
-                            onChange={(nextValue) => {
-                                if (!isPriorityLevel(nextValue)) {
-                                    return;
-                                }
+                        <div className="grid gap-4 md:grid-cols-3">
+                            <div>
+                                <label className="mb-2 block text-xs font-bold text-slate-300">
+                                    Priority
+                                </label>
+                                <select
+                                    value={newTaskPriority}
+                                    onChange={(event) => {
+                                        if (!isTaskPriority(event.target.value)) {
+                                            return;
+                                        }
 
-                                setNewTaskPriority(nextValue);
-                                setNewTaskError("");
-                                setNewTaskMessage("");
-                            }}
-                            helperText="Use High for urgent or high-impact work."
-                        />
-                    </div>
+                                        setNewTaskPriority(event.target.value);
+                                    }}
+                                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-emerald-300"
+                                >
+                                    {priorityOptions.map((priority) => (
+                                        <option key={priority} value={priority}>
+                                            {priority}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
-                    <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_0.7fr]">
-                        <CalendarDateField
-                            label="Due date"
-                            value={newTaskDueDate}
-                            onChange={(nextValue) => {
-                                setNewTaskDueDate(nextValue);
-                                setNewTaskError("");
-                                setNewTaskMessage("");
-                            }}
-                            helperText="Optional. Leave blank if this task is not scheduled yet."
-                        />
+                            <CalendarDateField
+                                label="Due date"
+                                value={newTaskDueDate}
+                                onChange={setNewTaskDueDate}
+                            />
 
-                        <EstimatedTimeField
-                            label="Estimated time"
-                            value={newTaskTime}
-                            onChange={(nextValue) => {
-                                setNewTaskTime(nextValue);
-                                setNewTaskError("");
-                                setNewTaskMessage("");
-                            }}
-                            helperText="Choose a number and unit. 60 min becomes 1 hour, 24 hours becomes 1 day."
-                        />
+                            <EstimatedTimeField
+                                label="Estimated time"
+                                value={newTaskEstimatedTime}
+                                onChange={setNewTaskEstimatedTime}
+                            />
+                        </div>
                     </div>
 
                     {newTaskError ? (
@@ -540,101 +586,59 @@ export default function ProjectDetailPage() {
                         </div>
                     ) : null}
 
-                    {newTaskMessage ? (
-                        <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm font-bold text-emerald-300">
-                            {newTaskMessage}
-                        </div>
-                    ) : null}
-
-                    <div className="mt-5">
-                        <button
-                            type="button"
-                            onClick={handleAddCustomTask}
-                            className="rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
-                        >
-                            Add custom task
-                        </button>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={handleAddCustomTask}
+                        className="mt-5 rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
+                    >
+                        Add task
+                    </button>
                 </section>
 
-                <div className="mb-8 grid gap-6 md:grid-cols-4">
-                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
-                        <p className="text-sm text-slate-400">Total tasks</p>
-                        <p className="mt-2 text-3xl font-black sm:text-4xl">
-                            {tasks.length}
-                        </p>
-                    </div>
-
-                    <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
-                        <p className="text-sm text-slate-400">Todo</p>
-                        <p className="mt-2 text-3xl font-black sm:text-4xl">
-                            {todoTaskCount}
-                        </p>
-                    </div>
-
-                    <div className="rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
-                        <p className="text-sm text-emerald-200">Done</p>
-                        <p className="mt-2 text-3xl font-black text-emerald-200 sm:text-4xl">
-                            {doneTaskCount}
-                        </p>
-                    </div>
-
-                    <div className="rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-6">
-                        <p className="text-sm text-cyan-200">Archived</p>
-                        <p className="mt-2 text-3xl font-black text-cyan-200 sm:text-4xl">
-                            {archivedTaskCount}
-                        </p>
-                    </div>
-                </div>
-
-                {currentPlan.tasksArchivedAt ? (
-                    <div className="mb-8 rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-6">
-                        <p className="mb-2 text-sm font-bold text-cyan-300">
-                            Tasks archived
-                        </p>
-                        <h2 className="text-2xl font-black sm:text-3xl">
-                            Completed tasks were archived.
-                        </h2>
-                        <p className="mt-2 text-sm leading-6 text-slate-300">
-                            This project remains completed at 100%, but its finished tasks
-                            are hidden from Today to keep your daily workspace clean. Adding a
-                            custom task will reactivate the project.
-                        </p>
-                    </div>
-                ) : null}
-
-                <section>
+                <section className="space-y-5">
                     <div className="mb-6">
-                        <p className="mb-2 text-sm font-bold text-cyan-300">Task list</p>
-                        <h2 className="text-2xl font-black sm:text-3xl">
-                            Generated and custom coursework tasks.
-                        </h2>
-                        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-                            These tasks include the original generated plan plus any custom
-                            tasks you add for your real workflow.
+                        <p className="mb-2 text-sm font-bold text-cyan-300">
+                            Project tasks
                         </p>
+                        <h2 className="text-3xl font-black tracking-tight">
+                            Active task list.
+                        </h2>
                     </div>
 
-                    {tasks.length > 0 ? (
-                        <div className="space-y-4">
-                            {tasks.map((task) => (
-                                <TaskCard
-                                    key={task.id}
-                                    task={task}
-                                    onChangeStatus={handleChangeTaskStatus}
-                                    onUpdateTask={handleUpdateTaskDetails}
-                                    onDeleteTask={handleDeleteTask}
-                                />
-                            ))}
-                        </div>
+                    {repairedTasks.length === 0 ? (
+                        <EmptyState
+                            eyebrow="No active tasks"
+                            title="This project has no active tasks right now."
+                            description="You may have archived completed tasks, or this project may need new work. Add a custom task to continue planning."
+                            icon="✨"
+                            actions={[
+                                {
+                                    label: "Back to projects",
+                                    href: "/projects",
+                                },
+                                {
+                                    label: "Open Today",
+                                    href: "/today",
+                                    variant: "secondary",
+                                },
+                            ]}
+                            tips={[
+                                "Archived completed tasks stay out of the active workspace.",
+                                "Adding new work can restore archived context when needed.",
+                                "Use custom tasks for teacher feedback, corrections, or extra drafting.",
+                                "Today will show active todo tasks from this project.",
+                            ]}
+                        />
                     ) : (
-                        <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
-                            <p className="mb-2 text-xl font-bold">No visible tasks.</p>
-                            <p className="text-sm leading-6 text-slate-300">
-                                This usually means the completed tasks were archived after the
-                                project reached 100%. Add a custom task if new work appears.
-                            </p>
-                        </div>
+                        repairedTasks.map((task) => (
+                            <TaskCard
+                                key={task.id}
+                                task={task}
+                                onUpdateTask={handleUpdateTask}
+                                onUpdateStatus={handleUpdateStatus}
+                                onDeleteTask={handleDeleteTask}
+                            />
+                        ))
                     )}
                 </section>
             </section>

@@ -11,6 +11,17 @@ export type CourseworkTask = {
     archivedAt?: string;
 };
 
+type LegacyTaskInput = Partial<CourseworkTask> & {
+    time?: string | number | null;
+    duration?: string | number | null;
+    estimate?: string | number | null;
+    estimated?: string | number | null;
+    timeEstimate?: string | number | null;
+    estimated_time?: string | number | null;
+    estimatedMinutes?: string | number | null;
+    minutes?: string | number | null;
+};
+
 export type GeneratedProjectPlan = {
     id: string;
     slug?: string;
@@ -93,11 +104,145 @@ function slugifyTitle(title: string) {
         .replace(/(^-|-$)/g, "");
 }
 
+function stringifyTimeValue(value: string | number | null | undefined) {
+    if (typeof value === "number") {
+        return String(value);
+    }
+
+    if (typeof value === "string") {
+        return value;
+    }
+
+    return "";
+}
+
+function removeTrailingZero(value: number) {
+    if (Number.isInteger(value)) {
+        return String(value);
+    }
+
+    return String(Number(value.toFixed(2)));
+}
+
+function getDefaultEstimatedTime(priority?: string) {
+    if (priority === "High") {
+        return "1 hour";
+    }
+
+    if (priority === "Low") {
+        return "30 min";
+    }
+
+    return "45 min";
+}
+
+function normaliseEstimatedTimeValue(
+    value: string | number | null | undefined,
+    priority?: string,
+    repairMissing = true,
+) {
+    const rawValue = stringifyTimeValue(value).trim();
+    const lowerValue = rawValue.toLowerCase();
+
+    if (!rawValue || lowerValue === "not set") {
+        return repairMissing ? getDefaultEstimatedTime(priority) : "Not set";
+    }
+
+    const numberMatch = lowerValue.match(/[\d.]+/);
+    const amount = numberMatch ? Number(numberMatch[0]) : NaN;
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        return repairMissing ? getDefaultEstimatedTime(priority) : "Not set";
+    }
+
+    const isDays =
+        lowerValue.includes("day") ||
+        lowerValue.includes("days") ||
+        lowerValue.endsWith(" d");
+
+    const isHours =
+        lowerValue.includes("hour") ||
+        lowerValue.includes("hours") ||
+        lowerValue.includes("hr") ||
+        lowerValue.includes("hrs") ||
+        lowerValue.endsWith(" h");
+
+    if (isDays) {
+        return `${removeTrailingZero(amount)} ${amount === 1 ? "day" : "days"}`;
+    }
+
+    if (isHours) {
+        if (amount >= 24) {
+            const days = amount / 24;
+            return `${removeTrailingZero(days)} ${days === 1 ? "day" : "days"}`;
+        }
+
+        return `${removeTrailingZero(amount)} ${amount === 1 ? "hour" : "hours"}`;
+    }
+
+    if (amount >= 1440) {
+        const days = amount / 1440;
+        return `${removeTrailingZero(days)} ${days === 1 ? "day" : "days"}`;
+    }
+
+    if (amount >= 60) {
+        const hours = amount / 60;
+        return `${removeTrailingZero(hours)} ${hours === 1 ? "hour" : "hours"}`;
+    }
+
+    return `${removeTrailingZero(amount)} min`;
+}
+
+function getLegacyEstimatedTime(rawTask: LegacyTaskInput) {
+    if (rawTask.estimatedTime !== undefined && rawTask.estimatedTime !== null) {
+        return rawTask.estimatedTime;
+    }
+
+    if (rawTask.time !== undefined && rawTask.time !== null) {
+        return rawTask.time;
+    }
+
+    if (rawTask.duration !== undefined && rawTask.duration !== null) {
+        return rawTask.duration;
+    }
+
+    if (rawTask.timeEstimate !== undefined && rawTask.timeEstimate !== null) {
+        return rawTask.timeEstimate;
+    }
+
+    if (rawTask.estimate !== undefined && rawTask.estimate !== null) {
+        return rawTask.estimate;
+    }
+
+    if (rawTask.estimated !== undefined && rawTask.estimated !== null) {
+        return rawTask.estimated;
+    }
+
+    if (rawTask.estimated_time !== undefined && rawTask.estimated_time !== null) {
+        return rawTask.estimated_time;
+    }
+
+    if (
+        rawTask.estimatedMinutes !== undefined &&
+        rawTask.estimatedMinutes !== null
+    ) {
+        return `${rawTask.estimatedMinutes} min`;
+    }
+
+    if (rawTask.minutes !== undefined && rawTask.minutes !== null) {
+        return `${rawTask.minutes} min`;
+    }
+
+    return "";
+}
+
 function getRawProjectRouteId(plan: Partial<GeneratedProjectPlan>, index = 0) {
-    const project = plan.project ?? {
-        title: "",
-        deadline: "",
-    };
+    const project =
+        plan.project ??
+        ({
+            title: "",
+            deadline: "",
+        } as GeneratedProjectPlan["project"]);
 
     return (
         plan.id ||
@@ -115,14 +260,22 @@ export function getProjectRouteId(plan: GeneratedProjectPlan, index = 0) {
     return getRawProjectRouteId(plan, index);
 }
 
-function normaliseTask(rawTask: Partial<CourseworkTask>, index: number) {
+function normaliseTask(rawTask: LegacyTaskInput, index: number) {
+    const priority = rawTask.priority || "Medium";
+    const legacyEstimatedTime = getLegacyEstimatedTime(rawTask);
+
     return {
         id: rawTask.id || createId(`task-${index}`),
         title: rawTask.title || "Untitled task",
-        status: rawTask.status === "Done" ? "Done" : "Todo",
-        priority: rawTask.priority || "Medium",
+        status:
+            String(rawTask.status).toLowerCase() === "done" ? "Done" : "Todo",
+        priority,
         dueDate: rawTask.dueDate || "",
-        estimatedTime: rawTask.estimatedTime || "Not set",
+        estimatedTime: normaliseEstimatedTimeValue(
+            legacyEstimatedTime,
+            priority,
+            true,
+        ),
         completedAt: rawTask.completedAt,
         archivedAt: rawTask.archivedAt,
     } satisfies CourseworkTask;
@@ -132,10 +285,12 @@ function normaliseProjectPlan(
     rawPlan: Partial<GeneratedProjectPlan>,
     index: number,
 ) {
-    const rawProject = rawPlan.project ?? {
-        title: "Untitled project",
-        deadline: "",
-    };
+    const rawProject =
+        rawPlan.project ??
+        ({
+            title: "Untitled project",
+            deadline: "",
+        } as GeneratedProjectPlan["project"]);
 
     const projectTitle = rawProject.title || "Untitled project";
     const projectDeadline = rawProject.deadline || "";
@@ -153,12 +308,14 @@ function normaliseProjectPlan(
     );
 
     const tasks = Array.isArray(rawPlan.tasks)
-        ? rawPlan.tasks.map((task, taskIndex) => normaliseTask(task, taskIndex))
+        ? rawPlan.tasks.map((task, taskIndex) =>
+            normaliseTask(task as LegacyTaskInput, taskIndex),
+        )
         : [];
 
     const archivedTasks = Array.isArray(rawPlan.archivedTasks)
         ? rawPlan.archivedTasks.map((task, taskIndex) =>
-            normaliseTask(task, taskIndex),
+            normaliseTask(task as LegacyTaskInput, taskIndex),
         )
         : [];
 
@@ -227,21 +384,6 @@ function removeLegacyProjectStorageKeys() {
             window.localStorage.removeItem(key);
         }
     });
-
-    Object.keys(window.localStorage).forEach((key) => {
-        const normalisedKey = key.toLowerCase();
-
-        const isCourseworkCompassProjectKey =
-            normalisedKey.includes("courseworkcompassprojects") ||
-            normalisedKey.includes("coursework-compass-plans") ||
-            normalisedKey.includes("coursework-compass-project-plans") ||
-            normalisedKey === "generatedprojectplans" ||
-            normalisedKey === "projectplans";
-
-        if (isCourseworkCompassProjectKey && key !== PRIMARY_PROJECT_STORAGE_KEY) {
-            window.localStorage.removeItem(key);
-        }
-    });
 }
 
 function readRawProjectPlans() {
@@ -286,7 +428,10 @@ function safeSetPrimaryProjectStorage(serialisedPlans: string) {
     }
 }
 
-function persistProjectPlansSilently(projectPlans: GeneratedProjectPlan[]) {
+function persistProjectPlansSilently(
+    projectPlans: GeneratedProjectPlan[],
+    shouldDispatch = false,
+) {
     if (!isBrowser()) {
         return;
     }
@@ -294,7 +439,7 @@ function persistProjectPlansSilently(projectPlans: GeneratedProjectPlan[]) {
     const serialisedPlans = JSON.stringify(projectPlans);
     const didSave = safeSetPrimaryProjectStorage(serialisedPlans);
 
-    if (didSave) {
+    if (didSave && shouldDispatch) {
         dispatchProjectPlanUpdate();
     }
 }
@@ -391,7 +536,7 @@ export function loadProjectPlans() {
     const normalisedPlans = Array.from(planMap.values());
 
     if (normalisedPlans.length > 0) {
-        persistProjectPlansSilently(normalisedPlans);
+        persistProjectPlansSilently(normalisedPlans, false);
     } else if (isBrowser()) {
         removeLegacyProjectStorageKeys();
     }
@@ -540,6 +685,8 @@ export function addCustomTask(
         return projectPlans;
     }
 
+    const priority = taskInput.priority || "Medium";
+
     const nextPlans = projectPlans.map((plan, index) => {
         if (index !== projectIndex) {
             return plan;
@@ -552,9 +699,13 @@ export function addCustomTask(
                 id: taskInput.id || createId("custom-task"),
                 title: taskInput.title || "Untitled custom task",
                 status: taskInput.status || "Todo",
-                priority: taskInput.priority || "Medium",
+                priority,
                 dueDate: taskInput.dueDate || "",
-                estimatedTime: taskInput.estimatedTime || "Not set",
+                estimatedTime: normaliseEstimatedTimeValue(
+                    taskInput.estimatedTime,
+                    priority,
+                    true,
+                ),
             },
             restoredPlan.tasks.length,
         );
@@ -609,16 +760,29 @@ export function updateTaskDetails(
             ...plan,
             updatedAt: new Date().toISOString(),
             completionPromptDismissed: false,
-            tasks: plan.tasks.map((task) =>
-                task.id === taskId
-                    ? {
-                        ...task,
-                        ...updates,
-                        id: task.id,
-                        status: updates.status || task.status,
-                    }
-                    : task,
-            ),
+            tasks: plan.tasks.map((task) => {
+                if (task.id !== taskId) {
+                    return task;
+                }
+
+                const nextPriority = updates.priority || task.priority || "Medium";
+
+                return {
+                    ...task,
+                    ...updates,
+                    id: task.id,
+                    priority: nextPriority,
+                    status: updates.status || task.status,
+                    estimatedTime:
+                        updates.estimatedTime !== undefined
+                            ? normaliseEstimatedTimeValue(
+                                updates.estimatedTime,
+                                nextPriority,
+                                false,
+                            )
+                            : task.estimatedTime,
+                };
+            }),
         };
     });
 
@@ -787,10 +951,6 @@ export function restoreArchivedTasks(projectId: string) {
             "Archived tasks have been restored to the active project because new work was added.",
     });
 }
-
-/**
- * Compatibility exports for CompletionWatcher.tsx.
- */
 
 export function archiveCompletedProjectTasks(projectId: string) {
     return archiveCompletedTasks(projectId);

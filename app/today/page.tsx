@@ -3,36 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import AppNav from "@/components/AppNav";
 import EmptyState from "@/components/EmptyState";
-import { loadProjectPlans, updateTaskStatus } from "@/lib/localStorage";
-
-type TaskStatus = "Todo" | "Done";
-
-type CourseworkTask = {
-    id: string;
-    title: string;
-    status: TaskStatus;
-    priority?: string;
-    dueDate?: string;
-    estimatedTime?: string;
-};
-
-type GeneratedProjectPlan = {
-    id?: string;
-    slug?: string;
-    projectId?: string;
-    project: {
-        id?: string;
-        slug?: string;
-        projectId?: string;
-        title: string;
-        deadline: string;
-        status?: string;
-        type?: string;
-    };
-    tasks: CourseworkTask[];
-    archivedTasks?: CourseworkTask[];
-    archivedTaskCount?: number;
-};
+import {
+    loadProjectPlans,
+    updateTaskStatus,
+    type GeneratedProjectPlan,
+    type CourseworkTask,
+} from "@/lib/localStorage";
 
 type TodayTask = CourseworkTask & {
     projectId: string;
@@ -59,6 +35,83 @@ function getProjectRouteId(plan: GeneratedProjectPlan, index: number) {
         slugifyTitle(plan.project.title) ||
         `project-${index}`
     );
+}
+
+function parseDateValue(value?: string) {
+    if (!value) {
+        return null;
+    }
+
+    const cleanedValue = value.trim().replaceAll("/", "-");
+    const parts = cleanedValue.split("-").map((part) => Number(part));
+
+    if (parts.length < 3 || parts.some((part) => Number.isNaN(part))) {
+        return null;
+    }
+
+    const [year, month, day] = parts;
+
+    return new Date(year, month - 1, day);
+}
+
+function getDaysLeftLabel(dateValue?: string) {
+    const targetDate = parseDateValue(dateValue);
+
+    if (!targetDate) {
+        return "Days left: unknown";
+    }
+
+    const today = new Date();
+    const todayDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+    );
+
+    const diffMs = targetDate.getTime() - todayDate.getTime();
+    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (daysLeft < 0) {
+        return `${Math.abs(daysLeft)} day${Math.abs(daysLeft) === 1 ? "" : "s"} overdue`;
+    }
+
+    if (daysLeft === 0) {
+        return "Due today";
+    }
+
+    if (daysLeft === 1) {
+        return "1 day left";
+    }
+
+    return `${daysLeft} days left`;
+}
+
+function getDaysLeftClasses(dateValue?: string) {
+    const targetDate = parseDateValue(dateValue);
+
+    if (!targetDate) {
+        return "border-slate-700 bg-slate-900 text-slate-300";
+    }
+
+    const today = new Date();
+    const todayDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+    );
+
+    const diffMs = targetDate.getTime() - todayDate.getTime();
+    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (daysLeft < 0 || daysLeft <= 3) {
+        return "border-red-400/30 bg-red-400/10 text-red-300";
+    }
+
+    if (daysLeft <= 10) {
+        return "border-amber-400/30 bg-amber-400/10 text-amber-300";
+    }
+
+    return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
 }
 
 function getPriorityClasses(priority?: string) {
@@ -92,10 +145,10 @@ function sortTodayTasks(tasks: TodayTask[]) {
             return aPriority - bPriority;
         }
 
-        const aDue = new Date(a.dueDate ?? a.projectDeadline).getTime();
-        const bDue = new Date(b.dueDate ?? b.projectDeadline).getTime();
+        const aDue = parseDateValue(a.dueDate || a.projectDeadline)?.getTime();
+        const bDue = parseDateValue(b.dueDate || b.projectDeadline)?.getTime();
 
-        if (Number.isNaN(aDue) || Number.isNaN(bDue)) {
+        if (!aDue || !bDue) {
             return a.title.localeCompare(b.title);
         }
 
@@ -107,7 +160,7 @@ export default function TodayPage() {
     const [projectPlans, setProjectPlans] = useState<GeneratedProjectPlan[]>([]);
 
     function refreshPlans() {
-        setProjectPlans(loadProjectPlans() as GeneratedProjectPlan[]);
+        setProjectPlans(loadProjectPlans());
     }
 
     useEffect(() => {
@@ -202,58 +255,70 @@ export default function TodayPage() {
                     />
                 ) : (
                     <section className="grid gap-5">
-                        {todayTasks.map((task) => (
-                            <div
-                                key={`${task.projectId}-${task.id}`}
-                                className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6"
-                            >
-                                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                                    <div>
-                                        <p className="mb-2 text-sm font-bold text-cyan-300">
-                                            {task.projectTitle}
-                                        </p>
-                                        <h2 className="text-2xl font-black text-white">
-                                            {task.title}
-                                        </h2>
+                        {todayTasks.map((task) => {
+                            const dueDate = task.dueDate || task.projectDeadline;
 
-                                        <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-slate-400">
-                      <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1">
-                        Due: {task.dueDate || task.projectDeadline}
-                      </span>
+                            return (
+                                <div
+                                    key={`${task.projectId}-${task.id}`}
+                                    className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6"
+                                >
+                                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                                        <div>
+                                            <p className="mb-2 text-sm font-bold text-cyan-300">
+                                                {task.projectTitle}
+                                            </p>
+                                            <h2 className="text-2xl font-black text-white">
+                                                {task.title}
+                                            </h2>
 
-                                            <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1">
-                        Time: {task.estimatedTime || "Not set"}
-                      </span>
+                                            <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-slate-400">
+                        <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1">
+                          Due: {dueDate || "Not set"}
+                        </span>
 
-                                            <span
-                                                className={`rounded-full border px-3 py-1 ${getPriorityClasses(
-                                                    task.priority,
-                                                )}`}
+                                                <span
+                                                    className={`rounded-full border px-3 py-1 ${getDaysLeftClasses(
+                                                        dueDate,
+                                                    )}`}
+                                                >
+                          {getDaysLeftLabel(dueDate)}
+                        </span>
+
+                                                <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1">
+                          Time: {task.estimatedTime || "Not set"}
+                        </span>
+
+                                                <span
+                                                    className={`rounded-full border px-3 py-1 ${getPriorityClasses(
+                                                        task.priority,
+                                                    )}`}
+                                                >
+                          {task.priority || "Medium"}
+                        </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleMarkDone(task.id)}
+                                                className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
                                             >
-                        {task.priority || "Medium"}
-                      </span>
+                                                Mark done
+                                            </button>
+
+                                            <a
+                                                href={`/projects/${task.projectId}`}
+                                                className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                                            >
+                                                Open project
+                                            </a>
                                         </div>
                                     </div>
-
-                                    <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleMarkDone(task.id)}
-                                            className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
-                                        >
-                                            Mark done
-                                        </button>
-
-                                        <a
-                                            href={`/projects/${task.projectId}`}
-                                            className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
-                                        >
-                                            Open project
-                                        </a>
-                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </section>
                 )}
             </section>

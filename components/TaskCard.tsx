@@ -5,348 +5,408 @@ import CalendarDateField from "@/components/CalendarDateField";
 import EstimatedTimeField, {
     normaliseEstimatedTime,
 } from "@/components/EstimatedTimeField";
-import FancySelect from "@/components/FancySelect";
-import RiskBadge from "@/components/RiskBadge";
-import type { PriorityLevel, Task, TaskStatus } from "@/types/coursework";
+import type { CourseworkTask, TaskStatus } from "@/lib/localStorage";
 
-export type TaskUpdateInput = {
-    title: string;
-    priority: PriorityLevel;
-    dueDate: string;
-    time: string;
-};
+type TaskPriority = "Low" | "Medium" | "High";
 
 type TaskCardProps = {
-    task?: Task;
-    onChangeStatus?: (taskId: string, nextStatus: TaskStatus) => void;
-    onUpdateTask?: (taskId: string, updates: TaskUpdateInput) => void;
-    onDeleteTask?: (taskId: string) => void;
+    task: CourseworkTask;
+    onUpdateTask: (taskId: string, updates: Partial<CourseworkTask>) => void;
+    onUpdateStatus: (taskId: string, nextStatus: TaskStatus) => void;
+    onDeleteTask: (taskId: string) => void;
 };
 
-const priorityOptions = [
-    {
-        label: "Low",
-        value: "Low",
-        description: "Useful but not urgent.",
-    },
-    {
-        label: "Medium",
-        value: "Medium",
-        description: "Important work that should stay visible.",
-    },
-    {
-        label: "High",
-        value: "High",
-        description: "Urgent or high-impact task. Do this early.",
-    },
-];
+const priorityOptions: TaskPriority[] = ["Low", "Medium", "High"];
 
-function isPriorityLevel(value: string): value is PriorityLevel {
+function isTaskPriority(value: string): value is TaskPriority {
     return value === "Low" || value === "Medium" || value === "High";
+}
+
+function getPriorityClasses(priority?: string) {
+    if (priority === "High") {
+        return "border-red-400/30 bg-red-400/10 text-red-300";
+    }
+
+    if (priority === "Medium") {
+        return "border-amber-400/30 bg-amber-400/10 text-amber-300";
+    }
+
+    if (priority === "Low") {
+        return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
+    }
+
+    return "border-slate-700 bg-slate-900 text-slate-300";
+}
+
+function getDefaultEstimatedTime(priority?: string) {
+    if (priority === "High") {
+        return "1 hour";
+    }
+
+    if (priority === "Low") {
+        return "30 min";
+    }
+
+    return "45 min";
+}
+
+function getDisplayEstimatedTime(value?: string, priority?: string) {
+    const normalisedValue = normaliseEstimatedTime(value);
+
+    if (!normalisedValue || normalisedValue === "Not set") {
+        return getDefaultEstimatedTime(priority);
+    }
+
+    return normalisedValue;
+}
+
+function parseDateValue(value?: string) {
+    if (!value) {
+        return null;
+    }
+
+    const cleanedValue = value.trim().replaceAll("/", "-");
+    const parts = cleanedValue.split("-").map((part) => Number(part));
+
+    if (parts.length < 3 || parts.some((part) => Number.isNaN(part))) {
+        return null;
+    }
+
+    const [year, month, day] = parts;
+
+    return new Date(year, month - 1, day);
+}
+
+function getDaysLeftLabel(dateValue?: string) {
+    const targetDate = parseDateValue(dateValue);
+
+    if (!targetDate) {
+        return "Days left: unknown";
+    }
+
+    const today = new Date();
+    const todayDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+    );
+
+    const diffMs = targetDate.getTime() - todayDate.getTime();
+    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (daysLeft < 0) {
+        const overdueDays = Math.abs(daysLeft);
+        return `${overdueDays} day${overdueDays === 1 ? "" : "s"} overdue`;
+    }
+
+    if (daysLeft === 0) {
+        return "Due today";
+    }
+
+    if (daysLeft === 1) {
+        return "1 day left";
+    }
+
+    return `${daysLeft} days left`;
+}
+
+function getDaysLeftClasses(dateValue?: string) {
+    const targetDate = parseDateValue(dateValue);
+
+    if (!targetDate) {
+        return "border-slate-700 bg-slate-900 text-slate-300";
+    }
+
+    const today = new Date();
+    const todayDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+    );
+
+    const diffMs = targetDate.getTime() - todayDate.getTime();
+    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (daysLeft < 0 || daysLeft <= 3) {
+        return "border-red-400/30 bg-red-400/10 text-red-300";
+    }
+
+    if (daysLeft <= 10) {
+        return "border-amber-400/30 bg-amber-400/10 text-amber-300";
+    }
+
+    return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
 }
 
 export default function TaskCard({
                                      task,
-                                     onChangeStatus,
                                      onUpdateTask,
+                                     onUpdateStatus,
                                      onDeleteTask,
                                  }: TaskCardProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
-    const [editTitle, setEditTitle] = useState("");
-    const [editPriority, setEditPriority] = useState<PriorityLevel>("Medium");
-    const [editDueDate, setEditDueDate] = useState("");
-    const [editTime, setEditTime] = useState("45 min");
+
+    const [editTitle, setEditTitle] = useState(task.title);
+    const [editPriority, setEditPriority] = useState<TaskPriority>(
+        isTaskPriority(task.priority || "") ? task.priority : "Medium",
+    );
+    const [editDueDate, setEditDueDate] = useState(task.dueDate || "");
+    const [editEstimatedTime, setEditEstimatedTime] = useState(
+        getDisplayEstimatedTime(task.estimatedTime, task.priority),
+    );
     const [editError, setEditError] = useState("");
-    const [editMessage, setEditMessage] = useState("");
-
-    useEffect(() => {
-        if (!task || isEditing) {
-            return;
-        }
-
-        setEditTitle(task.title);
-        setEditPriority(task.priority);
-        setEditDueDate(task.dueDate ?? "");
-        setEditTime(normaliseEstimatedTime(task.time));
-    }, [isEditing, task]);
-
-    if (!task) {
-        return (
-            <div className="rounded-3xl border border-red-400/30 bg-red-400/10 p-5 text-sm font-bold text-red-300 sm:p-6">
-                Task data is missing.
-            </div>
-        );
-    }
 
     const isDone = task.status === "Done";
-    const nextStatus: TaskStatus = isDone ? "Todo" : "Done";
+    const displayEstimatedTime = getDisplayEstimatedTime(
+        task.estimatedTime,
+        task.priority,
+    );
+    const dueDate = task.dueDate || "";
 
-    function handleStartEdit() {
-        if (!task) {
-            return;
-        }
-
+    useEffect(() => {
         setEditTitle(task.title);
-        setEditPriority(task.priority);
-        setEditDueDate(task.dueDate ?? "");
-        setEditTime(normaliseEstimatedTime(task.time));
-        setEditError("");
-        setEditMessage("");
-        setIsConfirmingDelete(false);
-        setIsEditing(true);
-    }
-
-    function handleCancelEdit() {
-        if (!task) {
-            return;
-        }
-
-        setEditTitle(task.title);
-        setEditPriority(task.priority);
-        setEditDueDate(task.dueDate ?? "");
-        setEditTime(normaliseEstimatedTime(task.time));
-        setEditError("");
-        setIsEditing(false);
-    }
+        setEditPriority(isTaskPriority(task.priority || "") ? task.priority : "Medium");
+        setEditDueDate(task.dueDate || "");
+        setEditEstimatedTime(getDisplayEstimatedTime(task.estimatedTime, task.priority));
+    }, [task]);
 
     function handleSaveEdit() {
-        if (!task) {
-            return;
-        }
-
         const trimmedTitle = editTitle.trim();
 
         if (!trimmedTitle) {
-            setEditError("Please enter a task title.");
+            setEditError("Please type a task title before saving.");
             return;
         }
 
-        onUpdateTask?.(task.id, {
+        onUpdateTask(task.id, {
             title: trimmedTitle,
             priority: editPriority,
             dueDate: editDueDate,
-            time: normaliseEstimatedTime(editTime),
+            estimatedTime: normaliseEstimatedTime(editEstimatedTime),
         });
 
-        setEditMessage("Task updated.");
+        setIsEditing(false);
+        setIsConfirmingDelete(false);
+        setEditError("");
+    }
+
+    function handleCancelEdit() {
+        setEditTitle(task.title);
+        setEditPriority(isTaskPriority(task.priority || "") ? task.priority : "Medium");
+        setEditDueDate(task.dueDate || "");
+        setEditEstimatedTime(getDisplayEstimatedTime(task.estimatedTime, task.priority));
+        setEditError("");
         setIsEditing(false);
     }
 
-    function handleDeleteTask() {
-        if (!task) {
-            return;
-        }
+    function handleToggleStatus() {
+        onUpdateStatus(task.id, isDone ? "Todo" : "Done");
+    }
 
-        onDeleteTask?.(task.id);
+    function handleConfirmDelete() {
+        onDeleteTask(task.id);
         setIsConfirmingDelete(false);
     }
 
-    if (isEditing) {
-        return (
-            <div className="rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-6">
-                <div className="mb-5">
-                    <p className="mb-2 text-sm font-bold text-cyan-300">Edit task</p>
-                    <h2 className="text-2xl font-black sm:text-3xl">
-                        Update task details.
-                    </h2>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">
-                        Change the title, priority, due date, or estimated time for this
-                        task.
-                    </p>
-                </div>
-
-                <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                    <div>
-                        <label className="mb-2 block text-sm font-bold text-white">
-                            Task title
-                        </label>
-                        <input
-                            type="text"
-                            value={editTitle}
-                            onChange={(event) => {
-                                setEditTitle(event.target.value);
-                                setEditError("");
-                                setEditMessage("");
-                            }}
-                            className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-lg focus:shadow-cyan-950/40"
-                        />
-                    </div>
-
-                    <FancySelect
-                        label="Priority"
-                        value={editPriority}
-                        placeholder="Choose priority"
-                        options={priorityOptions}
-                        onChange={(nextValue) => {
-                            if (!isPriorityLevel(nextValue)) {
-                                return;
-                            }
-
-                            setEditPriority(nextValue);
-                            setEditError("");
-                            setEditMessage("");
-                        }}
-                        helperText="Use High for urgent or high-impact work."
-                    />
-                </div>
-
-                <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_0.7fr]">
-                    <CalendarDateField
-                        label="Due date"
-                        value={editDueDate}
-                        onChange={(nextValue) => {
-                            setEditDueDate(nextValue);
-                            setEditError("");
-                            setEditMessage("");
-                        }}
-                        helperText="Optional. Use the calendar or double-click to type manually."
-                    />
-
-                    <EstimatedTimeField
-                        label="Estimated time"
-                        value={editTime}
-                        onChange={(nextValue) => {
-                            setEditTime(nextValue);
-                            setEditError("");
-                            setEditMessage("");
-                        }}
-                        helperText="Choose a number and unit. 60 min becomes 1 hour, 24 hours becomes 1 day."
-                    />
-                </div>
-
-                {editError ? (
-                    <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
-                        {editError}
-                    </div>
-                ) : null}
-
-                {editMessage ? (
-                    <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm font-bold text-emerald-300">
-                        {editMessage}
-                    </div>
-                ) : null}
-
-                <div className="mt-5 flex flex-col gap-4 sm:flex-row">
-                    <button
-                        type="button"
-                        onClick={handleSaveEdit}
-                        className="rounded-2xl bg-cyan-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-cyan-300"
-                    >
-                        Save task
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={handleCancelEdit}
-                        className="rounded-2xl border border-slate-700 px-6 py-4 font-bold text-white transition hover:border-slate-400"
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <div
-            className={`rounded-3xl border p-5 sm:p-6 ${
+        <article
+            className={`rounded-[2rem] border p-5 transition sm:p-6 ${
                 isDone
                     ? "border-emerald-400/30 bg-emerald-400/10"
                     : "border-slate-800 bg-slate-900"
             }`}
         >
-            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0">
-                    <h2
-                        className={`break-words text-xl font-bold leading-tight ${
-                            isDone ? "text-emerald-200 line-through" : "text-white"
-                        }`}
-                    >
-                        {task.title}
-                    </h2>
-                    <p className="mt-1 break-words text-sm text-slate-400">
-                        {task.project}
-                    </p>
-                </div>
+            {isEditing ? (
+                <div>
+                    <div className="mb-5">
+                        <p className="mb-2 text-sm font-bold text-cyan-300">Edit task</p>
+                        <h3 className="text-2xl font-black text-white">
+                            Update this task.
+                        </h3>
+                    </div>
 
-                <div className="shrink-0">
-                    {isDone ? (
-                        <span className="rounded-full bg-emerald-400/10 px-4 py-2 text-sm font-bold text-emerald-300">
-              Done
-            </span>
-                    ) : (
-                        <RiskBadge level={task.priority} />
-                    )}
-                </div>
-            </div>
+                    <div className="grid gap-4">
+                        <div>
+                            <label className="mb-2 block text-xs font-bold text-slate-300">
+                                Task title
+                            </label>
+                            <input
+                                type="text"
+                                value={editTitle}
+                                onChange={(event) => {
+                                    setEditTitle(event.target.value);
+                                    setEditError("");
+                                }}
+                                className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
+                            />
+                        </div>
 
-            <div className="flex flex-col gap-4 text-sm text-slate-300 sm:flex-row sm:items-end sm:justify-between">
-                <div className="space-y-1">
-                    <p>Estimated time: {normaliseEstimatedTime(task.time)}</p>
-                    <p>Due date: {task.dueDate || "Not scheduled"}</p>
-                </div>
+                        <div className="grid gap-4 md:grid-cols-3">
+                            <div>
+                                <label className="mb-2 block text-xs font-bold text-slate-300">
+                                    Priority
+                                </label>
+                                <select
+                                    value={editPriority}
+                                    onChange={(event) => {
+                                        if (!isTaskPriority(event.target.value)) {
+                                            return;
+                                        }
 
-                <div className="flex flex-col gap-3 sm:flex-row">
-                    {onUpdateTask ? (
-                        <button
-                            type="button"
-                            onClick={handleStartEdit}
-                            className="w-full rounded-xl border border-slate-700 px-4 py-3 font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300 sm:w-auto"
-                        >
-                            Edit
-                        </button>
+                                        setEditPriority(event.target.value);
+                                    }}
+                                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
+                                >
+                                    {priorityOptions.map((priority) => (
+                                        <option key={priority} value={priority}>
+                                            {priority}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <CalendarDateField
+                                label="Due date"
+                                value={editDueDate}
+                                onChange={setEditDueDate}
+                            />
+
+                            <EstimatedTimeField
+                                label="Estimated time"
+                                value={editEstimatedTime}
+                                onChange={setEditEstimatedTime}
+                            />
+                        </div>
+                    </div>
+
+                    {editError ? (
+                        <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
+                            {editError}
+                        </div>
                     ) : null}
 
-                    {onDeleteTask ? (
+                    <div className="mt-5 flex flex-col gap-3 sm:flex-row">
                         <button
                             type="button"
-                            onClick={() => setIsConfirmingDelete(true)}
-                            className="w-full rounded-xl border border-red-400/30 px-4 py-3 font-bold text-red-300 transition hover:bg-red-400/10 sm:w-auto"
+                            onClick={handleSaveEdit}
+                            className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
                         >
-                            Delete
-                        </button>
-                    ) : null}
-
-                    <button
-                        type="button"
-                        onClick={() => onChangeStatus?.(task.id, nextStatus)}
-                        className={`w-full rounded-xl px-4 py-3 font-bold transition sm:w-auto ${
-                            isDone
-                                ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-200 hover:bg-emerald-400/20"
-                                : "bg-cyan-400 text-slate-950 hover:bg-cyan-300"
-                        }`}
-                    >
-                        {isDone ? "Mark as todo" : "Mark done"}
-                    </button>
-                </div>
-            </div>
-
-            {isConfirmingDelete ? (
-                <div className="mt-5 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
-                    <p className="text-sm font-bold text-red-300">
-                        Delete this task? This cannot be undone.
-                    </p>
-
-                    <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                        <button
-                            type="button"
-                            onClick={handleDeleteTask}
-                            className="rounded-xl bg-red-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-red-300"
-                        >
-                            Confirm delete
+                            Save changes
                         </button>
 
                         <button
                             type="button"
-                            onClick={() => setIsConfirmingDelete(false)}
-                            className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-bold text-white transition hover:border-slate-400"
+                            onClick={handleCancelEdit}
+                            className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
                         >
                             Cancel
                         </button>
                     </div>
                 </div>
-            ) : null}
-        </div>
+            ) : (
+                <div>
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                        <div className="min-w-0">
+                            <h3
+                                className={`text-2xl font-black ${
+                                    isDone ? "text-emerald-200 line-through" : "text-white"
+                                }`}
+                            >
+                                {task.title}
+                            </h3>
+
+                            <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold">
+                <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1 text-slate-300">
+                  Estimated time: {displayEstimatedTime}
+                </span>
+
+                                <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1 text-slate-300">
+                  Due date: {dueDate || "Not set"}
+                </span>
+
+                                <span
+                                    className={`rounded-full border px-3 py-1 ${getDaysLeftClasses(
+                                        dueDate,
+                                    )}`}
+                                >
+                  {getDaysLeftLabel(dueDate)}
+                </span>
+
+                                <span
+                                    className={`rounded-full border px-3 py-1 ${getPriorityClasses(
+                                        task.priority,
+                                    )}`}
+                                >
+                  {isDone ? "Done" : task.priority || "Medium"}
+                </span>
+                            </div>
+                        </div>
+
+                        <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsEditing(true);
+                                    setIsConfirmingDelete(false);
+                                }}
+                                className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsConfirmingDelete(true);
+                                    setIsEditing(false);
+                                }}
+                                className="rounded-2xl border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                            >
+                                Delete
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={handleToggleStatus}
+                                className={
+                                    isDone
+                                        ? "rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-5 py-3 text-sm font-bold text-emerald-200 transition hover:bg-emerald-400/20"
+                                        : "rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                                }
+                            >
+                                {isDone ? "Mark as todo" : "Mark done"}
+                            </button>
+                        </div>
+                    </div>
+
+                    {isConfirmingDelete ? (
+                        <div className="mt-5 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
+                            <p className="text-sm font-bold text-red-300">
+                                Delete this task? This cannot be undone.
+                            </p>
+
+                            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                                <button
+                                    type="button"
+                                    onClick={handleConfirmDelete}
+                                    className="rounded-2xl bg-red-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-red-300"
+                                >
+                                    Confirm delete
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setIsConfirmingDelete(false)}
+                                    className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    ) : null}
+                </div>
+            )}
+        </article>
     );
 }
