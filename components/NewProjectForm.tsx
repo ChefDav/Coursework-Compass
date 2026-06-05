@@ -1,263 +1,238 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import TaskCard from "@/components/TaskCard";
+import FancySelect from "@/components/FancySelect";
 import { projectTemplates } from "@/lib/mockData";
-import {
-    calculateDaysLeft,
-    calculateRisk,
-    createProjectId,
-    isValidDeadlineFormat,
-    normalizeDeadline,
-} from "@/lib/projectUtils";
+import { generateProjectPlan } from "@/lib/taskGenerator";
 import { saveProjectPlan } from "@/lib/localStorage";
-import { generateTasksForProject } from "@/lib/taskGenerator";
 import type {
     GeneratedProjectPlan,
     PlanningIntensity,
-    Project,
-    Task,
 } from "@/types/coursework";
+
+const planningIntensityOptions = [
+    {
+        label: "Light",
+        value: "light",
+        description: "4 focused tasks for a lighter workload or early planning.",
+    },
+    {
+        label: "Balanced",
+        value: "balanced",
+        description: "6 tasks for steady daily progress without overload.",
+    },
+    {
+        label: "Intense",
+        value: "intense",
+        description: "8 tasks for urgent deadlines or a stronger work sprint.",
+    },
+];
+
+function isPlanningIntensity(value: string): value is PlanningIntensity {
+    return value === "light" || value === "balanced" || value === "intense";
+}
+
+function validateDeadline(deadline: string) {
+    const deadlinePattern = /^(\d{4})\/(\d{2})\/(\d{2})$/;
+    const match = deadline.match(deadlinePattern);
+
+    if (!match) {
+        return "Use the format yyyy/mm/dd, for example 2026/07/10.";
+    }
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+
+    if (year < 2026) {
+        return "The year cannot be earlier than 2026.";
+    }
+
+    if (month < 1 || month > 12) {
+        return "The month must be between 01 and 12.";
+    }
+
+    const parsedDate = new Date(year, month - 1, day);
+
+    const isRealDate =
+        parsedDate.getFullYear() === year &&
+        parsedDate.getMonth() === month - 1 &&
+        parsedDate.getDate() === day;
+
+    if (!isRealDate) {
+        return "Enter a real calendar date.";
+    }
+
+    return "";
+}
 
 export default function NewProjectForm() {
     const searchParams = useSearchParams();
     const templateFromUrl = searchParams.get("template") ?? "";
 
-    const [projectTitle, setProjectTitle] = useState("");
-    const [selectedTemplateId, setSelectedTemplateId] =
-        useState(templateFromUrl);
+    const [projectName, setProjectName] = useState("");
+    const [selectedTemplateId, setSelectedTemplateId] = useState("");
     const [deadline, setDeadline] = useState("");
-    const [intensity, setIntensity] =
+    const [planningIntensity, setPlanningIntensity] =
         useState<PlanningIntensity>("balanced");
-    const [errorMessage, setErrorMessage] = useState("");
-    const [successMessage, setSuccessMessage] = useState("");
-    const [previewProject, setPreviewProject] = useState<Project | null>(null);
-    const [generatedTasks, setGeneratedTasks] = useState<Task[]>([]);
-    const [isSaved, setIsSaved] = useState(false);
+    const [generatedPlan, setGeneratedPlan] =
+        useState<GeneratedProjectPlan | null>(null);
+    const [formError, setFormError] = useState("");
+    const [saveMessage, setSaveMessage] = useState("");
 
     useEffect(() => {
-        setSelectedTemplateId(templateFromUrl);
+        const templateExists = projectTemplates.some(
+            (template) => template.id === templateFromUrl,
+        );
+
+        if (templateExists) {
+            setSelectedTemplateId(templateFromUrl);
+        }
     }, [templateFromUrl]);
+
+    const templateOptions = useMemo(() => {
+        return projectTemplates.map((template) => ({
+            label: template.name,
+            value: template.id,
+            description: template.description,
+        }));
+    }, []);
 
     const selectedTemplate = projectTemplates.find(
         (template) => template.id === selectedTemplateId,
     );
 
     function handleCreateProject() {
-        setErrorMessage("");
-        setSuccessMessage("");
-        setPreviewProject(null);
-        setGeneratedTasks([]);
-        setIsSaved(false);
+        setFormError("");
+        setSaveMessage("");
 
-        if (!projectTitle.trim()) {
-            setErrorMessage("Please enter a project name.");
+        const trimmedProjectName = projectName.trim();
+
+        if (!trimmedProjectName) {
+            setFormError("Please enter a project name.");
             return;
         }
 
-        if (!selectedTemplateId || !selectedTemplate) {
-            setErrorMessage("Please choose a project type.");
+        if (!selectedTemplateId) {
+            setFormError("Please choose a project template.");
             return;
         }
 
-        if (!deadline.trim()) {
-            setErrorMessage("Please enter a deadline.");
+        const deadlineError = validateDeadline(deadline);
+
+        if (deadlineError) {
+            setFormError(deadlineError);
             return;
         }
 
-        if (!isValidDeadlineFormat(deadline.trim())) {
-            setErrorMessage(
-                "Please enter a valid deadline in yyyy/mm/dd format. The year must be 2026 or later.",
-            );
-            return;
-        }
-
-        const cleanDeadline = deadline.trim();
-        const normalizedDeadline = normalizeDeadline(cleanDeadline);
-        const daysLeft = calculateDaysLeft(cleanDeadline);
-        const risk = calculateRisk(daysLeft);
-
-        const newProject: Project = {
-            id: createProjectId(projectTitle),
-            title: projectTitle.trim(),
-            type: selectedTemplate.name,
-            progress: 0,
-            daysLeft,
-            risk,
-            deadline: normalizedDeadline,
-            status: "Active",
-        };
-
-        const taskPlan = generateTasksForProject({
-            projectTitle: newProject.title,
+        const plan = generateProjectPlan({
+            projectName: trimmedProjectName,
             templateId: selectedTemplateId,
-            deadline: normalizedDeadline,
-            intensity,
+            deadline,
+            intensity: planningIntensity,
         });
 
-        setPreviewProject(newProject);
-        setGeneratedTasks(taskPlan);
-        setSuccessMessage(
-            `Project preview created with ${taskPlan.length} generated tasks.`,
-        );
+        setGeneratedPlan(plan);
     }
 
-    function handleSaveProjectLocally() {
-        setErrorMessage("");
-
-        if (!previewProject || generatedTasks.length === 0) {
-            setErrorMessage("Please generate a project plan before saving.");
+    function handleSaveProject() {
+        if (!generatedPlan) {
             return;
         }
 
-        const plan: GeneratedProjectPlan = {
-            project: previewProject,
-            tasks: generatedTasks,
-            intensity,
-            createdAt: new Date().toISOString(),
-        };
-
-        saveProjectPlan(plan);
-        setIsSaved(true);
-        setSuccessMessage(
-            `${previewProject.title} has been saved locally in this browser.`,
+        saveProjectPlan(generatedPlan);
+        setSaveMessage(
+            `${generatedPlan.project.title} was saved locally in this browser.`,
         );
     }
 
     return (
-        <div className="rounded-3xl border border-slate-800 bg-slate-900 p-6">
-            <form className="space-y-6">
-                {errorMessage ? (
-                    <div className="rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
-                        {errorMessage}
-                    </div>
-                ) : null}
-
-                {successMessage ? (
-                    <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm font-bold text-emerald-300">
-                        {successMessage}
-                    </div>
-                ) : null}
-
+        <div className="rounded-3xl border border-cyan-400/20 bg-slate-900/80 p-5 shadow-2xl shadow-cyan-950/30 sm:p-8">
+            <div className="space-y-6">
                 <div>
-                    <label
-                        htmlFor="project-title"
-                        className="mb-2 block text-sm font-bold text-slate-200"
-                    >
+                    <label className="mb-2 block text-sm font-bold text-white">
                         Project name
                     </label>
                     <input
-                        id="project-title"
-                        name="project-title"
                         type="text"
-                        value={projectTitle}
-                        onChange={(event) => setProjectTitle(event.target.value)}
+                        value={projectName}
+                        onChange={(event) => {
+                            setProjectName(event.target.value);
+                            setGeneratedPlan(null);
+                            setSaveMessage("");
+                        }}
                         placeholder="e.g. Math IA Exploration"
-                        className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-4 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400"
+                        className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-lg focus:shadow-cyan-950/40"
                     />
                 </div>
 
-                <div>
-                    <label
-                        htmlFor="project-template"
-                        className="mb-2 block text-sm font-bold text-slate-200"
-                    >
-                        Project type
-                    </label>
-                    <select
-                        id="project-template"
-                        name="project-template"
-                        value={selectedTemplateId}
-                        onChange={(event) => setSelectedTemplateId(event.target.value)}
-                        className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-4 text-white outline-none transition focus:border-cyan-400"
-                    >
-                        <option value="" disabled>
-                            Choose a template
-                        </option>
-                        {projectTemplates.map((template) => (
-                            <option key={template.id} value={template.id}>
-                                {template.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                {selectedTemplate ? (
-                    <div className="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 p-5">
-                        <p className="mb-2 text-sm font-bold text-cyan-300">
-                            Selected template
-                        </p>
-                        <h2 className="mb-2 text-xl font-black">
-                            {selectedTemplate.name}
-                        </h2>
-                        <p className="text-sm leading-6 text-slate-300">
-                            {selectedTemplate.description}
-                        </p>
-                    </div>
-                ) : (
-                    <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5">
-                        <p className="mb-2 text-sm font-bold text-slate-300">
-                            No template selected
-                        </p>
-                        <p className="text-sm leading-6 text-slate-400">
-                            Choose a coursework type so Coursework Compass can prepare a
-                            deadline-based plan in the next missions.
-                        </p>
-                    </div>
-                )}
+                <FancySelect
+                    label="Project type"
+                    value={selectedTemplateId}
+                    placeholder="Choose a template"
+                    options={templateOptions}
+                    onChange={(nextValue) => {
+                        setSelectedTemplateId(nextValue);
+                        setGeneratedPlan(null);
+                        setSaveMessage("");
+                    }}
+                    helperText={
+                        selectedTemplate
+                            ? selectedTemplate.description
+                            : "Choose a coursework type so Coursework Compass can prepare a deadline-based plan."
+                    }
+                />
 
                 <div>
-                    <label
-                        htmlFor="deadline"
-                        className="mb-2 block text-sm font-bold text-slate-200"
-                    >
+                    <label className="mb-2 block text-sm font-bold text-white">
                         Deadline
                     </label>
                     <input
-                        id="deadline"
-                        name="deadline"
                         type="text"
                         value={deadline}
-                        onChange={(event) => setDeadline(event.target.value)}
+                        onChange={(event) => {
+                            setDeadline(event.target.value);
+                            setGeneratedPlan(null);
+                            setSaveMessage("");
+                        }}
                         placeholder="yyyy/mm/dd"
-                        inputMode="numeric"
-                        className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-4 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400"
+                        className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-lg focus:shadow-cyan-950/40"
                     />
-                    <p className="mt-2 text-xs text-slate-500">
-                        Use yyyy/mm/dd format. Example: 2026/07/10.
+                    <p className="mt-2 text-xs leading-5 text-slate-400">
+                        Use a 4-digit year. The date cannot be earlier than 2026.
                     </p>
                 </div>
 
-                <div>
-                    <label
-                        htmlFor="intensity"
-                        className="mb-2 block text-sm font-bold text-slate-200"
-                    >
-                        Planning intensity
-                    </label>
-                    <select
-                        id="intensity"
-                        name="intensity"
-                        value={intensity}
-                        onChange={(event) =>
-                            setIntensity(event.target.value as PlanningIntensity)
+                <FancySelect
+                    label="Planning intensity"
+                    value={planningIntensity}
+                    placeholder="Choose planning intensity"
+                    options={planningIntensityOptions}
+                    onChange={(nextValue) => {
+                        if (!isPlanningIntensity(nextValue)) {
+                            return;
                         }
-                        className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-4 text-white outline-none transition focus:border-cyan-400"
-                    >
-                        <option value="light">Light: fewer tasks per week</option>
-                        <option value="balanced">Balanced: steady daily progress</option>
-                        <option value="intense">Intense: faster deadline attack</option>
-                    </select>
-                </div>
 
-                <div className="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 p-5">
-                    <p className="mb-2 text-sm font-bold text-cyan-300">
-                        Generation engine online
-                    </p>
+                        setPlanningIntensity(nextValue);
+                        setGeneratedPlan(null);
+                        setSaveMessage("");
+                    }}
+                    helperText="Choose how aggressively Coursework Compass should break down your plan."
+                />
+
+                {formError ? (
+                    <div className="rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
+                        {formError}
+                    </div>
+                ) : null}
+
+                <div className="rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-5">
+                    <p className="mb-2 text-sm font-bold text-cyan-300">Coming next</p>
                     <p className="text-sm leading-6 text-slate-300">
-                        Coursework Compass can now generate and locally save a first task
-                        plan from your chosen template, deadline, and planning intensity.
+                        Click Create Project to generate a real coursework plan from your
+                        template, deadline, and planning intensity. You can then save it
+                        locally and track it through Dashboard, Today, and Project Details.
                     </p>
                 </div>
 
@@ -277,101 +252,85 @@ export default function NewProjectForm() {
                         Back to Projects
                     </a>
                 </div>
+            </div>
 
-                {previewProject ? (
-                    <div className="mt-8 rounded-3xl border border-slate-700 bg-slate-950 p-6">
-                        <p className="mb-2 text-sm font-bold text-cyan-300">
+            {generatedPlan ? (
+                <section className="mt-8 rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
+                    <div className="mb-6">
+                        <p className="mb-2 text-sm font-bold text-emerald-300">
                             Project preview
                         </p>
-
-                        <div className="mb-5 flex flex-col justify-between gap-4 md:flex-row md:items-center">
-                            <div>
-                                <h2 className="text-2xl font-black">
-                                    {previewProject.title}
-                                </h2>
-                                <p className="text-sm text-slate-400">
-                                    {previewProject.type}
-                                </p>
-                            </div>
-
-                            <span
-                                className={`rounded-full px-4 py-2 text-sm font-bold ${
-                                    previewProject.risk === "High"
-                                        ? "bg-red-400/10 text-red-300"
-                                        : previewProject.risk === "Medium"
-                                            ? "bg-amber-400/10 text-amber-300"
-                                            : "bg-emerald-400/10 text-emerald-300"
-                                }`}
-                            >
-                {previewProject.risk} Risk
-              </span>
-                        </div>
-
-                        <div className="grid gap-4 md:grid-cols-3">
-                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-                                <p className="text-sm text-slate-400">Progress</p>
-                                <p className="mt-2 text-2xl font-black">
-                                    {previewProject.progress}%
-                                </p>
-                            </div>
-
-                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-                                <p className="text-sm text-slate-400">Days left</p>
-                                <p className="mt-2 text-2xl font-black">
-                                    {previewProject.daysLeft}
-                                </p>
-                            </div>
-
-                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-                                <p className="text-sm text-slate-400">Deadline</p>
-                                <p className="mt-2 text-2xl font-black">
-                                    {previewProject.deadline}
-                                </p>
-                            </div>
-                        </div>
+                        <h2 className="text-2xl font-black sm:text-3xl">
+                            {generatedPlan.project.title}
+                        </h2>
+                        <p className="mt-2 text-sm leading-6 text-slate-300">
+                            {generatedPlan.project.type} · {generatedPlan.tasks.length} tasks
+                            generated · deadline {generatedPlan.project.deadline}
+                        </p>
                     </div>
-                ) : null}
 
-                {generatedTasks.length > 0 ? (
-                    <div className="mt-8 rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-6">
-                        <div className="mb-6">
-                            <p className="mb-2 text-sm font-bold text-cyan-300">
-                                Generated task plan
-                            </p>
-                            <h2 className="text-2xl font-black">
-                                {generatedTasks.length} tasks created
-                            </h2>
-                            <p className="mt-2 text-sm leading-6 text-slate-300">
-                                This is the first automatically generated plan for your
-                                coursework. Save it locally to keep it in this browser.
+                    <div className="mb-6 grid gap-4 sm:grid-cols-3">
+                        <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                            <p className="text-xs font-bold text-slate-400">Risk</p>
+                            <p className="mt-1 text-xl font-black">
+                                {generatedPlan.project.risk}
                             </p>
                         </div>
 
-                        <div className="mb-6 flex flex-col gap-4 sm:flex-row">
-                            <button
-                                type="button"
-                                onClick={handleSaveProjectLocally}
-                                className="rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
-                            >
-                                {isSaved ? "Saved Locally" : "Save Project Locally"}
-                            </button>
-
-                            <a
-                                href="/dashboard"
-                                className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
-                            >
-                                Go to Dashboard
-                            </a>
+                        <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                            <p className="text-xs font-bold text-slate-400">Days left</p>
+                            <p className="mt-1 text-xl font-black">
+                                {generatedPlan.project.daysLeft}
+                            </p>
                         </div>
 
-                        <div className="space-y-4">
-                            {generatedTasks.map((task) => (
-                                <TaskCard key={task.id} task={task} />
-                            ))}
+                        <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                            <p className="text-xs font-bold text-slate-400">Intensity</p>
+                            <p className="mt-1 text-xl font-black capitalize">
+                                {generatedPlan.intensity}
+                            </p>
                         </div>
                     </div>
-                ) : null}
-            </form>
+
+                    <div className="space-y-3">
+                        {generatedPlan.tasks.map((task) => (
+                            <div
+                                key={task.id}
+                                className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4"
+                            >
+                                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                                    <div>
+                                        <p className="font-bold text-white">{task.title}</p>
+                                        <p className="mt-1 text-xs text-slate-400">
+                                            Due {task.dueDate || "Not scheduled"} · {task.time}
+                                        </p>
+                                    </div>
+
+                                    <span className="w-fit rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-bold text-cyan-300">
+                    {task.priority}
+                  </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
+                        <button
+                            type="button"
+                            onClick={handleSaveProject}
+                            className="rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
+                        >
+                            Save Project Locally
+                        </button>
+
+                        {saveMessage ? (
+                            <p className="text-sm font-bold text-emerald-300">
+                                {saveMessage}
+                            </p>
+                        ) : null}
+                    </div>
+                </section>
+            ) : null}
         </div>
     );
 }
