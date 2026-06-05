@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const feedbackTypes = [
     "Bug report",
@@ -43,11 +43,11 @@ function createFeedbackBody(feedbackType: string, pageUrl: string) {
 
 export default function FeedbackPanel() {
     const [selectedType, setSelectedType] = useState("General feedback");
+    const [pageUrl, setPageUrl] = useState("Coursework Compass");
 
-    const pageUrl =
-        typeof window === "undefined"
-            ? "Coursework Compass"
-            : window.location.href;
+    useEffect(() => {
+        setPageUrl(window.location.href);
+    }, []);
 
     const feedbackMailto = useMemo(() => {
         const subject = encodeURIComponent(
