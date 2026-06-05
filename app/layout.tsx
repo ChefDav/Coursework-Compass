@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import OnboardingPopup from "@/components/OnboardingPopup";
+import SaveSuccessToast from "@/components/SaveSuccessToast";
 import GlobalClock from "@/components/GlobalClock";
 import CompletionWatcher from "@/components/CompletionWatcher";
 
@@ -20,6 +21,7 @@ export default function RootLayout({
         <body>
         {children}
         <OnboardingPopup />
+        <SaveSuccessToast />
         <CompletionWatcher />
         <GlobalClock />
         </body>

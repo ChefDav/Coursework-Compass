@@ -3,46 +3,12 @@
 import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import AppNav from "@/components/AppNav";
 import EmptyState from "@/components/EmptyState";
-import { loadProjectPlans } from "@/lib/localStorage";
-
-type TaskStatus = "Todo" | "Done";
-
-type CourseworkTask = {
-    id: string;
-    title: string;
-    status: TaskStatus;
-    priority?: string;
-    dueDate?: string;
-    estimatedTime?: string;
-};
-
-type GeneratedProjectPlan = {
-    id?: string;
-    slug?: string;
-    projectId?: string;
-    project: {
-        id?: string;
-        slug?: string;
-        projectId?: string;
-        title: string;
-        deadline: string;
-        status?: string;
-        type?: string;
-    };
-    tasks: CourseworkTask[];
-    archivedTasks?: CourseworkTask[];
-    archivedTaskCount?: number;
-};
-
-const projectStorageKeys = [
-    "coursework-compass-projects",
-    "coursework-compass-plans",
-    "coursework-compass-project-plans",
-    "courseworkCompassProjects",
-    "courseworkCompassProjectPlans",
-    "generatedProjectPlans",
-    "projectPlans",
-];
+import {
+    deleteProjectPlan,
+    loadProjectPlans,
+    type GeneratedProjectPlan,
+    type CourseworkTask,
+} from "@/lib/localStorage";
 
 function calculateProgress(tasks: CourseworkTask[]) {
     if (tasks.length === 0) {
@@ -98,19 +64,15 @@ function getProjectRouteId(plan: GeneratedProjectPlan, index: number) {
     );
 }
 
-function saveProjectPlansToLocalStorage(projectPlans: GeneratedProjectPlan[]) {
-    const serialisedPlans = JSON.stringify(projectPlans);
-
-    projectStorageKeys.forEach((key) => {
-        window.localStorage.setItem(key, serialisedPlans);
-    });
-}
-
 export default function ProjectsPage() {
     const [projectPlans, setProjectPlans] = useState<GeneratedProjectPlan[]>([]);
 
+    function refreshProjects() {
+        setProjectPlans(loadProjectPlans());
+    }
+
     useEffect(() => {
-        setProjectPlans(loadProjectPlans() as GeneratedProjectPlan[]);
+        refreshProjects();
     }, []);
 
     const sortedPlans = useMemo(() => {
@@ -129,9 +91,12 @@ export default function ProjectsPage() {
     function handleDeleteProject(
         event: MouseEvent<HTMLButtonElement>,
         planToDelete: GeneratedProjectPlan,
+        planIndex: number,
     ) {
         event.preventDefault();
         event.stopPropagation();
+
+        const projectRouteId = getProjectRouteId(planToDelete, planIndex);
 
         const confirmed = window.confirm(
             `Delete "${planToDelete.project.title}"? This will remove this project and its tasks from this browser.`,
@@ -141,10 +106,8 @@ export default function ProjectsPage() {
             return;
         }
 
-        const nextPlans = projectPlans.filter((plan) => plan !== planToDelete);
-
-        setProjectPlans(nextPlans);
-        saveProjectPlansToLocalStorage(nextPlans);
+        deleteProjectPlan(projectRouteId);
+        refreshProjects();
     }
 
     return (
@@ -278,7 +241,9 @@ export default function ProjectsPage() {
 
                                         <button
                                             type="button"
-                                            onClick={(event) => handleDeleteProject(event, plan)}
+                                            onClick={(event) =>
+                                                handleDeleteProject(event, plan, index)
+                                            }
                                             className="rounded-2xl border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
                                         >
                                             Delete project

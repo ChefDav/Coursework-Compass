@@ -1,40 +1,45 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import FancySelect from "@/components/FancySelect";
 
-type TimeUnit = "minutes" | "hours" | "days";
+type TimeUnit = "min" | "hours" | "days";
 
-type EstimatedTimeFieldProps = {
-    label: string;
-    value: string;
-    onChange: (value: string) => void;
-    helperText?: string;
+type ParsedEstimatedTime = {
+    amount: string;
+    unit: TimeUnit;
 };
 
-const unitOptions = [
+type EstimatedTimeFieldProps = {
+    value?: string | null;
+    onChange: (value: string) => void;
+    label?: string;
+    disabled?: boolean;
+};
+
+const unitOptions: { label: string; value: TimeUnit }[] = [
     {
-        label: "Minutes",
-        value: "minutes",
-        description: "Best for short tasks, for example 30 min or 45 min.",
+        label: "min",
+        value: "min",
     },
     {
-        label: "Hours",
+        label: "hours",
         value: "hours",
-        description: "Best for longer work blocks, for example 1 hour or 2 hours.",
     },
     {
-        label: "Days",
+        label: "days",
         value: "days",
-        description: "Best for major tasks that take multiple days.",
     },
 ];
 
-function isTimeUnit(value: string): value is TimeUnit {
-    return value === "minutes" || value === "hours" || value === "days";
+function safeString(value: string | null | undefined) {
+    if (typeof value !== "string") {
+        return "";
+    }
+
+    return value;
 }
 
-function formatNumber(value: number) {
+function removeTrailingZero(value: number) {
     if (Number.isInteger(value)) {
         return String(value);
     }
@@ -42,61 +47,29 @@ function formatNumber(value: number) {
     return String(Number(value.toFixed(2)));
 }
 
-function formatEstimatedTimeFromMinutes(totalMinutes: number) {
-    if (!Number.isFinite(totalMinutes) || totalMinutes <= 0) {
-        return "45 min";
-    }
+export function parseEstimatedTime(
+    value: string | null | undefined,
+): ParsedEstimatedTime {
+    const cleanedValue = safeString(value).trim().toLowerCase();
 
-    if (totalMinutes < 60) {
-        return `${formatNumber(totalMinutes)} min`;
-    }
-
-    if (totalMinutes < 24 * 60) {
-        const hours = totalMinutes / 60;
-        const unit = hours === 1 ? "hour" : "hours";
-
-        return `${formatNumber(hours)} ${unit}`;
-    }
-
-    const days = totalMinutes / (24 * 60);
-    const unit = days === 1 ? "day" : "days";
-
-    return `${formatNumber(days)} ${unit}`;
-}
-
-function convertToMinutes(amount: number, unit: TimeUnit) {
-    if (unit === "minutes") {
-        return amount;
-    }
-
-    if (unit === "hours") {
-        return amount * 60;
-    }
-
-    return amount * 24 * 60;
-}
-
-function parseEstimatedTime(value: string) {
-    const cleanedValue = value.trim().toLowerCase();
-
-    if (!cleanedValue) {
+    if (!cleanedValue || cleanedValue === "not set") {
         return {
-            amount: "45",
-            unit: "minutes" as TimeUnit,
+            amount: "",
+            unit: "min",
         };
     }
 
-    const numberMatch = cleanedValue.match(/(\d+(\.\d+)?)/);
-    const amount = numberMatch?.[1] ?? "45";
+    const numberMatch = cleanedValue.match(/[\d.]+/);
+    const amount = numberMatch ? numberMatch[0] : "";
 
     if (
         cleanedValue.includes("day") ||
         cleanedValue.includes("days") ||
-        cleanedValue.includes("d")
+        cleanedValue === "d"
     ) {
         return {
             amount,
-            unit: "days" as TimeUnit,
+            unit: "days",
         };
     }
 
@@ -105,122 +78,153 @@ function parseEstimatedTime(value: string) {
         cleanedValue.includes("hours") ||
         cleanedValue.includes("hr") ||
         cleanedValue.includes("hrs") ||
-        cleanedValue.includes("h")
+        cleanedValue === "h"
     ) {
         return {
             amount,
-            unit: "hours" as TimeUnit,
+            unit: "hours",
         };
     }
 
     return {
         amount,
-        unit: "minutes" as TimeUnit,
+        unit: "min",
     };
 }
 
-export function normaliseEstimatedTime(value: string) {
-    const parsedValue = parseEstimatedTime(value);
-    const amount = Number(parsedValue.amount);
+export function normaliseEstimatedTime(
+    value: string | null | undefined,
+    fallbackUnit: TimeUnit = "min",
+) {
+    const cleanedValue = safeString(value).trim();
 
-    if (!Number.isFinite(amount) || amount <= 0) {
-        return "45 min";
+    if (!cleanedValue) {
+        return "Not set";
     }
 
-    return formatEstimatedTimeFromMinutes(
-        convertToMinutes(amount, parsedValue.unit),
-    );
+    const parsed = parseEstimatedTime(cleanedValue);
+    const amountNumber = Number(parsed.amount);
+
+    if (!Number.isFinite(amountNumber) || amountNumber <= 0) {
+        return "Not set";
+    }
+
+    const unit = parsed.unit || fallbackUnit;
+
+    if (unit === "min") {
+        if (amountNumber >= 1440 && amountNumber % 1440 === 0) {
+            const days = amountNumber / 1440;
+            return `${removeTrailingZero(days)} ${days === 1 ? "day" : "days"}`;
+        }
+
+        if (amountNumber >= 60 && amountNumber % 60 === 0) {
+            const hours = amountNumber / 60;
+            return `${removeTrailingZero(hours)} ${
+                hours === 1 ? "hour" : "hours"
+            }`;
+        }
+
+        return `${removeTrailingZero(amountNumber)} min`;
+    }
+
+    if (unit === "hours") {
+        if (amountNumber >= 24 && amountNumber % 24 === 0) {
+            const days = amountNumber / 24;
+            return `${removeTrailingZero(days)} ${days === 1 ? "day" : "days"}`;
+        }
+
+        return `${removeTrailingZero(amountNumber)} ${
+            amountNumber === 1 ? "hour" : "hours"
+        }`;
+    }
+
+    return `${removeTrailingZero(amountNumber)} ${
+        amountNumber === 1 ? "day" : "days"
+    }`;
 }
 
 export default function EstimatedTimeField({
-                                               label,
                                                value,
                                                onChange,
-                                               helperText,
+                                               label = "Estimated time",
+                                               disabled = false,
                                            }: EstimatedTimeFieldProps) {
-    const parsedInitialValue = useMemo(() => parseEstimatedTime(value), [value]);
+    const parsedValue = useMemo(() => parseEstimatedTime(value), [value]);
 
-    const [amount, setAmount] = useState(parsedInitialValue.amount);
-    const [unit, setUnit] = useState<TimeUnit>(parsedInitialValue.unit);
-    const [error, setError] = useState("");
+    const [amount, setAmount] = useState(parsedValue.amount);
+    const [unit, setUnit] = useState<TimeUnit>(parsedValue.unit);
 
     useEffect(() => {
-        const parsedValue = parseEstimatedTime(value);
-        setAmount(parsedValue.amount);
-        setUnit(parsedValue.unit);
+        const nextParsedValue = parseEstimatedTime(value);
+        setAmount(nextParsedValue.amount);
+        setUnit(nextParsedValue.unit);
     }, [value]);
 
-    function updateEstimatedTime(nextAmount: string, nextUnit: TimeUnit) {
-        setAmount(nextAmount);
+    function commitValue(nextAmount: string, nextUnit: TimeUnit) {
+        const cleanedAmount = nextAmount.trim();
+
+        if (!cleanedAmount) {
+            onChange("Not set");
+            return;
+        }
+
+        const normalisedValue = normaliseEstimatedTime(
+            `${cleanedAmount} ${nextUnit}`,
+            nextUnit,
+        );
+
+        onChange(normalisedValue);
+    }
+
+    function handleAmountChange(nextAmount: string) {
+        const cleanedAmount = nextAmount.replace(/[^\d.]/g, "");
+        setAmount(cleanedAmount);
+    }
+
+    function handleAmountBlur() {
+        commitValue(amount, unit);
+    }
+
+    function handleUnitChange(nextUnit: TimeUnit) {
         setUnit(nextUnit);
-        setError("");
-
-        const numericAmount = Number(nextAmount);
-
-        if (!nextAmount.trim()) {
-            onChange("");
-            return;
-        }
-
-        if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-            setError("Enter a positive number.");
-            return;
-        }
-
-        const totalMinutes = convertToMinutes(numericAmount, nextUnit);
-        const formattedValue = formatEstimatedTimeFromMinutes(totalMinutes);
-
-        onChange(formattedValue);
+        commitValue(amount, nextUnit);
     }
 
     return (
         <div>
-            <label className="mb-2 block text-sm font-bold text-white">
+            <label className="mb-2 block text-xs font-bold text-slate-300">
                 {label}
             </label>
 
-            <div className="grid gap-3 sm:grid-cols-[0.8fr_1.2fr]">
+            <div className="grid grid-cols-[1fr_8.5rem] gap-3">
                 <input
-                    type="number"
-                    min="0"
-                    step="0.25"
+                    type="text"
                     value={amount}
-                    onChange={(event) => updateEstimatedTime(event.target.value, unit)}
-                    placeholder="45"
-                    className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-lg focus:shadow-cyan-950/40"
+                    disabled={disabled}
+                    onChange={(event) => handleAmountChange(event.target.value)}
+                    onBlur={handleAmountBlur}
+                    placeholder="e.g. 60"
+                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
                 />
 
-                <FancySelect
-                    label="Unit"
+                <select
                     value={unit}
-                    placeholder="Choose unit"
-                    options={unitOptions}
-                    onChange={(nextValue) => {
-                        if (!isTimeUnit(nextValue)) {
-                            return;
-                        }
-
-                        updateEstimatedTime(amount, nextValue);
-                    }}
-                    helperText=""
-                />
+                    disabled={disabled}
+                    onChange={(event) => handleUnitChange(event.target.value as TimeUnit)}
+                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                    {unitOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </select>
             </div>
 
-            <div className="mt-2 rounded-2xl border border-slate-800 bg-slate-950/60 px-3 py-2">
-                <p className="text-xs font-bold text-cyan-300">
-                    Saved as: {normaliseEstimatedTime(value || `${amount} ${unit}`)}
-                </p>
-            </div>
-
-            {helperText ? (
-                <p className="mt-2 text-xs leading-5 text-slate-400">{helperText}</p>
-            ) : null}
-
-            {error ? (
-                <div className="mt-3 rounded-2xl border border-red-400/30 bg-red-400/10 p-3 text-xs font-bold text-red-300">
-                    {error}
-                </div>
-            ) : null}
+            <p className="mt-2 text-xs leading-5 text-slate-500">
+                Examples: 60 min becomes 1 hour, 120 min becomes 2 hours, and 24 hours
+                becomes 1 day.
+            </p>
         </div>
     );
 }

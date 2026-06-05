@@ -1,584 +1,883 @@
-import type {
-    GeneratedProjectPlan,
-    PriorityLevel,
-    RiskLevel,
-    Task,
-    TaskStatus,
-} from "@/types/coursework";
+export type TaskStatus = "Todo" | "Done";
 
-const PROJECT_PLANS_STORAGE_KEY = "coursework-compass-project-plans";
-const PROJECT_PLANS_UPDATED_EVENT = "coursework-compass-project-plans-updated";
+export type CourseworkTask = {
+    id: string;
+    title: string;
+    status: TaskStatus;
+    priority?: string;
+    dueDate?: string;
+    estimatedTime?: string;
+    completedAt?: string;
+    archivedAt?: string;
+};
 
-function notifyProjectPlanUpdates() {
-    window.dispatchEvent(new Event(PROJECT_PLANS_UPDATED_EVENT));
-}
-
-function formatNumber(value: number) {
-    if (Number.isInteger(value)) {
-        return String(value);
-    }
-
-    return String(Number(value.toFixed(2)));
-}
-
-function formatEstimatedTimeFromMinutes(totalMinutes: number) {
-    if (!Number.isFinite(totalMinutes) || totalMinutes <= 0) {
-        return "45 min";
-    }
-
-    if (totalMinutes < 60) {
-        return `${formatNumber(totalMinutes)} min`;
-    }
-
-    if (totalMinutes < 24 * 60) {
-        const hours = totalMinutes / 60;
-        const unit = hours === 1 ? "hour" : "hours";
-
-        return `${formatNumber(hours)} ${unit}`;
-    }
-
-    const days = totalMinutes / (24 * 60);
-    const unit = days === 1 ? "day" : "days";
-
-    return `${formatNumber(days)} ${unit}`;
-}
-
-function parseEstimatedTime(value: string) {
-    const cleanedValue = value.trim().toLowerCase();
-
-    if (!cleanedValue) {
-        return {
-            amount: "45",
-            unit: "minutes",
-        };
-    }
-
-    const numberMatch = cleanedValue.match(/(\d+(\.\d+)?)/);
-    const amount = numberMatch?.[1] ?? "45";
-
-    if (
-        cleanedValue.includes("day") ||
-        cleanedValue.includes("days") ||
-        cleanedValue.includes("d")
-    ) {
-        return {
-            amount,
-            unit: "days",
-        };
-    }
-
-    if (
-        cleanedValue.includes("hour") ||
-        cleanedValue.includes("hours") ||
-        cleanedValue.includes("hr") ||
-        cleanedValue.includes("hrs") ||
-        cleanedValue.includes("h")
-    ) {
-        return {
-            amount,
-            unit: "hours",
-        };
-    }
-
-    return {
-        amount,
-        unit: "minutes",
+export type GeneratedProjectPlan = {
+    id: string;
+    slug?: string;
+    projectId?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    completionPromptDismissed?: boolean;
+    project: {
+        id?: string;
+        slug?: string;
+        projectId?: string;
+        title: string;
+        deadline: string;
+        status?: string;
+        type?: string;
     };
+    tasks: CourseworkTask[];
+    archivedTasks?: CourseworkTask[];
+    archivedTaskCount?: number;
+};
+
+type SaveSuccessOptions = {
+    title?: string;
+    message: string;
+    actionLabel?: string;
+    actionHref?: string;
+};
+
+const PRIMARY_PROJECT_STORAGE_KEY = "coursework-compass-projects";
+
+export const PROJECT_STORAGE_KEYS = [
+    PRIMARY_PROJECT_STORAGE_KEY,
+    "coursework-compass-plans",
+    "coursework-compass-project-plans",
+    "courseworkCompassProjects",
+    "courseworkCompassProjectPlans",
+    "generatedProjectPlans",
+    "projectPlans",
+];
+
+const SAVE_SUCCESS_EVENT_NAME = "coursework-compass-save-success";
+const PROJECT_PLAN_UPDATE_EVENT_NAME =
+    "coursework-compass-project-plans-updated";
+
+function isBrowser() {
+    return typeof window !== "undefined";
 }
 
-function convertEstimatedTimeToMinutes(amount: number, unit: string) {
-    if (unit === "minutes") {
-        return amount;
+function dispatchSaveSuccess(options: SaveSuccessOptions) {
+    if (!isBrowser()) {
+        return;
     }
 
-    if (unit === "hours") {
-        return amount * 60;
-    }
-
-    return amount * 24 * 60;
-}
-
-function normaliseStoredEstimatedTime(value: string) {
-    const parsedValue = parseEstimatedTime(value);
-    const amount = Number(parsedValue.amount);
-
-    if (!Number.isFinite(amount) || amount <= 0) {
-        return "45 min";
-    }
-
-    return formatEstimatedTimeFromMinutes(
-        convertEstimatedTimeToMinutes(amount, parsedValue.unit),
+    window.dispatchEvent(
+        new CustomEvent(SAVE_SUCCESS_EVENT_NAME, {
+            detail: options,
+        }),
     );
 }
 
-export function loadProjectPlans(): GeneratedProjectPlan[] {
-    if (typeof window === "undefined") {
-        return [];
+function dispatchProjectPlanUpdate() {
+    if (!isBrowser()) {
+        return;
     }
 
-    const rawPlans = window.localStorage.getItem(PROJECT_PLANS_STORAGE_KEY);
+    window.dispatchEvent(new CustomEvent(PROJECT_PLAN_UPDATE_EVENT_NAME));
+}
 
-    if (!rawPlans) {
+function createId(prefix: string) {
+    return `${prefix}-${Date.now().toString(36)}-${Math.random()
+        .toString(36)
+        .slice(2, 8)}`;
+}
+
+function slugifyTitle(title: string) {
+    return title
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+}
+
+function getRawProjectRouteId(plan: Partial<GeneratedProjectPlan>, index = 0) {
+    const project = plan.project ?? {
+        title: "",
+        deadline: "",
+    };
+
+    return (
+        plan.id ||
+        plan.slug ||
+        plan.projectId ||
+        project.id ||
+        project.slug ||
+        project.projectId ||
+        slugifyTitle(project.title || "") ||
+        `project-${index}`
+    );
+}
+
+export function getProjectRouteId(plan: GeneratedProjectPlan, index = 0) {
+    return getRawProjectRouteId(plan, index);
+}
+
+function normaliseTask(rawTask: Partial<CourseworkTask>, index: number) {
+    return {
+        id: rawTask.id || createId(`task-${index}`),
+        title: rawTask.title || "Untitled task",
+        status: rawTask.status === "Done" ? "Done" : "Todo",
+        priority: rawTask.priority || "Medium",
+        dueDate: rawTask.dueDate || "",
+        estimatedTime: rawTask.estimatedTime || "Not set",
+        completedAt: rawTask.completedAt,
+        archivedAt: rawTask.archivedAt,
+    } satisfies CourseworkTask;
+}
+
+function normaliseProjectPlan(
+    rawPlan: Partial<GeneratedProjectPlan>,
+    index: number,
+) {
+    const rawProject = rawPlan.project ?? {
+        title: "Untitled project",
+        deadline: "",
+    };
+
+    const projectTitle = rawProject.title || "Untitled project";
+    const projectDeadline = rawProject.deadline || "";
+
+    const routeId = getRawProjectRouteId(
+        {
+            ...rawPlan,
+            project: {
+                ...rawProject,
+                title: projectTitle,
+                deadline: projectDeadline,
+            },
+        },
+        index,
+    );
+
+    const tasks = Array.isArray(rawPlan.tasks)
+        ? rawPlan.tasks.map((task, taskIndex) => normaliseTask(task, taskIndex))
+        : [];
+
+    const archivedTasks = Array.isArray(rawPlan.archivedTasks)
+        ? rawPlan.archivedTasks.map((task, taskIndex) =>
+            normaliseTask(task, taskIndex),
+        )
+        : [];
+
+    return {
+        id: routeId,
+        slug: rawPlan.slug,
+        projectId: rawPlan.projectId,
+        createdAt: rawPlan.createdAt || new Date().toISOString(),
+        updatedAt: rawPlan.updatedAt || new Date().toISOString(),
+        completionPromptDismissed: rawPlan.completionPromptDismissed || false,
+        project: {
+            id: rawProject.id,
+            slug: rawProject.slug,
+            projectId: rawProject.projectId,
+            title: projectTitle,
+            deadline: projectDeadline,
+            status: rawProject.status || "Active",
+            type: rawProject.type || "",
+        },
+        tasks,
+        archivedTasks,
+        archivedTaskCount:
+            typeof rawPlan.archivedTaskCount === "number"
+                ? rawPlan.archivedTaskCount
+                : archivedTasks.length,
+    } satisfies GeneratedProjectPlan;
+}
+
+function parseStorageValue(value: string | null) {
+    if (!value) {
         return [];
     }
 
     try {
-        const parsedPlans = JSON.parse(rawPlans);
+        const parsedValue = JSON.parse(value);
 
-        if (!Array.isArray(parsedPlans)) {
-            return [];
+        if (Array.isArray(parsedValue)) {
+            return parsedValue;
         }
 
-        return parsedPlans;
+        if (parsedValue && Array.isArray(parsedValue.projectPlans)) {
+            return parsedValue.projectPlans;
+        }
+
+        if (parsedValue && Array.isArray(parsedValue.projects)) {
+            return parsedValue.projects;
+        }
+
+        if (parsedValue && parsedValue.project && Array.isArray(parsedValue.tasks)) {
+            return [parsedValue];
+        }
+
+        return [];
     } catch {
         return [];
     }
 }
 
-export function saveProjectPlans(plans: GeneratedProjectPlan[]) {
-    window.localStorage.setItem(
-        PROJECT_PLANS_STORAGE_KEY,
-        JSON.stringify(plans),
-    );
+function removeLegacyProjectStorageKeys() {
+    if (!isBrowser()) {
+        return;
+    }
 
-    notifyProjectPlanUpdates();
+    PROJECT_STORAGE_KEYS.forEach((key) => {
+        if (key !== PRIMARY_PROJECT_STORAGE_KEY) {
+            window.localStorage.removeItem(key);
+        }
+    });
+
+    Object.keys(window.localStorage).forEach((key) => {
+        const normalisedKey = key.toLowerCase();
+
+        const isCourseworkCompassProjectKey =
+            normalisedKey.includes("courseworkcompassprojects") ||
+            normalisedKey.includes("coursework-compass-plans") ||
+            normalisedKey.includes("coursework-compass-project-plans") ||
+            normalisedKey === "generatedprojectplans" ||
+            normalisedKey === "projectplans";
+
+        if (isCourseworkCompassProjectKey && key !== PRIMARY_PROJECT_STORAGE_KEY) {
+            window.localStorage.removeItem(key);
+        }
+    });
 }
 
-export function saveProjectPlan(plan: GeneratedProjectPlan) {
-    const existingPlans = loadProjectPlans();
+function readRawProjectPlans() {
+    if (!isBrowser()) {
+        return [];
+    }
 
-    const updatedPlans = [
-        ...existingPlans.filter(
-            (existingPlan) => existingPlan.project.id !== plan.project.id,
-        ),
-        plan,
-    ];
+    const rawPlans: unknown[] = [];
 
-    saveProjectPlans(updatedPlans);
+    PROJECT_STORAGE_KEYS.forEach((key) => {
+        rawPlans.push(...parseStorageValue(window.localStorage.getItem(key)));
+    });
 
-    return updatedPlans;
+    return rawPlans;
 }
 
-export function clearProjectPlans() {
-    window.localStorage.removeItem(PROJECT_PLANS_STORAGE_KEY);
-    notifyProjectPlanUpdates();
+function safeSetPrimaryProjectStorage(serialisedPlans: string) {
+    if (!isBrowser()) {
+        return false;
+    }
+
+    removeLegacyProjectStorageKeys();
+
+    try {
+        window.localStorage.setItem(PRIMARY_PROJECT_STORAGE_KEY, serialisedPlans);
+        return true;
+    } catch {
+        try {
+            removeLegacyProjectStorageKeys();
+            window.localStorage.removeItem(PRIMARY_PROJECT_STORAGE_KEY);
+            window.localStorage.setItem(PRIMARY_PROJECT_STORAGE_KEY, serialisedPlans);
+            return true;
+        } catch {
+            dispatchSaveSuccess({
+                title: "Local storage is full",
+                message:
+                    "Your browser storage is full. Please use Reset data if this is only test data, then create a smaller test project.",
+            });
+
+            return false;
+        }
+    }
 }
 
-export function deleteProjectPlan(projectId: string) {
-    const existingPlans = loadProjectPlans();
+function persistProjectPlansSilently(projectPlans: GeneratedProjectPlan[]) {
+    if (!isBrowser()) {
+        return;
+    }
 
-    const updatedPlans = existingPlans.filter(
-        (plan) => plan.project.id !== projectId,
-    );
+    const serialisedPlans = JSON.stringify(projectPlans);
+    const didSave = safeSetPrimaryProjectStorage(serialisedPlans);
 
-    saveProjectPlans(updatedPlans);
-
-    return updatedPlans;
+    if (didSave) {
+        dispatchProjectPlanUpdate();
+    }
 }
 
-export function listenForProjectPlanUpdates(callback: () => void) {
-    function handleStorageEvent(event: StorageEvent) {
-        if (event.key === PROJECT_PLANS_STORAGE_KEY) {
-            callback();
+function persistProjectPlans(
+    projectPlans: GeneratedProjectPlan[],
+    saveSuccessOptions?: SaveSuccessOptions,
+) {
+    const normalisedPlans = projectPlans.map((plan, index) => ({
+        ...normaliseProjectPlan(plan, index),
+        updatedAt: plan.updatedAt || new Date().toISOString(),
+    }));
+
+    const serialisedPlans = JSON.stringify(normalisedPlans);
+    const didSave = safeSetPrimaryProjectStorage(serialisedPlans);
+
+    if (didSave) {
+        dispatchProjectPlanUpdate();
+
+        if (saveSuccessOptions) {
+            dispatchSaveSuccess(saveSuccessOptions);
         }
     }
 
-    window.addEventListener(PROJECT_PLANS_UPDATED_EVENT, callback);
-    window.addEventListener("storage", handleStorageEvent);
-
-    return () => {
-        window.removeEventListener(PROJECT_PLANS_UPDATED_EVENT, callback);
-        window.removeEventListener("storage", handleStorageEvent);
-    };
+    return normalisedPlans;
 }
 
-function parseProjectDeadline(deadline: string) {
-    const normalisedDeadline = deadline.replaceAll("/", "-");
-    const parsedDate = new Date(`${normalisedDeadline}T00:00:00`);
+function findPlanIndexByProjectId(
+    projectPlans: GeneratedProjectPlan[],
+    projectId: string,
+) {
+    return projectPlans.findIndex((plan, index) => {
+        const routeId = getProjectRouteId(plan, index);
 
-    if (Number.isNaN(parsedDate.getTime())) {
+        return (
+            routeId === projectId ||
+            plan.id === projectId ||
+            plan.slug === projectId ||
+            plan.projectId === projectId ||
+            plan.project.id === projectId ||
+            plan.project.slug === projectId ||
+            plan.project.projectId === projectId ||
+            slugifyTitle(plan.project.title) === projectId
+        );
+    });
+}
+
+function restoreArchivedTasksForNewWork(plan: GeneratedProjectPlan) {
+    const archivedTasks = plan.archivedTasks ?? [];
+
+    if (archivedTasks.length === 0) {
+        return plan;
+    }
+
+    return {
+        ...plan,
+        tasks: [
+            ...plan.tasks,
+            ...archivedTasks.map((task) => ({
+                ...task,
+                archivedAt: undefined,
+            })),
+        ],
+        archivedTasks: [],
+        archivedTaskCount: 0,
+        completionPromptDismissed: false,
+        project: {
+            ...plan.project,
+            status: "Active",
+        },
+    } satisfies GeneratedProjectPlan;
+}
+
+export function loadProjectPlans() {
+    const rawPlans = readRawProjectPlans();
+    const planMap = new Map<string, GeneratedProjectPlan>();
+
+    rawPlans.forEach((rawPlan, index) => {
+        const normalisedPlan = normaliseProjectPlan(
+            rawPlan as Partial<GeneratedProjectPlan>,
+            index,
+        );
+
+        let routeId = getProjectRouteId(normalisedPlan, index);
+
+        if (planMap.has(routeId)) {
+            routeId = `${routeId}-${index}`;
+            normalisedPlan.id = routeId;
+        }
+
+        planMap.set(routeId, normalisedPlan);
+    });
+
+    const normalisedPlans = Array.from(planMap.values());
+
+    if (normalisedPlans.length > 0) {
+        persistProjectPlansSilently(normalisedPlans);
+    } else if (isBrowser()) {
+        removeLegacyProjectStorageKeys();
+    }
+
+    return normalisedPlans;
+}
+
+export function saveProjectPlans(
+    projectPlans: GeneratedProjectPlan[],
+    message = "Changes saved locally in this browser.",
+) {
+    return persistProjectPlans(projectPlans, {
+        title: "Saved successfully",
+        message,
+    });
+}
+
+export function saveProjectPlan(projectPlan: Partial<GeneratedProjectPlan>) {
+    const existingPlans = loadProjectPlans();
+    const normalisedPlan = normaliseProjectPlan(projectPlan, existingPlans.length);
+    const projectIndex = findPlanIndexByProjectId(existingPlans, normalisedPlan.id);
+
+    let nextPlans: GeneratedProjectPlan[];
+
+    if (projectIndex >= 0) {
+        nextPlans = existingPlans.map((plan, index) =>
+            index === projectIndex
+                ? {
+                    ...normalisedPlan,
+                    updatedAt: new Date().toISOString(),
+                }
+                : plan,
+        );
+    } else {
+        nextPlans = [
+            ...existingPlans,
+            {
+                ...normalisedPlan,
+                updatedAt: new Date().toISOString(),
+            },
+        ];
+    }
+
+    return persistProjectPlans(nextPlans, {
+        title: "Project saved locally",
+        message:
+            "Your coursework plan is saved in this browser. You can now view it in Dashboard, Projects, or Today.",
+        actionLabel: "Open dashboard",
+        actionHref: "/dashboard",
+    });
+}
+
+export const saveGeneratedProjectPlan = saveProjectPlan;
+export const addProjectPlan = saveProjectPlan;
+
+export function findProjectPlan(projectId: string) {
+    const projectPlans = loadProjectPlans();
+    const projectIndex = findPlanIndexByProjectId(projectPlans, projectId);
+
+    if (projectIndex < 0) {
         return null;
     }
 
-    return parsedDate;
+    return projectPlans[projectIndex];
 }
 
-function getStartOfDay(date: Date) {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+export function deleteProjectPlan(projectId: string) {
+    const projectPlans = loadProjectPlans();
+    const projectIndex = findPlanIndexByProjectId(projectPlans, projectId);
+
+    if (projectIndex < 0) {
+        return projectPlans;
+    }
+
+    const deletedProjectTitle = projectPlans[projectIndex].project.title;
+    const nextPlans = projectPlans.filter((_, index) => index !== projectIndex);
+
+    return persistProjectPlans(nextPlans, {
+        title: "Project deleted",
+        message: `"${deletedProjectTitle}" has been removed from this browser.`,
+        actionLabel: "View projects",
+        actionHref: "/projects",
+    });
 }
 
-function getDaysLeftFromDeadline(deadline: string) {
-    const parsedDeadline = parseProjectDeadline(deadline);
-
-    if (!parsedDeadline) {
-        return 0;
+export function clearProjectPlans() {
+    if (!isBrowser()) {
+        return;
     }
 
-    const today = getStartOfDay(new Date());
-    const target = getStartOfDay(parsedDeadline);
-    const millisecondsPerDay = 1000 * 60 * 60 * 24;
+    PROJECT_STORAGE_KEYS.forEach((key) => {
+        window.localStorage.removeItem(key);
+    });
 
-    return Math.max(
-        Math.ceil((target.getTime() - today.getTime()) / millisecondsPerDay),
-        0,
-    );
-}
+    removeLegacyProjectStorageKeys();
+    dispatchProjectPlanUpdate();
 
-function getRiskLevelFromDaysLeft(daysLeft: number): RiskLevel {
-    if (daysLeft <= 7) {
-        return "High";
-    }
-
-    if (daysLeft <= 21) {
-        return "Medium";
-    }
-
-    return "Low";
+    dispatchSaveSuccess({
+        title: "Local data reset",
+        message:
+            "All local Coursework Compass projects have been removed from this browser.",
+    });
 }
 
 export function updateProjectDetails(
     projectId: string,
-    updates: {
-        title: string;
-        deadline: string;
-    },
+    updates: Partial<GeneratedProjectPlan["project"]>,
 ) {
-    const existingPlans = loadProjectPlans();
-    const trimmedTitle = updates.title.trim();
+    const projectPlans = loadProjectPlans();
+    const projectIndex = findPlanIndexByProjectId(projectPlans, projectId);
 
-    if (!trimmedTitle) {
-        return existingPlans;
+    if (projectIndex < 0) {
+        return projectPlans;
     }
 
-    const daysLeft = getDaysLeftFromDeadline(updates.deadline);
-    const risk = getRiskLevelFromDaysLeft(daysLeft);
-
-    const updatedPlans = existingPlans.map((plan) => {
-        if (plan.project.id !== projectId) {
+    const nextPlans = projectPlans.map((plan, index) => {
+        if (index !== projectIndex) {
             return plan;
         }
 
         return {
             ...plan,
+            updatedAt: new Date().toISOString(),
+            completionPromptDismissed: false,
             project: {
                 ...plan.project,
-                title: trimmedTitle,
-                deadline: updates.deadline,
-                daysLeft,
-                risk,
+                ...updates,
             },
-            tasks: plan.tasks.map((task) => ({
-                ...task,
-                project: trimmedTitle,
-            })),
-            archivedTasks: plan.archivedTasks?.map((task) => ({
-                ...task,
-                project: trimmedTitle,
-            })),
-        } satisfies GeneratedProjectPlan;
+        };
     });
 
-    saveProjectPlans(updatedPlans);
-
-    return updatedPlans;
-}
-
-function slugifyTaskPart(value: string) {
-    return value
-        .toLowerCase()
-        .trim()
-        .replace(/&/g, "and")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)+/g, "");
-}
-
-function createCustomTaskId(projectId: string, title: string) {
-    const safeTitle = slugifyTaskPart(title) || "custom-task";
-    return `${projectId}-custom-${Date.now().toString(36)}-${safeTitle}`;
+    return persistProjectPlans(nextPlans, {
+        title: "Project details saved",
+        message: "Your project title, deadline, or settings have been updated.",
+    });
 }
 
 export function addCustomTask(
     projectId: string,
-    taskInput: {
-        title: string;
-        priority: PriorityLevel;
-        dueDate: string;
-        time: string;
-    },
+    taskInput: Partial<CourseworkTask>,
 ) {
-    const existingPlans = loadProjectPlans();
-    const trimmedTitle = taskInput.title.trim();
-    const trimmedTime = normaliseStoredEstimatedTime(taskInput.time);
+    const projectPlans = loadProjectPlans();
+    const projectIndex = findPlanIndexByProjectId(projectPlans, projectId);
 
-    if (!trimmedTitle) {
-        return existingPlans;
+    if (projectIndex < 0) {
+        return projectPlans;
     }
 
-    const updatedPlans = existingPlans.map((plan) => {
-        if (plan.project.id !== projectId) {
+    const nextPlans = projectPlans.map((plan, index) => {
+        if (index !== projectIndex) {
             return plan;
         }
 
-        const customTask: Task = {
-            id: createCustomTaskId(projectId, trimmedTitle),
-            title: trimmedTitle,
-            project: plan.project.title,
-            priority: taskInput.priority,
-            time: trimmedTime,
-            status: "Todo",
-            dueDate: taskInput.dueDate,
-        };
+        const restoredPlan = restoreArchivedTasksForNewWork(plan);
 
-        const restoredArchivedTasks = plan.archivedTasks ?? [];
-        const shouldRestoreArchivedTasks =
-            Boolean(plan.tasksArchivedAt) && restoredArchivedTasks.length > 0;
-
-        const nextTasks = shouldRestoreArchivedTasks
-            ? [...restoredArchivedTasks, customTask]
-            : [...plan.tasks, customTask];
+        const newTask = normaliseTask(
+            {
+                id: taskInput.id || createId("custom-task"),
+                title: taskInput.title || "Untitled custom task",
+                status: taskInput.status || "Todo",
+                priority: taskInput.priority || "Medium",
+                dueDate: taskInput.dueDate || "",
+                estimatedTime: taskInput.estimatedTime || "Not set",
+            },
+            restoredPlan.tasks.length,
+        );
 
         return {
-            ...plan,
-            tasks: nextTasks,
-            archivedTasks: undefined,
-            archivedTaskCount: 0,
-            tasksArchivedAt: undefined,
-            completedAt: undefined,
-            completionPromptShown: false,
+            ...restoredPlan,
+            updatedAt: new Date().toISOString(),
+            completionPromptDismissed: false,
             project: {
-                ...plan.project,
+                ...restoredPlan.project,
                 status: "Active",
             },
-        } satisfies GeneratedProjectPlan;
+            tasks: [...restoredPlan.tasks, newTask],
+        };
     });
 
-    saveProjectPlans(updatedPlans);
-
-    return updatedPlans;
+    return persistProjectPlans(nextPlans, {
+        title: "Task saved locally",
+        message:
+            "Your new task has been added. Today, Dashboard, and this project have been updated.",
+        actionLabel: "Open Today",
+        actionHref: "/today",
+    });
 }
 
 export function updateTaskDetails(
-    taskId: string,
-    updates: {
-        title: string;
-        priority: PriorityLevel;
-        dueDate: string;
-        time: string;
-    },
+    projectIdOrTaskId: string,
+    taskIdOrUpdates: string | Partial<CourseworkTask>,
+    maybeUpdates?: Partial<CourseworkTask>,
 ) {
-    const existingPlans = loadProjectPlans();
-    const trimmedTitle = updates.title.trim();
-    const trimmedTime = normaliseStoredEstimatedTime(updates.time);
+    const projectPlans = loadProjectPlans();
 
-    if (!trimmedTitle) {
-        return existingPlans;
-    }
+    const projectId =
+        typeof taskIdOrUpdates === "string" ? projectIdOrTaskId : "";
+    const taskId =
+        typeof taskIdOrUpdates === "string" ? taskIdOrUpdates : projectIdOrTaskId;
+    const updates =
+        typeof taskIdOrUpdates === "string" ? maybeUpdates ?? {} : taskIdOrUpdates;
 
-    function updateTask(task: Task) {
-        if (task.id !== taskId) {
-            return task;
-        }
-
-        return {
-            ...task,
-            title: trimmedTitle,
-            priority: updates.priority,
-            dueDate: updates.dueDate,
-            time: trimmedTime,
-        };
-    }
-
-    const updatedPlans = existingPlans.map((plan) => {
-        const updatedTasks = plan.tasks.map(updateTask);
-        const updatedArchivedTasks = plan.archivedTasks?.map(updateTask);
-
-        return {
-            ...plan,
-            tasks: updatedTasks,
-            archivedTasks: updatedArchivedTasks,
-        } satisfies GeneratedProjectPlan;
-    });
-
-    saveProjectPlans(updatedPlans);
-
-    return updatedPlans;
-}
-
-export function deleteTask(taskId: string) {
-    const existingPlans = loadProjectPlans();
-
-    const updatedPlans = existingPlans.map((plan) => {
-        const taskBelongsToVisibleTasks = plan.tasks.some(
-            (task) => task.id === taskId,
-        );
-
-        const taskBelongsToArchivedTasks =
-            plan.archivedTasks?.some((task) => task.id === taskId) ?? false;
-
-        if (!taskBelongsToVisibleTasks && !taskBelongsToArchivedTasks) {
+    const nextPlans = projectPlans.map((plan) => {
+        if (projectId && findPlanIndexByProjectId([plan], projectId) < 0) {
             return plan;
         }
 
-        const updatedTasks = plan.tasks.filter((task) => task.id !== taskId);
-        const updatedArchivedTasks = plan.archivedTasks?.filter(
-            (task) => task.id !== taskId,
-        );
+        const taskExists = plan.tasks.some((task) => task.id === taskId);
 
-        const hasVisibleTasks = updatedTasks.length > 0;
-        const allVisibleTasksDone =
-            hasVisibleTasks &&
-            updatedTasks.every((task) => task.status === "Done");
+        if (!taskExists) {
+            return plan;
+        }
 
         return {
             ...plan,
-            tasks: updatedTasks,
-            archivedTasks: updatedArchivedTasks,
-            archivedTaskCount: updatedArchivedTasks?.length ?? plan.archivedTaskCount,
-            completedAt: allVisibleTasksDone ? plan.completedAt : undefined,
-            completionPromptShown: allVisibleTasksDone
-                ? plan.completionPromptShown
-                : false,
+            updatedAt: new Date().toISOString(),
+            completionPromptDismissed: false,
+            tasks: plan.tasks.map((task) =>
+                task.id === taskId
+                    ? {
+                        ...task,
+                        ...updates,
+                        id: task.id,
+                        status: updates.status || task.status,
+                    }
+                    : task,
+            ),
+        };
+    });
+
+    return persistProjectPlans(nextPlans, {
+        title: "Task changes saved",
+        message: "Your task edits have been saved locally in this browser.",
+    });
+}
+
+export function updateTaskStatus(
+    projectIdOrTaskId: string,
+    taskIdOrStatus: string | TaskStatus,
+    maybeStatus?: TaskStatus,
+) {
+    const projectPlans = loadProjectPlans();
+
+    const projectId = maybeStatus !== undefined ? projectIdOrTaskId : "";
+    const taskId =
+        maybeStatus !== undefined
+            ? String(taskIdOrStatus)
+            : String(projectIdOrTaskId);
+    const nextStatus =
+        maybeStatus !== undefined ? maybeStatus : (taskIdOrStatus as TaskStatus);
+
+    const nextPlans = projectPlans.map((plan) => {
+        if (projectId && findPlanIndexByProjectId([plan], projectId) < 0) {
+            return plan;
+        }
+
+        const taskExists = plan.tasks.some((task) => task.id === taskId);
+
+        if (!taskExists) {
+            return plan;
+        }
+
+        return {
+            ...plan,
+            updatedAt: new Date().toISOString(),
+            completionPromptDismissed: false,
+            tasks: plan.tasks.map((task) => {
+                if (task.id !== taskId) {
+                    return task;
+                }
+
+                return {
+                    ...task,
+                    status: nextStatus,
+                    completedAt:
+                        nextStatus === "Done"
+                            ? task.completedAt || new Date().toISOString()
+                            : undefined,
+                };
+            }),
+        };
+    });
+
+    return persistProjectPlans(nextPlans, {
+        title: nextStatus === "Done" ? "Task marked done" : "Task restored",
+        message:
+            nextStatus === "Done"
+                ? "Nice work. Your progress has been saved and recalculated."
+                : "This task has been restored to todo and your progress has been updated.",
+    });
+}
+
+export function deleteTask(projectIdOrTaskId: string, maybeTaskId?: string) {
+    const projectPlans = loadProjectPlans();
+
+    const projectId = maybeTaskId ? projectIdOrTaskId : "";
+    const taskId = maybeTaskId || projectIdOrTaskId;
+
+    const nextPlans = projectPlans.map((plan) => {
+        if (projectId && findPlanIndexByProjectId([plan], projectId) < 0) {
+            return plan;
+        }
+
+        const taskExists = plan.tasks.some((task) => task.id === taskId);
+
+        if (!taskExists) {
+            return plan;
+        }
+
+        return {
+            ...plan,
+            updatedAt: new Date().toISOString(),
+            completionPromptDismissed: false,
+            tasks: plan.tasks.filter((task) => task.id !== taskId),
+        };
+    });
+
+    return persistProjectPlans(nextPlans, {
+        title: "Task deleted",
+        message:
+            "The task has been removed and project progress has been recalculated.",
+    });
+}
+
+export function archiveCompletedTasks(projectId: string) {
+    const projectPlans = loadProjectPlans();
+    const projectIndex = findPlanIndexByProjectId(projectPlans, projectId);
+
+    if (projectIndex < 0) {
+        return projectPlans;
+    }
+
+    const nextPlans = projectPlans.map((plan, index) => {
+        if (index !== projectIndex) {
+            return plan;
+        }
+
+        const completedTasks = plan.tasks.filter((task) => task.status === "Done");
+        const activeTasks = plan.tasks.filter((task) => task.status !== "Done");
+
+        if (completedTasks.length === 0) {
+            return plan;
+        }
+
+        const archivedTasks = [
+            ...(plan.archivedTasks ?? []),
+            ...completedTasks.map((task) => ({
+                ...task,
+                archivedAt: new Date().toISOString(),
+            })),
+        ];
+
+        return {
+            ...plan,
+            updatedAt: new Date().toISOString(),
+            completionPromptDismissed: true,
+            tasks: activeTasks,
+            archivedTasks,
+            archivedTaskCount: archivedTasks.length,
             project: {
                 ...plan.project,
-                status: allVisibleTasksDone ? plan.project.status : "Active",
+                status: activeTasks.length === 0 ? "Complete" : "Active",
             },
-        } satisfies GeneratedProjectPlan;
+        };
     });
 
-    saveProjectPlans(updatedPlans);
-
-    return updatedPlans;
+    return persistProjectPlans(nextPlans, {
+        title: "Completed tasks archived",
+        message:
+            "Completed tasks have been archived so the active workspace stays clean.",
+    });
 }
 
-export function updateTaskStatus(taskId: string, status: TaskStatus) {
-    const existingPlans = loadProjectPlans();
+export function restoreArchivedTasks(projectId: string) {
+    const projectPlans = loadProjectPlans();
+    const projectIndex = findPlanIndexByProjectId(projectPlans, projectId);
 
-    const updatedPlans = existingPlans.map((plan) => {
-        let changedTaskBelongsToThisPlan = false;
+    if (projectIndex < 0) {
+        return projectPlans;
+    }
 
-        const updatedTasks = plan.tasks.map((task) => {
-            if (task.id !== taskId) {
-                return task;
-            }
-
-            changedTaskBelongsToThisPlan = true;
-
-            return {
-                ...task,
-                status,
-            };
-        });
-
-        if (!changedTaskBelongsToThisPlan) {
+    const nextPlans = projectPlans.map((plan, index) => {
+        if (index !== projectIndex) {
             return plan;
         }
 
-        const allTasksDone =
-            updatedTasks.length > 0 &&
-            updatedTasks.every((task) => task.status === "Done");
-
-        if (status === "Todo") {
-            return {
-                ...plan,
-                tasks: updatedTasks,
-                completedAt: undefined,
-                completionPromptShown: false,
-                project: {
-                    ...plan.project,
-                    status: "Active",
-                },
-            } satisfies GeneratedProjectPlan;
-        }
-
-        if (allTasksDone) {
-            return {
-                ...plan,
-                tasks: updatedTasks,
-            } satisfies GeneratedProjectPlan;
-        }
-
-        return {
-            ...plan,
-            tasks: updatedTasks,
-        } satisfies GeneratedProjectPlan;
+        return restoreArchivedTasksForNewWork(plan);
     });
 
-    saveProjectPlans(updatedPlans);
-
-    return updatedPlans;
+    return persistProjectPlans(nextPlans, {
+        title: "Archived tasks restored",
+        message:
+            "Archived tasks have been restored to the active project because new work was added.",
+    });
 }
 
-export function findCompletedPlanWaitingForPrompt() {
-    const existingPlans = loadProjectPlans();
+/**
+ * Compatibility exports for CompletionWatcher.tsx.
+ */
 
-    return (
-        existingPlans.find((plan) => {
-            const hasVisibleTasks = plan.tasks.length > 0;
-            const allTasksDone =
-                hasVisibleTasks && plan.tasks.every((task) => task.status === "Done");
-
-            return (
-                allTasksDone &&
-                !plan.completionPromptShown &&
-                !plan.tasksArchivedAt
-            );
-        }) ?? null
-    );
+export function archiveCompletedProjectTasks(projectId: string) {
+    return archiveCompletedTasks(projectId);
 }
 
 export function keepCompletedProjectTasks(projectId: string) {
-    const existingPlans = loadProjectPlans();
+    const projectPlans = loadProjectPlans();
+    const projectIndex = findPlanIndexByProjectId(projectPlans, projectId);
 
-    const updatedPlans = existingPlans.map((plan) => {
-        if (plan.project.id !== projectId) {
+    if (projectIndex < 0) {
+        return projectPlans;
+    }
+
+    const nextPlans = projectPlans.map((plan, index) => {
+        if (index !== projectIndex) {
             return plan;
         }
 
         return {
             ...plan,
-            completedAt: plan.completedAt ?? new Date().toISOString(),
-            completionPromptShown: true,
+            updatedAt: new Date().toISOString(),
+            completionPromptDismissed: true,
             project: {
                 ...plan.project,
-                progress: 100,
-                status: "Completed",
+                status: "Complete",
             },
-        } satisfies GeneratedProjectPlan;
+        };
     });
 
-    saveProjectPlans(updatedPlans);
-
-    return updatedPlans;
+    return persistProjectPlans(nextPlans, {
+        title: "Completed tasks kept",
+        message:
+            "Completed tasks will stay visible in this project. You can add new work later if the project changes.",
+    });
 }
 
-export function archiveCompletedProjectTasks(projectId: string) {
-    const existingPlans = loadProjectPlans();
+export function findCompletedPlanWaitingForPrompt() {
+    const projectPlans = loadProjectPlans();
 
-    const updatedPlans = existingPlans.map((plan) => {
-        if (plan.project.id !== projectId) {
-            return plan;
+    return (
+        projectPlans.find((plan) => {
+            if (plan.completionPromptDismissed) {
+                return false;
+            }
+
+            if (plan.project.status === "Complete") {
+                return false;
+            }
+
+            if (plan.tasks.length === 0) {
+                return false;
+            }
+
+            return plan.tasks.every((task) => task.status === "Done");
+        }) || null
+    );
+}
+
+export function listenForProjectPlanUpdates(callback: () => void) {
+    if (!isBrowser()) {
+        return () => {};
+    }
+
+    function handleUpdate() {
+        callback();
+    }
+
+    function handleStorage(event: StorageEvent) {
+        if (!event.key) {
+            callback();
+            return;
         }
 
-        const tasksToArchive =
-            plan.tasks.length > 0 ? plan.tasks : plan.archivedTasks ?? [];
+        if (
+            PROJECT_STORAGE_KEYS.includes(event.key) ||
+            event.key.toLowerCase().includes("coursework-compass") ||
+            event.key.toLowerCase().includes("courseworkcompass")
+        ) {
+            callback();
+        }
+    }
 
-        return {
-            ...plan,
-            tasks: [],
-            archivedTasks: tasksToArchive,
-            archivedTaskCount: tasksToArchive.length,
-            tasksArchivedAt: new Date().toISOString(),
-            completedAt: plan.completedAt ?? new Date().toISOString(),
-            completionPromptShown: true,
-            project: {
-                ...plan.project,
-                progress: 100,
-                status: "Completed",
-            },
-        } satisfies GeneratedProjectPlan;
-    });
+    window.addEventListener(PROJECT_PLAN_UPDATE_EVENT_NAME, handleUpdate);
+    window.addEventListener("storage", handleStorage);
 
-    saveProjectPlans(updatedPlans);
-
-    return updatedPlans;
+    return () => {
+        window.removeEventListener(PROJECT_PLAN_UPDATE_EVENT_NAME, handleUpdate);
+        window.removeEventListener("storage", handleStorage);
+    };
 }
