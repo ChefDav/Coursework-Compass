@@ -14,6 +14,22 @@ export default function BetaNotice() {
                         coursework projects, generate plans, add your own tasks, edit task
                         details, delete tasks, and track progress locally in your browser.
                     </p>
+
+                    <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                        <a
+                            href="/updates"
+                            className="rounded-2xl bg-cyan-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                        >
+                            View release notes
+                        </a>
+
+                        <a
+                            href="/projects/new"
+                            className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-slate-400"
+                        >
+                            Try the beta
+                        </a>
+                    </div>
                 </div>
 
                 <span className="w-fit rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
