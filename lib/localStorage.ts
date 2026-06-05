@@ -404,6 +404,52 @@ export function updateTaskDetails(
     return updatedPlans;
 }
 
+export function deleteTask(taskId: string) {
+    const existingPlans = loadProjectPlans();
+
+    const updatedPlans = existingPlans.map((plan) => {
+        const taskBelongsToVisibleTasks = plan.tasks.some(
+            (task) => task.id === taskId,
+        );
+
+        const taskBelongsToArchivedTasks =
+            plan.archivedTasks?.some((task) => task.id === taskId) ?? false;
+
+        if (!taskBelongsToVisibleTasks && !taskBelongsToArchivedTasks) {
+            return plan;
+        }
+
+        const updatedTasks = plan.tasks.filter((task) => task.id !== taskId);
+        const updatedArchivedTasks = plan.archivedTasks?.filter(
+            (task) => task.id !== taskId,
+        );
+
+        const hasVisibleTasks = updatedTasks.length > 0;
+        const allVisibleTasksDone =
+            hasVisibleTasks &&
+            updatedTasks.every((task) => task.status === "Done");
+
+        return {
+            ...plan,
+            tasks: updatedTasks,
+            archivedTasks: updatedArchivedTasks,
+            archivedTaskCount: updatedArchivedTasks?.length ?? plan.archivedTaskCount,
+            completedAt: allVisibleTasksDone ? plan.completedAt : undefined,
+            completionPromptShown: allVisibleTasksDone
+                ? plan.completionPromptShown
+                : false,
+            project: {
+                ...plan.project,
+                status: allVisibleTasksDone ? plan.project.status : "Active",
+            },
+        } satisfies GeneratedProjectPlan;
+    });
+
+    saveProjectPlans(updatedPlans);
+
+    return updatedPlans;
+}
+
 export function updateTaskStatus(taskId: string, status: TaskStatus) {
     const existingPlans = loadProjectPlans();
 

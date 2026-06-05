@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import AppNav from "@/components/AppNav";
 import TaskCard from "@/components/TaskCard";
 import {
+    deleteTask,
     loadProjectPlans,
     updateTaskDetails,
     updateTaskStatus,
@@ -100,6 +101,15 @@ export default function TodayPage() {
         );
 
         const updatedPlans = updateTaskDetails(taskId, updates);
+        setSavedPlans(updatedPlans);
+    }
+
+    function handleDeleteTask(taskId: string) {
+        setMockTasks((currentTasks) =>
+            currentTasks.filter((task) => task.id !== taskId),
+        );
+
+        const updatedPlans = deleteTask(taskId);
         setSavedPlans(updatedPlans);
     }
 
@@ -239,6 +249,7 @@ export default function TodayPage() {
                                     task={task}
                                     onChangeStatus={handleChangeTaskStatus}
                                     onUpdateTask={handleUpdateTaskDetails}
+                                    onDeleteTask={handleDeleteTask}
                                 />
                             ))
                         ) : (

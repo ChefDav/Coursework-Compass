@@ -13,6 +13,7 @@ import TaskCard from "@/components/TaskCard";
 import type { TaskUpdateInput } from "@/components/TaskCard";
 import {
     addCustomTask,
+    deleteTask,
     loadProjectPlans,
     updateProjectDetails,
     updateTaskDetails,
@@ -138,6 +139,11 @@ export default function ProjectDetailPage() {
 
     function handleUpdateTaskDetails(taskId: string, updates: TaskUpdateInput) {
         const updatedPlans = updateTaskDetails(taskId, updates);
+        setSavedPlans(updatedPlans);
+    }
+
+    function handleDeleteTask(taskId: string) {
+        const updatedPlans = deleteTask(taskId);
         setSavedPlans(updatedPlans);
     }
 
@@ -617,6 +623,7 @@ export default function ProjectDetailPage() {
                                     task={task}
                                     onChangeStatus={handleChangeTaskStatus}
                                     onUpdateTask={handleUpdateTaskDetails}
+                                    onDeleteTask={handleDeleteTask}
                                 />
                             ))}
                         </div>

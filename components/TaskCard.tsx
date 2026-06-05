@@ -20,6 +20,7 @@ type TaskCardProps = {
     task?: Task;
     onChangeStatus?: (taskId: string, nextStatus: TaskStatus) => void;
     onUpdateTask?: (taskId: string, updates: TaskUpdateInput) => void;
+    onDeleteTask?: (taskId: string) => void;
 };
 
 const priorityOptions = [
@@ -48,8 +49,10 @@ export default function TaskCard({
                                      task,
                                      onChangeStatus,
                                      onUpdateTask,
+                                     onDeleteTask,
                                  }: TaskCardProps) {
     const [isEditing, setIsEditing] = useState(false);
+    const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
     const [editTitle, setEditTitle] = useState("");
     const [editPriority, setEditPriority] = useState<PriorityLevel>("Medium");
     const [editDueDate, setEditDueDate] = useState("");
@@ -90,6 +93,7 @@ export default function TaskCard({
         setEditTime(normaliseEstimatedTime(task.time));
         setEditError("");
         setEditMessage("");
+        setIsConfirmingDelete(false);
         setIsEditing(true);
     }
 
@@ -103,7 +107,6 @@ export default function TaskCard({
         setEditDueDate(task.dueDate ?? "");
         setEditTime(normaliseEstimatedTime(task.time));
         setEditError("");
-        setEditMessage("");
         setIsEditing(false);
     }
 
@@ -128,6 +131,15 @@ export default function TaskCard({
 
         setEditMessage("Task updated.");
         setIsEditing(false);
+    }
+
+    function handleDeleteTask() {
+        if (!task) {
+            return;
+        }
+
+        onDeleteTask?.(task.id);
+        setIsConfirmingDelete(false);
     }
 
     if (isEditing) {
@@ -286,6 +298,16 @@ export default function TaskCard({
                         </button>
                     ) : null}
 
+                    {onDeleteTask ? (
+                        <button
+                            type="button"
+                            onClick={() => setIsConfirmingDelete(true)}
+                            className="w-full rounded-xl border border-red-400/30 px-4 py-3 font-bold text-red-300 transition hover:bg-red-400/10 sm:w-auto"
+                        >
+                            Delete
+                        </button>
+                    ) : null}
+
                     <button
                         type="button"
                         onClick={() => onChangeStatus?.(task.id, nextStatus)}
@@ -299,6 +321,32 @@ export default function TaskCard({
                     </button>
                 </div>
             </div>
+
+            {isConfirmingDelete ? (
+                <div className="mt-5 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
+                    <p className="text-sm font-bold text-red-300">
+                        Delete this task? This cannot be undone.
+                    </p>
+
+                    <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                        <button
+                            type="button"
+                            onClick={handleDeleteTask}
+                            className="rounded-xl bg-red-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-red-300"
+                        >
+                            Confirm delete
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setIsConfirmingDelete(false)}
+                            className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-bold text-white transition hover:border-slate-400"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            ) : null}
         </div>
     );
 }
