@@ -16,9 +16,14 @@ import type {
     TaskStatus,
 } from "@/types/coursework";
 
+function normaliseDeadlineFormat(deadline: string) {
+    return deadline.trim().replaceAll("-", "/");
+}
+
 function validateDeadline(deadline: string) {
+    const normalisedDeadline = normaliseDeadlineFormat(deadline);
     const deadlinePattern = /^(\d{4})\/(\d{2})\/(\d{2})$/;
-    const match = deadline.match(deadlinePattern);
+    const match = normalisedDeadline.match(deadlinePattern);
 
     if (!match) {
         return "Use the format yyyy/mm/dd, for example 2026/07/10.";
@@ -55,10 +60,13 @@ export default function ProjectDetailPage() {
     const projectId = params.projectId;
 
     const [savedPlans, setSavedPlans] = useState<GeneratedProjectPlan[]>([]);
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [editTitle, setEditTitle] = useState("");
     const [editDeadline, setEditDeadline] = useState("");
-    const [editError, setEditError] = useState("");
-    const [editMessage, setEditMessage] = useState("");
+    const [titleError, setTitleError] = useState("");
+    const [titleMessage, setTitleMessage] = useState("");
+    const [deadlineError, setDeadlineError] = useState("");
+    const [deadlineMessage, setDeadlineMessage] = useState("");
 
     useEffect(() => {
         const plans = loadProjectPlans();
@@ -81,7 +89,7 @@ export default function ProjectDetailPage() {
         }
 
         setEditTitle(project.title);
-        setEditDeadline(project.deadline);
+        setEditDeadline(normaliseDeadlineFormat(project.deadline));
     }, [project?.id, project?.title, project?.deadline]);
 
     function handleChangeTaskStatus(taskId: string, nextStatus: TaskStatus) {
@@ -89,31 +97,79 @@ export default function ProjectDetailPage() {
         setSavedPlans(updatedPlans);
     }
 
-    function handleSaveProjectDetails() {
-        setEditError("");
-        setEditMessage("");
+    function handleStartTitleEdit() {
+        if (!project) {
+            return;
+        }
+
+        setEditTitle(project.title);
+        setTitleError("");
+        setTitleMessage("");
+        setIsEditingTitle(true);
+    }
+
+    function handleCancelTitleEdit() {
+        if (!project) {
+            return;
+        }
+
+        setEditTitle(project.title);
+        setTitleError("");
+        setIsEditingTitle(false);
+    }
+
+    function handleSaveTitle() {
+        if (!project) {
+            return;
+        }
+
+        setTitleError("");
+        setTitleMessage("");
 
         const trimmedTitle = editTitle.trim();
 
         if (!trimmedTitle) {
-            setEditError("Please enter a project name.");
+            setTitleError("Please enter a project name.");
             return;
         }
 
-        const deadlineError = validateDeadline(editDeadline);
+        const safeDeadline = normaliseDeadlineFormat(project.deadline);
 
-        if (deadlineError) {
-            setEditError(deadlineError);
+        const updatedPlans = updateProjectDetails(projectId, {
+            title: trimmedTitle,
+            deadline: safeDeadline,
+        });
+
+        setSavedPlans(updatedPlans);
+        setEditDeadline(safeDeadline);
+        setIsEditingTitle(false);
+        setTitleMessage("Project title updated.");
+    }
+
+    function handleSaveDeadline() {
+        if (!project) {
+            return;
+        }
+
+        setDeadlineError("");
+        setDeadlineMessage("");
+
+        const normalisedDeadline = normaliseDeadlineFormat(editDeadline);
+        const deadlineValidationError = validateDeadline(normalisedDeadline);
+
+        if (deadlineValidationError) {
+            setDeadlineError(deadlineValidationError);
             return;
         }
 
         const updatedPlans = updateProjectDetails(projectId, {
-            title: trimmedTitle,
-            deadline: editDeadline,
+            title: project.title,
+            deadline: normalisedDeadline,
         });
 
         setSavedPlans(updatedPlans);
-        setEditMessage("Project details updated.");
+        setEditDeadline(normalisedDeadline);
+        setDeadlineMessage("Project deadline updated.");
     }
 
     if (projectId === "new") {
@@ -183,16 +239,86 @@ export default function ProjectDetailPage() {
                 <AppNav />
 
                 <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-                    <div>
+                    <div className="min-w-0">
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             Project details
                         </p>
-                        <h1 className="break-words text-4xl font-black tracking-tight sm:text-5xl">
-                            {project.title}
-                        </h1>
+
+                        {isEditingTitle ? (
+                            <div className="max-w-3xl">
+                                <input
+                                    type="text"
+                                    value={editTitle}
+                                    onChange={(event) => {
+                                        setEditTitle(event.target.value);
+                                        setTitleError("");
+                                        setTitleMessage("");
+                                    }}
+                                    onKeyDown={(event) => {
+                                        if (event.key === "Enter") {
+                                            handleSaveTitle();
+                                        }
+
+                                        if (event.key === "Escape") {
+                                            handleCancelTitleEdit();
+                                        }
+                                    }}
+                                    autoFocus
+                                    className="w-full rounded-3xl border border-cyan-400/50 bg-slate-950/80 px-4 py-4 text-4xl font-black tracking-tight text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-2xl focus:shadow-cyan-950/50 sm:text-5xl"
+                                />
+
+                                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+                                    <button
+                                        type="button"
+                                        onClick={handleSaveTitle}
+                                        className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                                    >
+                                        Save title
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleCancelTitleEdit}
+                                        className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
+                                    >
+                                        Cancel
+                                    </button>
+
+                                    <p className="text-xs text-slate-400">
+                                        Press Enter to save or Esc to cancel.
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={handleStartTitleEdit}
+                                className="group max-w-4xl text-left"
+                            >
+                                <h1 className="break-words text-4xl font-black tracking-tight transition group-hover:text-cyan-300 sm:text-5xl">
+                                    {project.title}
+                                </h1>
+                                <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 transition group-hover:text-cyan-400">
+                                    Click title to rename
+                                </p>
+                            </button>
+                        )}
+
+                        {titleError ? (
+                            <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
+                                {titleError}
+                            </div>
+                        ) : null}
+
+                        {titleMessage ? (
+                            <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm font-bold text-emerald-300">
+                                {titleMessage}
+                            </div>
+                        ) : null}
+
                         <p className="mt-4 max-w-2xl text-slate-300">
-                            Review this coursework project, track generated tasks, edit basic
-                            project details, and keep pressure on the deadline.
+                            Review this coursework project, track generated tasks, rename the
+                            project directly from the title, and adjust the deadline below.
                         </p>
                     </div>
 
@@ -211,35 +337,18 @@ export default function ProjectDetailPage() {
                 <section className="mb-8 rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-6">
                     <div className="mb-5">
                         <p className="mb-2 text-sm font-bold text-cyan-300">
-                            Edit project details
+                            Deadline control
                         </p>
                         <h2 className="text-2xl font-black sm:text-3xl">
-                            Update the name or deadline.
+                            Update the project deadline.
                         </h2>
                         <p className="mt-2 text-sm leading-6 text-slate-300">
-                            If your teacher changes the deadline or you want a clearer
-                            project name, update it here. Risk and days left will be
-                            recalculated automatically.
+                            Change the deadline if your teacher updates the schedule. Days
+                            left and risk level will be recalculated automatically.
                         </p>
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
-                        <div>
-                            <label className="mb-2 block text-sm font-bold text-white">
-                                Project name
-                            </label>
-                            <input
-                                type="text"
-                                value={editTitle}
-                                onChange={(event) => {
-                                    setEditTitle(event.target.value);
-                                    setEditError("");
-                                    setEditMessage("");
-                                }}
-                                className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-lg focus:shadow-cyan-950/40"
-                            />
-                        </div>
-
+                    <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
                         <div>
                             <label className="mb-2 block text-sm font-bold text-white">
                                 Deadline
@@ -249,39 +358,38 @@ export default function ProjectDetailPage() {
                                 value={editDeadline}
                                 onChange={(event) => {
                                     setEditDeadline(event.target.value);
-                                    setEditError("");
-                                    setEditMessage("");
+                                    setDeadlineError("");
+                                    setDeadlineMessage("");
                                 }}
                                 placeholder="yyyy/mm/dd"
                                 className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-lg focus:shadow-cyan-950/40"
                             />
                             <p className="mt-2 text-xs leading-5 text-slate-400">
-                                Use yyyy/mm/dd. The year cannot be earlier than 2026.
+                                Use yyyy/mm/dd. If an older project shows yyyy-mm-dd, it will be
+                                converted automatically.
                             </p>
                         </div>
-                    </div>
 
-                    {editError ? (
-                        <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
-                            {editError}
-                        </div>
-                    ) : null}
-
-                    {editMessage ? (
-                        <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm font-bold text-emerald-300">
-                            {editMessage}
-                        </div>
-                    ) : null}
-
-                    <div className="mt-5">
                         <button
                             type="button"
-                            onClick={handleSaveProjectDetails}
+                            onClick={handleSaveDeadline}
                             className="rounded-2xl bg-cyan-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-cyan-300"
                         >
-                            Save changes
+                            Save deadline
                         </button>
                     </div>
+
+                    {deadlineError ? (
+                        <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
+                            {deadlineError}
+                        </div>
+                    ) : null}
+
+                    {deadlineMessage ? (
+                        <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm font-bold text-emerald-300">
+                            {deadlineMessage}
+                        </div>
+                    ) : null}
                 </section>
 
                 <div className="mb-8 grid gap-6 md:grid-cols-4">
