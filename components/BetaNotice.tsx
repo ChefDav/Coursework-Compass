@@ -1,0 +1,66 @@
+export default function BetaNotice() {
+    return (
+        <section className="rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 shadow-2xl shadow-cyan-950/20 sm:p-6">
+            <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div>
+                    <p className="mb-2 text-sm font-bold text-cyan-300">
+                        Coursework Compass v1.1 Beta
+                    </p>
+                    <h2 className="text-2xl font-black sm:text-3xl">
+                        Early testing version is now open.
+                    </h2>
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                        This version is designed for real student testing. You can create
+                        coursework projects, generate plans, add your own tasks, edit task
+                        details, delete tasks, and track progress locally in your browser.
+                    </p>
+                </div>
+
+                <span className="w-fit rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
+          Beta
+        </span>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+                <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
+                    <p className="mb-2 text-sm font-black text-cyan-300">01</p>
+                    <h3 className="mb-2 font-bold text-white">Plan coursework</h3>
+                    <p className="text-sm leading-6 text-slate-400">
+                        Choose a template, set a deadline, and generate a practical task
+                        plan for IA, EE, TOK, essays, EPQ, and more.
+                    </p>
+                </div>
+
+                <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
+                    <p className="mb-2 text-sm font-black text-cyan-300">02</p>
+                    <h3 className="mb-2 font-bold text-white">Edit your workflow</h3>
+                    <p className="text-sm leading-6 text-slate-400">
+                        Add custom tasks, edit task title, due date, priority, estimated
+                        time, and delete tasks that do not fit your real project.
+                    </p>
+                </div>
+
+                <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
+                    <p className="mb-2 text-sm font-black text-cyan-300">03</p>
+                    <h3 className="mb-2 font-bold text-white">Send feedback</h3>
+                    <p className="text-sm leading-6 text-slate-400">
+                        This beta is being improved through real student feedback. If
+                        something feels confusing, broken, or missing, please report it.
+                    </p>
+                </div>
+            </div>
+
+            <div className="mt-5 rounded-3xl border border-amber-400/30 bg-amber-400/10 p-4">
+                <p className="mb-2 text-sm font-bold text-amber-300">
+                    Privacy and data note
+                </p>
+                <p className="text-sm leading-6 text-slate-300">
+                    The current beta stores project data locally in your browser. You do
+                    not need an account, and you should not enter private or sensitive
+                    personal information. Cloud sync and accounts are planned for a later
+                    version.
+                </p>
+            </div>
+        </section>
+    );
+}

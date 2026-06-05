@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import AppNav from "@/components/AppNav";
+import BetaNotice from "@/components/BetaNotice";
 import NewProjectForm from "@/components/NewProjectForm";
 import TestingGuideCard from "@/components/TestingGuideCard";
 
@@ -11,15 +12,20 @@ export default function NewProjectPage() {
 
                 <div className="mb-10">
                     <p className="mb-2 text-sm font-bold text-cyan-300">
-                        New coursework project
+                        New coursework plan
                     </p>
                     <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
                         Create a new project.
                     </h1>
                     <p className="mt-4 max-w-2xl text-slate-300">
-                        Set up your coursework goal, deadline, and planning style. This
-                        form can generate and save a real coursework task plan.
+                        Set up your coursework goal, template, deadline, and planning
+                        intensity. Coursework Compass will generate a real task plan that
+                        you can save, edit, and track.
                     </p>
+                </div>
+
+                <div className="mb-8">
+                    <BetaNotice />
                 </div>
 
                 <Suspense
