@@ -178,6 +178,50 @@ function sanitizeProjectPlans(value: unknown): GeneratedProjectPlan[] {
         .filter((plan): plan is GeneratedProjectPlan => plan !== null);
 }
 
+function parseProjectDeadline(deadline: string) {
+    const normalisedDeadline = deadline.replaceAll("/", "-");
+    const parsedDate = new Date(`${normalisedDeadline}T00:00:00`);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+        return null;
+    }
+
+    return parsedDate;
+}
+
+function getStartOfDay(date: Date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function getDaysLeftFromDeadline(deadline: string) {
+    const parsedDeadline = parseProjectDeadline(deadline);
+
+    if (!parsedDeadline) {
+        return 0;
+    }
+
+    const today = getStartOfDay(new Date());
+    const target = getStartOfDay(parsedDeadline);
+    const millisecondsPerDay = 1000 * 60 * 60 * 24;
+
+    return Math.max(
+        Math.ceil((target.getTime() - today.getTime()) / millisecondsPerDay),
+        0,
+    );
+}
+
+function getRiskLevelFromDaysLeft(daysLeft: number): RiskLevel {
+    if (daysLeft <= 7) {
+        return "High";
+    }
+
+    if (daysLeft <= 21) {
+        return "Medium";
+    }
+
+    return "Low";
+}
+
 export function loadProjectPlans(): GeneratedProjectPlan[] {
     if (typeof window === "undefined") {
         return [];
@@ -236,6 +280,49 @@ export function deleteProjectPlan(projectId: string) {
     const updatedPlans = existingPlans.filter(
         (plan) => plan.project.id !== projectId,
     );
+
+    saveProjectPlans(updatedPlans);
+
+    return updatedPlans;
+}
+
+export function updateProjectDetails(
+    projectId: string,
+    updates: {
+        title: string;
+        deadline: string;
+    },
+) {
+    const existingPlans = loadProjectPlans();
+    const trimmedTitle = updates.title.trim();
+
+    if (!trimmedTitle) {
+        return existingPlans;
+    }
+
+    const daysLeft = getDaysLeftFromDeadline(updates.deadline);
+    const risk = getRiskLevelFromDaysLeft(daysLeft);
+
+    const updatedPlans = existingPlans.map((plan) => {
+        if (plan.project.id !== projectId) {
+            return plan;
+        }
+
+        return {
+            ...plan,
+            project: {
+                ...plan.project,
+                title: trimmedTitle,
+                deadline: updates.deadline,
+                daysLeft,
+                risk,
+            },
+            tasks: plan.tasks.map((task) => ({
+                ...task,
+                project: trimmedTitle,
+            })),
+        } satisfies GeneratedProjectPlan;
+    });
 
     saveProjectPlans(updatedPlans);
 

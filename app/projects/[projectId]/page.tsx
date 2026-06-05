@@ -5,18 +5,60 @@ import { useParams } from "next/navigation";
 import AppNav from "@/components/AppNav";
 import ProjectCard from "@/components/ProjectCard";
 import TaskCard from "@/components/TaskCard";
-import { loadProjectPlans, updateTaskStatus } from "@/lib/localStorage";
+import {
+    loadProjectPlans,
+    updateProjectDetails,
+    updateTaskStatus,
+} from "@/lib/localStorage";
 import { applyProgressToProject, countDoneTasks } from "@/lib/progressUtils";
 import type {
     GeneratedProjectPlan,
     TaskStatus,
 } from "@/types/coursework";
 
+function validateDeadline(deadline: string) {
+    const deadlinePattern = /^(\d{4})\/(\d{2})\/(\d{2})$/;
+    const match = deadline.match(deadlinePattern);
+
+    if (!match) {
+        return "Use the format yyyy/mm/dd, for example 2026/07/10.";
+    }
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+
+    if (year < 2026) {
+        return "The year cannot be earlier than 2026.";
+    }
+
+    if (month < 1 || month > 12) {
+        return "The month must be between 01 and 12.";
+    }
+
+    const parsedDate = new Date(year, month - 1, day);
+
+    const isRealDate =
+        parsedDate.getFullYear() === year &&
+        parsedDate.getMonth() === month - 1 &&
+        parsedDate.getDate() === day;
+
+    if (!isRealDate) {
+        return "Enter a real calendar date.";
+    }
+
+    return "";
+}
+
 export default function ProjectDetailPage() {
     const params = useParams<{ projectId: string }>();
     const projectId = params.projectId;
 
     const [savedPlans, setSavedPlans] = useState<GeneratedProjectPlan[]>([]);
+    const [editTitle, setEditTitle] = useState("");
+    const [editDeadline, setEditDeadline] = useState("");
+    const [editError, setEditError] = useState("");
+    const [editMessage, setEditMessage] = useState("");
 
     useEffect(() => {
         const plans = loadProjectPlans();
@@ -33,9 +75,45 @@ export default function ProjectDetailPage() {
     const todoTaskCount = tasks.filter((task) => task.status === "Todo").length;
     const archivedTaskCount = currentPlan?.archivedTaskCount ?? 0;
 
+    useEffect(() => {
+        if (!project) {
+            return;
+        }
+
+        setEditTitle(project.title);
+        setEditDeadline(project.deadline);
+    }, [project?.id, project?.title, project?.deadline]);
+
     function handleChangeTaskStatus(taskId: string, nextStatus: TaskStatus) {
         const updatedPlans = updateTaskStatus(taskId, nextStatus);
         setSavedPlans(updatedPlans);
+    }
+
+    function handleSaveProjectDetails() {
+        setEditError("");
+        setEditMessage("");
+
+        const trimmedTitle = editTitle.trim();
+
+        if (!trimmedTitle) {
+            setEditError("Please enter a project name.");
+            return;
+        }
+
+        const deadlineError = validateDeadline(editDeadline);
+
+        if (deadlineError) {
+            setEditError(deadlineError);
+            return;
+        }
+
+        const updatedPlans = updateProjectDetails(projectId, {
+            title: trimmedTitle,
+            deadline: editDeadline,
+        });
+
+        setSavedPlans(updatedPlans);
+        setEditMessage("Project details updated.");
     }
 
     if (projectId === "new") {
@@ -109,12 +187,12 @@ export default function ProjectDetailPage() {
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             Project details
                         </p>
-                        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
+                        <h1 className="break-words text-4xl font-black tracking-tight sm:text-5xl">
                             {project.title}
                         </h1>
                         <p className="mt-4 max-w-2xl text-slate-300">
-                            Review this coursework project, track generated tasks, and keep
-                            pressure on the deadline.
+                            Review this coursework project, track generated tasks, edit basic
+                            project details, and keep pressure on the deadline.
                         </p>
                     </div>
 
@@ -129,6 +207,82 @@ export default function ProjectDetailPage() {
                 <div className="mb-8">
                     <ProjectCard project={project} />
                 </div>
+
+                <section className="mb-8 rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-6">
+                    <div className="mb-5">
+                        <p className="mb-2 text-sm font-bold text-cyan-300">
+                            Edit project details
+                        </p>
+                        <h2 className="text-2xl font-black sm:text-3xl">
+                            Update the name or deadline.
+                        </h2>
+                        <p className="mt-2 text-sm leading-6 text-slate-300">
+                            If your teacher changes the deadline or you want a clearer
+                            project name, update it here. Risk and days left will be
+                            recalculated automatically.
+                        </p>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+                        <div>
+                            <label className="mb-2 block text-sm font-bold text-white">
+                                Project name
+                            </label>
+                            <input
+                                type="text"
+                                value={editTitle}
+                                onChange={(event) => {
+                                    setEditTitle(event.target.value);
+                                    setEditError("");
+                                    setEditMessage("");
+                                }}
+                                className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-lg focus:shadow-cyan-950/40"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="mb-2 block text-sm font-bold text-white">
+                                Deadline
+                            </label>
+                            <input
+                                type="text"
+                                value={editDeadline}
+                                onChange={(event) => {
+                                    setEditDeadline(event.target.value);
+                                    setEditError("");
+                                    setEditMessage("");
+                                }}
+                                placeholder="yyyy/mm/dd"
+                                className="w-full rounded-2xl border border-slate-600 bg-slate-950/70 px-4 py-4 font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 focus:shadow-lg focus:shadow-cyan-950/40"
+                            />
+                            <p className="mt-2 text-xs leading-5 text-slate-400">
+                                Use yyyy/mm/dd. The year cannot be earlier than 2026.
+                            </p>
+                        </div>
+                    </div>
+
+                    {editError ? (
+                        <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
+                            {editError}
+                        </div>
+                    ) : null}
+
+                    {editMessage ? (
+                        <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm font-bold text-emerald-300">
+                            {editMessage}
+                        </div>
+                    ) : null}
+
+                    <div className="mt-5">
+                        <button
+                            type="button"
+                            onClick={handleSaveProjectDetails}
+                            className="rounded-2xl bg-cyan-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-cyan-300"
+                        >
+                            Save changes
+                        </button>
+                    </div>
+                </section>
 
                 <div className="mb-8 grid gap-6 md:grid-cols-4">
                     <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
@@ -183,7 +337,7 @@ export default function ProjectDetailPage() {
                         </h2>
                         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
                             These tasks were generated from the original template and
-                            deadline.
+                            deadline. Task editing will come in a later version.
                         </p>
                     </div>
 
