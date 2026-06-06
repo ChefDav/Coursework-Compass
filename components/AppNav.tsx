@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { clearProjectPlans } from "@/lib/localStorage";
 
 const navItems = [
     {
@@ -29,16 +30,6 @@ const navItems = [
     },
 ];
 
-const storageKeysToClear = [
-    "coursework-compass-projects",
-    "coursework-compass-plans",
-    "coursework-compass-project-plans",
-    "courseworkCompassProjects",
-    "courseworkCompassProjectPlans",
-    "generatedProjectPlans",
-    "projectPlans",
-];
-
 function isActivePath(pathname: string, href: string) {
     if (href === "/") {
         return pathname === "/";
@@ -51,30 +42,16 @@ function isActivePath(pathname: string, href: string) {
     return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function clearCourseworkCompassData() {
+function handleResetData() {
     const confirmed = window.confirm(
-        "Reset all local Coursework Compass data in this browser? This will remove saved projects and tasks.",
+        "Reset all local Coursework Compass data in this browser? This will remove saved projects and tasks from this browser only.",
     );
 
     if (!confirmed) {
         return;
     }
 
-    storageKeysToClear.forEach((key) => {
-        window.localStorage.removeItem(key);
-    });
-
-    Object.keys(window.localStorage).forEach((key) => {
-        const normalisedKey = key.toLowerCase();
-
-        if (
-            normalisedKey.includes("coursework-compass") ||
-            normalisedKey.includes("courseworkcompass")
-        ) {
-            window.localStorage.removeItem(key);
-        }
-    });
-
+    clearProjectPlans();
     window.location.href = "/";
 }
 
@@ -116,12 +93,32 @@ export default function AppNav() {
 
                     <button
                         type="button"
-                        onClick={clearCourseworkCompassData}
+                        onClick={handleResetData}
                         className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
                     >
                         Reset data
                     </button>
                 </nav>
+            </div>
+
+            <div className="mt-5 rounded-3xl border border-amber-400/30 bg-amber-400/10 p-4">
+                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                    <div>
+                        <p className="mb-1 text-sm font-black text-amber-300">
+                            Browser-only beta storage
+                        </p>
+                        <p className="max-w-4xl text-xs leading-5 text-slate-300 sm:text-sm sm:leading-6">
+                            Your projects are saved in this browser&apos;s local storage, not
+                            in a cloud account. If you change device, browser, or clear
+                            browser data, your saved projects may not appear. Please avoid
+                            entering sensitive personal information during testing.
+                        </p>
+                    </div>
+
+                    <span className="w-fit rounded-full border border-amber-400/30 bg-slate-950/60 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-amber-300">
+            Local only
+          </span>
+                </div>
             </div>
         </header>
     );

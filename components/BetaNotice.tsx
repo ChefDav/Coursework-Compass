@@ -76,14 +76,24 @@ export default function BetaNotice() {
 
             <div className="mt-5 rounded-3xl border border-amber-400/30 bg-amber-400/10 p-4">
                 <p className="mb-2 text-sm font-bold text-amber-300">
-                    Privacy and data note
+                    Important data note
                 </p>
-                <p className="text-sm leading-6 text-slate-300">
-                    The current beta stores project data locally in your browser. You do
-                    not need an account, and you should avoid entering private or
-                    sensitive personal information. Cloud sync and accounts are planned
-                    for a later version.
-                </p>
+                <div className="space-y-2 text-sm leading-6 text-slate-300">
+                    <p>
+                        Coursework Compass v1.2 does not use accounts or cloud sync yet.
+                        Your projects are saved only in this browser&apos;s local storage.
+                    </p>
+                    <p>
+                        This means your projects may disappear if you clear browser data,
+                        use another browser, use another device, or reset local data from
+                        the navigation bar.
+                    </p>
+                    <p>
+                        For testing, please use sample coursework information or non-sensitive
+                        project details. Cloud accounts and cross-device sync are planned
+                        for a later version.
+                    </p>
+                </div>
             </div>
         </section>
     );

@@ -53,8 +53,8 @@ export default function OnboardingPopup() {
                             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
                                 Coursework Compass helps IB and A-Level students turn large
                                 coursework projects into clearer tasks, deadlines, and daily
-                                actions. This version is prepared for student testing and
-                                early feedback.
+                                actions. This version is prepared for student testing and early
+                                feedback.
                             </p>
                         </div>
 
@@ -98,13 +98,28 @@ export default function OnboardingPopup() {
 
                     <div className="mt-5 rounded-3xl border border-amber-400/30 bg-amber-400/10 p-4">
                         <p className="mb-2 text-sm font-bold text-amber-300">
-                            Data and privacy note
+                            Before you save project data
                         </p>
-                        <p className="text-sm leading-6 text-slate-300">
-                            This beta stores your projects in this browser only. No account is
-                            required. Please avoid entering private or sensitive personal
-                            information during testing.
-                        </p>
+
+                        <div className="space-y-2 text-sm leading-6 text-slate-300">
+                            <p>
+                                This beta saves projects in the local storage of this browser.
+                                It does not currently create an online account or sync data
+                                across devices.
+                            </p>
+
+                            <p>
+                                Your saved projects may not appear if you switch device, switch
+                                browser, clear browser data, use private browsing, or press
+                                Reset data.
+                            </p>
+
+                            <p>
+                                Please avoid entering private or sensitive personal information
+                                during testing. You can use sample project names and sample
+                                coursework details instead.
+                            </p>
+                        </div>
                     </div>
 
                     <div className="mt-6 flex flex-col gap-4 sm:flex-row">
