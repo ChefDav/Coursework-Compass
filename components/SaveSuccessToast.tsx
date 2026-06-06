@@ -53,19 +53,19 @@ export default function SaveSuccessToast() {
     }
 
     return (
-        <section className="fixed bottom-6 left-4 right-4 z-[70] mx-auto max-w-xl rounded-[1.75rem] border border-emerald-400/30 bg-slate-950/95 p-4 text-white shadow-2xl shadow-emerald-950/40 backdrop-blur-md sm:left-auto sm:right-6 sm:mx-0 sm:w-[28rem]">
-            <div className="flex gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-400/10 text-xl">
+        <section className="fixed bottom-4 left-3 right-3 z-[70] rounded-[1.5rem] border border-emerald-400/30 bg-slate-950/95 p-4 text-white shadow-2xl shadow-emerald-950/40 backdrop-blur-md sm:bottom-6 sm:left-auto sm:right-6 sm:w-[28rem] sm:rounded-[1.75rem]">
+            <div className="flex gap-3 sm:gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-400/10 text-lg sm:h-12 sm:w-12 sm:text-xl">
                     ✓
                 </div>
 
                 <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-4">
-                        <div>
+                    <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
                             <p className="text-sm font-black text-emerald-300">
                                 {toast.title}
                             </p>
-                            <p className="mt-1 text-sm leading-6 text-slate-300">
+                            <p className="mt-1 text-sm leading-5 text-slate-300 sm:leading-6">
                                 {toast.message}
                             </p>
                         </div>

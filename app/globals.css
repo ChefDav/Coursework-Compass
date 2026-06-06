@@ -34,3 +34,62 @@ body {
     transform: scaleX(0);
   }
 }
+
+@keyframes saveToastBar {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+* {
+  min-width: 0;
+}
+
+input,
+select,
+textarea,
+button {
+  font-size: 16px;
+}
+
+@media (min-width: 640px) {
+  input,
+  select,
+  textarea,
+  button {
+    font-size: inherit;
+  }
+}
+
+@media (max-width: 639px) {
+  main {
+    overflow-x: hidden;
+  }
+
+  section {
+    scroll-margin-top: 1rem;
+  }
+
+  a,
+  button,
+  summary {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  summary {
+    cursor: pointer;
+  }
+}
