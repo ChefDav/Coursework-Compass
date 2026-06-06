@@ -8,41 +8,54 @@ const currentFeatures = [
     "Mark tasks as done and restore them back to todo",
     "Add custom tasks for real coursework needs",
     "Edit task title, priority, due date, and estimated time",
-    "Delete tasks that no longer fit the project",
+    "Delete individual tasks and whole projects safely",
     "Use calendar picker for project deadlines and task due dates",
     "Automatically normalise estimated time, such as 60 min to 1 hour",
-    "Archive completed tasks and restore them when new work is added",
-    "Use draggable, collapsible world clock widget",
-    "Use the isolated guided tutorial sandbox",
-    "See the v1.2 onboarding popup on first visit",
+    "Show days left and overdue status for project and task deadlines",
+    "Archive completed tasks and restore archived tasks when new work is added",
+    "Use clearer save success messages after project and task changes",
     "See clearer empty states on Dashboard, Projects, and Today",
+    "Read clearer browser-only local storage notices across the product",
+    "Use a mobile-friendly navigation menu and improved mobile layout foundation",
+    "Use the draggable, collapsible world clock widget",
+    "Use the isolated guided tutorial sandbox for student testing",
+    "See the v1.2 onboarding popup on first visit",
+    "See unified inline error messages for missing project and task titles",
     "Send structured student testing feedback",
 ];
 
 const whatToTest = [
     "Open the website and read the v1.2 onboarding popup",
+    "Check the browser-only local storage notice",
     "Open the guided tutorial from the homepage",
     "Choose a sample project inside the tutorial",
     "Complete the hands-on simulated planner actions",
     "Watch the feedback loading screen reach 100%",
-    "Send feedback through the structured feedback panel",
     "Return to the main menu from the completion screen",
     "Create a real project from the normal product flow",
-    "Check that the test tutorial does not affect real saved project data",
-    "Clear browser data and check Dashboard, Projects, and Today empty states",
+    "Open Dashboard, Projects, Today, and Project Details",
+    "Add a custom task inside Project Details",
+    "Edit task title, priority, due date, and estimated time",
+    "Try estimated time conversion, such as 60 min to 1 hour",
+    "Mark a task as done and restore it back to todo",
+    "Delete a task and delete a project",
+    "Check that days left appears correctly in Today and Project Details",
+    "Clear browser data or use Reset data to check empty states",
 ];
 
 const mobileChecklist = [
     "Open the website on a phone or small screen",
-    "Check whether the onboarding popup is readable",
+    "Check whether the mobile navigation menu is easy to open",
+    "Check whether the onboarding popup fits the screen",
     "Check whether buttons are easy to tap",
-    "Check whether the guided tutorial cards are readable",
-    "Check whether the simulated task controls fit properly",
-    "Check whether the feedback loading screen looks smooth",
-    "Check whether the congrats screen is readable and not cramped",
-    "Check whether empty states are clear and not too long on mobile",
-    "Check whether the clock widget blocks any important action",
-    "Report any page that feels cramped or hard to use",
+    "Check whether project cards are readable",
+    "Check whether Project Details is usable on mobile",
+    "Check whether task edit controls fit properly",
+    "Check whether calendar and estimated time fields are usable",
+    "Check whether empty states are clear and not cramped",
+    "Check whether the save success toast does not block important actions",
+    "Check whether the clock widget can be minimized, hidden, and moved",
+    "Report any page that feels cramped, confusing, or difficult to use",
 ];
 
 const recentUpdates = [
@@ -50,7 +63,7 @@ const recentUpdates = [
         version: "v1.2",
         title: "Student Testing Polish",
         description:
-            "Unified the current product version as v1.2, added the first-visit onboarding popup, improved empty states across Dashboard, Projects, and Today, updated testing guidance, refreshed feedback wording, and prepared the product for a more stable student testing session.",
+            "Completed the v1.2 student testing release. This version unified product version labels, added first-visit onboarding, improved empty states, clarified browser-only local storage, added clearer save success messages, improved mobile layout foundations, restored stable project deletion, repaired estimated time display and conversion, restored days-left indicators, fixed project detail hydration issues, unified inline error messages, and prepared the product for a more stable student testing session.",
     },
     {
         version: "v1.1.3",
@@ -78,7 +91,7 @@ const recentUpdates = [
     },
     {
         version: "v1.0.x",
-        title: "Student testing polish",
+        title: "Student Testing Preparation",
         description:
             "Added more templates, custom dropdown UI, calendar date picker, IB exam countdown, movable world clock, testing guide, beta notice, and structured feedback panel.",
     },
@@ -97,15 +110,25 @@ const currentLimitations = [
     "The guided test tutorial uses simulated data and does not save real project data.",
     "Feedback is currently collected through email templates.",
     "AI-generated adaptive planning is not included yet.",
+    "Students should avoid entering sensitive personal information during testing.",
 ];
 
 const nextSteps = [
     "Run full v1.2 testing with real students",
-    "Improve mobile layout based on feedback",
-    "Add more subject-specific templates",
+    "Collect Year 12 and Year 13 feedback",
+    "Use student feedback to plan v1.3",
+    "Improve the feedback system after real testing",
+    "Add more subject-specific templates based on student demand",
     "Prepare Chinese language support",
-    "Add theme switching between dark and light mode",
-    "Design the future cloud account version",
+    "Explore theme switching after the testing release is stable",
+    "Design the future cloud account version carefully",
+];
+
+const stabilityNotes = [
+    "v1.2 is now in stabilisation mode.",
+    "No major data-layer rewrites should be made before student testing.",
+    "Future updates should be smaller, slower, and tested with a clear checklist.",
+    "Testing feedback will guide v1.3 instead of adding more speculative features now.",
 ];
 
 export default function UpdatesPage() {
@@ -120,13 +143,13 @@ export default function UpdatesPage() {
                     </div>
 
                     <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
-                        Coursework Compass v1.2 is ready for student testing polish.
+                        Coursework Compass v1.2 is ready for student testing.
                     </h1>
 
                     <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
-                        This page explains what the current beta can do, what students
-                        should test, what is still limited, and what will come next.
-                        Coursework Compass is being shaped through real student feedback.
+                        v1.2 is the Student Testing Polish release. It focuses on making
+                        Coursework Compass clearer, safer, more stable, and easier to test
+                        before real Year 12 and Year 13 feedback is collected.
                     </p>
 
                     <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -161,11 +184,11 @@ export default function UpdatesPage() {
                         v1.2: Student Testing Polish
                     </h2>
                     <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
-                        The main goal of v1.2 is to make Coursework Compass clearer for
-                        first-time student testers. This version unifies the product
-                        version, adds a first-visit onboarding popup, improves empty states,
-                        improves testing guidance, and keeps the guided tutorial separate
-                        from real saved project data.
+                        The main goal of v1.2 is to make Coursework Compass ready for
+                        student testing. This version improves onboarding, empty states,
+                        local storage communication, save feedback, mobile layout,
+                        estimated time handling, deadline visibility, and inline error
+                        messages.
                     </p>
                 </section>
 
@@ -178,7 +201,7 @@ export default function UpdatesPage() {
                     </h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
                         The /test page uses simulated data only. It does not open Dashboard,
-                        Projects, or Today, and it does not write to localStorage. This
+                        Projects, or Today, and it does not write real project data. This
                         makes the testing route safer and clearer for students.
                     </p>
 
@@ -192,17 +215,47 @@ export default function UpdatesPage() {
                     </div>
                 </section>
 
-                <section className="mt-10 rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-8">
-                    <p className="mb-2 text-sm font-bold text-cyan-300">
-                        Better empty states
+                <section className="mt-10 rounded-[2rem] border border-amber-400/30 bg-amber-400/10 p-5 sm:p-8">
+                    <p className="mb-2 text-sm font-bold text-amber-300">
+                        Data and privacy boundary
                     </p>
                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                        Empty pages now guide the next action.
+                        v1.2 stores projects locally in the browser.
                     </h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        Dashboard, Projects, and Today no longer feel like dead ends when no
-                        data exists. They explain what is missing, why the page matters, and
-                        where students can go next.
+                        Coursework Compass v1.2 does not use accounts or cloud sync yet.
+                        Saved projects are stored in this browser only. Students should
+                        avoid sensitive personal information during testing and use sample
+                        project details when possible.
+                    </p>
+                </section>
+
+                <section className="mt-10 rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-8">
+                    <p className="mb-2 text-sm font-bold text-cyan-300">
+                        Better empty states and errors
+                    </p>
+                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+                        Empty pages and mistakes now guide the next action.
+                    </h2>
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                        Dashboard, Projects, Today, and Project Details now give clearer
+                        guidance when data is missing. Form mistakes such as blank task
+                        titles now use unified inline error messages instead of inconsistent
+                        temporary warnings.
+                    </p>
+                </section>
+
+                <section className="mt-10 rounded-[2rem] border border-fuchsia-400/30 bg-fuchsia-400/10 p-5 sm:p-8">
+                    <p className="mb-2 text-sm font-bold text-fuchsia-300">
+                        Mobile polish
+                    </p>
+                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+                        v1.2 improves the mobile foundation.
+                    </h2>
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                        The navigation bar, onboarding popup, empty states, save success
+                        toast, and clock widget have been adjusted to work more comfortably
+                        on smaller screens.
                     </p>
                 </section>
 
@@ -214,8 +267,9 @@ export default function UpdatesPage() {
                         Suggested testing flow for v1.2.
                     </h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        Students can test the tutorial safely first, then explore the real
-                        planning tools afterwards if they want to create a real project.
+                        Students can test the guided tutorial safely first, then explore the
+                        real planning tools afterwards if they want to create a real
+                        browser-saved project.
                     </p>
 
                     <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -362,6 +416,33 @@ export default function UpdatesPage() {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </section>
+
+                <section className="mt-16 rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-8">
+                    <p className="mb-2 text-sm font-bold text-cyan-300">
+                        Stabilisation notes
+                    </p>
+                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+                        v1.2 is now frozen for testing.
+                    </h2>
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                        After this release, the product should avoid major feature changes
+                        before the student testing session. The next meaningful product
+                        direction should come from real student feedback.
+                    </p>
+
+                    <div className="mt-6 grid gap-4 md:grid-cols-2">
+                        {stabilityNotes.map((note) => (
+                            <div
+                                key={note}
+                                className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4"
+                            >
+                                <p className="text-sm font-bold leading-6 text-slate-200">
+                                    {note}
+                                </p>
+                            </div>
+                        ))}
                     </div>
                 </section>
 
