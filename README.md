@@ -1,8 +1,8 @@
 # Coursework Compass
 
-**Coursework Compass v1.1 Editable Planner**
+**Coursework Compass v1.2.0 - Student Testing Polish**
 
-Coursework Compass is a student-first coursework planning tool designed for IB, A-Level, and international school students. It helps students turn major academic projects into clear, editable, deadline-aware task plans.
+Coursework Compass is a coursework planning web app for IB, A-Level, and international school students. It helps students turn large academic projects into clear tasks, deadlines, progress, and daily actions.
 
 Live site: https://coursework-compass.vercel.app
 
@@ -10,208 +10,156 @@ Live site: https://coursework-compass.vercel.app
 
 ## Current Version
 
-**v1.1 Editable Planner**
+**v1.2.0 Student Testing Polish**
 
-This version focuses on making generated coursework plans editable and maintainable after creation.
+This release focuses on making Coursework Compass clearer, safer, more stable, and easier to test with real students.
 
-Students can now create projects, generate tasks, add custom tasks, edit task details, delete tasks, track progress, archive completed work, and send structured beta feedback.
+v1.2.0 is now considered a student testing release. Future development should be guided by real Year 12 and Year 13 feedback rather than rapid feature expansion.
 
 ---
 
 ## What Coursework Compass Does
 
-Coursework Compass helps students answer one painful question:
+Coursework Compass helps students:
 
-> What exactly should I do next?
-
-Instead of leaving coursework as one huge deadline, the app breaks projects into visible tasks, progress, and daily actions.
-
-It is especially useful for:
-
-* IB Internal Assessments
-* Extended Essay
-* TOK Essay
-* English Essay
-* Economics Commentary
-* EPQ
-* University Personal Statement
-* Subject coursework projects
-* Long-term school assignments
+* Create coursework projects from subject templates
+* Set project deadlines
+* Generate structured task plans
+* Track progress through Dashboard, Projects, Today, and Project Details
+* Add custom tasks
+* Edit task title, priority, due date, and estimated time
+* Mark tasks as done and restore them back to todo
+* Delete tasks and projects
+* Archive completed tasks
+* See days left and overdue status
+* Use a guided student testing tutorial
+* Send structured feedback
 
 ---
 
-## v1.1 Core Features
+## v1.2.0 Highlights
+
+### Student Testing Polish
+
+* Unified product labels as **v1.2 Student Testing Polish**
+* Added a first-visit onboarding popup
+* Added clearer browser-only local storage notices
+* Improved Dashboard, Projects, and Today empty states
+* Added clearer save success feedback
+* Improved mobile navigation and mobile layout foundations
+* Added unified inline error messages
+* Fixed estimated time display and conversion
+* Restored days-left indicators
+* Stabilised Project Detail hydration behaviour
+* Improved project deletion
+* Improved local storage quota handling
+* Prepared the product for Year 12 and Year 13 student testing
+
+---
+
+## Important Data Notice
+
+Coursework Compass v1.2.0 currently stores project data **locally in the browser**.
+
+This means:
+
+* No account is required
+* No cloud sync is currently available
+* Data is saved only in the current browser
+* Data may not appear on another device or browser
+* Data may be removed if the user clears browser data
+* Students should avoid entering sensitive personal information during testing
+
+Cloud accounts and cross-device sync are planned for a later version.
+
+---
+
+## Student Testing Flow
+
+The project includes a dedicated guided testing route:
+
+`/test`
+
+The test route is separated from the real planner. It uses simulated data and helps students understand the workflow before creating real saved projects.
+
+Suggested testing flow:
+
+1. Open the homepage
+2. Read the onboarding popup
+3. Open the guided tutorial
+4. Complete the tutorial steps
+5. Create a real sample project
+6. Test Dashboard, Projects, Today, and Project Details
+7. Add, edit, complete, restore, and delete tasks
+8. Test estimated time conversion
+9. Check the mobile experience
+10. Send structured feedback
+
+---
+
+## Core Pages
+
+* `/`
+  Main landing page
+
+* `/test`
+  Guided student testing tutorial
+
+* `/dashboard`
+  Overall project progress and active overview
+
+* `/projects`
+  Saved coursework project library
+
+* `/projects/new`
+  Create a new coursework plan
+
+* `/projects/[projectId]`
+  Project detail workspace
+
+* `/today`
+  Daily active task list
+
+* `/updates`
+  Release notes and testing guidance
+
+---
+
+## Key Features
 
 ### Project Planning
 
-* Create coursework projects
-* Choose from subject-specific templates
-* Set project deadlines
-* Choose planning intensity
-* Generate structured task plans
-* Save projects locally in the browser
+Students can create a coursework project using a template, deadline, and planning settings.
 
-### Editable Planner
+### Editable Task Workspace
 
-* Rename projects by clicking the project title
-* Edit project deadlines
-* Add custom tasks
-* Edit task title
-* Edit task priority
-* Edit task due date
-* Edit estimated time
-* Delete tasks
-* Mark tasks as done
-* Restore completed tasks back to todo
+Students can add, edit, delete, complete, and restore tasks.
 
-### Calendar and Time Tools
+### Estimated Time Conversion
 
-* Calendar date picker for project deadlines
-* Calendar date picker for task due dates
-* Manual date input support
-* Date format normalisation
-* Estimated time unit selector
-* Automatic time conversion
+The app normalises estimated time values.
 
 Examples:
 
-* 60 min becomes 1 hour
-* 120 min becomes 2 hours
-* 24 hours becomes 1 day
-* 48 hours becomes 2 days
-* 90 min becomes 1.5 hours
+* `60 min` becomes `1 hour`
+* `120 min` becomes `2 hours`
+* `24 hours` becomes `1 day`
 
-### Progress and Task Management
+### Deadline Visibility
 
-* Dashboard overview
-* Projects page
-* Today page
-* Project detail page
-* Task progress tracking
-* Risk level display
-* Completion detection
-* Completed task archive
-* Archived tasks restore when new work is added
+Tasks and projects show deadline information, including days left and overdue status.
 
-### Beta and Feedback
+### Local Storage
 
-* v1.1 Beta notice
-* Release notes page
-* Structured feedback panel
-* Feedback email template
-* Testing guide
-* Local data and privacy notice
+Project data is saved in browser local storage during the beta stage.
 
----
+### Mobile UI Foundation
 
-## Supported Templates
+v1.2.0 improves mobile navigation, onboarding, empty states, toast messages, and the clock widget.
 
-The current template library includes:
+### Guided Tutorial
 
-* Math IA
-* Computer Science IA
-* Biology IA
-* Chemistry IA
-* Physics IA
-* Business IA
-* History Essay
-* Geography IA
-* Psychology Essay
-* English Essay
-* English IO
-* TOK Essay
-* Extended Essay
-* Economics Commentary
-* EPQ
-* University Personal Statement
-
-More templates will be added based on student feedback.
-
----
-
-## Pages
-
-Coursework Compass currently includes:
-
-* Home page
-* Dashboard
-* Projects
-* New Project
-* Project Detail
-* Today
-* Updates / Release Notes
-
----
-
-## Current Limitations
-
-This is still an early beta version.
-
-Current limitations:
-
-* Data is stored locally in the browser
-* There is no account system yet
-* Cloud sync is not available yet
-* Data does not automatically transfer across devices
-* Feedback is currently collected through email templates
-* AI-generated adaptive planning is not included yet
-
-Users should not enter private or sensitive personal information into the current beta.
-
----
-
-## Roadmap
-
-### v1.1 Editable Planner
-
-Status: Current version
-
-Focus:
-
-* Editable project plans
-* Custom tasks
-* Task editing
-* Task deletion
-* Better beta feedback
-* Release notes
-
-### v1.2 Student Testing Polish
-
-Planned:
-
-* Better onboarding
-* Improved mobile layout
-* Clearer empty states
-* More testing guidance
-* More polished beta user experience
-
-### v1.3 Multilingual Version
-
-Planned:
-
-* Chinese language support
-* Chinese UI text
-* Chinese template names
-* Chinese testing guide
-
-### v1.4 Personalisation
-
-Planned:
-
-* Dark / light theme switching
-* Theme preference saving
-* More visual polish
-* Customisation options
-
-### v2.0 Cloud Account Version
-
-Long-term goal:
-
-* User accounts
-* Cloud project saving
-* Cross-device sync
-* User settings
-* More serious SaaS foundation
+The `/test` page provides an isolated tutorial experience for student testers.
 
 ---
 
@@ -221,64 +169,116 @@ Long-term goal:
 * React
 * TypeScript
 * Tailwind CSS
-* localStorage
 * Vercel
+* Browser localStorage
 
 ---
 
-## Local Development
+## Development Commands
 
 Install dependencies:
 
-```bash
+```
 npm install
 ```
 
 Run development server:
 
-```bash
+```
 npm run dev
 ```
 
 Build production version:
 
-```bash
+```
 npm run build
+```
+
+Start production server:
+
+```
+npm run start
 ```
 
 ---
 
-## Deployment
+## Version History
 
-The project is deployed on Vercel.
+### v1.2.0 - Student Testing Polish
 
-Live site:
+Completed the student testing release. This version focuses on onboarding, mobile layout foundations, local storage clarity, save success feedback, empty states, estimated time repairs, deadline visibility, inline error feedback, and overall testing stability.
 
-https://coursework-compass.vercel.app
+### v1.1.3 - Guided Test Flow + Homepage Restore
+
+Restored the homepage to a normal product entry, added a larger Join student test button, redesigned `/test` as an isolated tutorial sandbox, added a feedback loading screen, and added a final congratulations screen after testing.
+
+### v1.1.2 - Student Testing Guide
+
+Added a dedicated student testing page, suggested sample projects, clearer feedback instructions, and testing labels in feedback email subjects.
+
+### v1.1.1 - Pre-Test Polish
+
+Added clearer tester guidance, short feedback prompts, mobile testing guidance, and a focused testing checklist.
+
+### v1.1 - Editable Planner
+
+Added support for adding, editing, deleting, completing, restoring, and archiving tasks.
+
+### v1.0 - Public MVP
+
+Initial public version with project creation, generated coursework plans, local saving, progress tracking, Dashboard, Today, Projects, and Project Details.
 
 ---
 
-## Feedback
+## Current Limitations
 
-Coursework Compass is currently being improved through real student testing.
-
-Useful feedback includes:
-
-* Bugs
-* Confusing interactions
-* Missing templates
-* Feature requests
-* Mobile layout problems
-* Suggestions from real coursework experience
-
-Students can use the structured feedback panel inside the app to send feedback.
+* Project data is stored locally in the browser
+* There is no account system yet
+* Cloud sync is not available yet
+* Feedback is currently collected through email templates
+* AI-generated adaptive planning is not included yet
+* The guided tutorial uses simulated data
 
 ---
 
-## Version
+## Roadmap
 
-Current release:
+### v1.3 - Feedback and Insight Release
 
-**Coursework Compass v1.1 Editable Planner**
+Planned focus:
 
-Released as an early beta for student testing.
+* Analyse real student feedback
+* Improve the feedback system
+* Adjust unclear user flows
+* Add or refine subject templates based on demand
+* Improve mobile experience based on real testing
+
+### Future Versions
+
+Possible future improvements:
+
+* Chinese language support
+* Theme switching
+* More subject-specific templates
+* Cloud accounts
+* Cross-device sync
+* Export options
+* Smarter planning assistance
+
+---
+
+## Release Status
+
+**v1.2.0 is frozen for student testing.**
+
+Before the student testing session, the project should avoid major feature changes. Only critical bugs or small text/UI fixes should be made.
+
+Future development should be based on real user feedback.
+
+---
+
+## Author
+
+Created by Zichuan as an independent student software project.
+
+Coursework Compass is built to help students make long coursework projects less overwhelming, more visible, and easier to act on.
