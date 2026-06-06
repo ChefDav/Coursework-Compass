@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import AppNav from "@/components/AppNav";
-import EmptyState from "@/components/EmptyState";
-import TaskCard from "@/components/TaskCard";
 import CalendarDateField from "@/components/CalendarDateField";
+import EmptyState from "@/components/EmptyState";
+import ErrorNotice from "@/components/ErrorNotice";
 import EstimatedTimeField, {
     normaliseEstimatedTime,
 } from "@/components/EstimatedTimeField";
+import TaskCard from "@/components/TaskCard";
 import {
     addCustomTask,
     archiveCompletedTasks,
@@ -190,6 +191,7 @@ export default function ProjectDetailPage() {
     const [isEditingProject, setIsEditingProject] = useState(false);
     const [projectTitle, setProjectTitle] = useState("");
     const [projectDeadline, setProjectDeadline] = useState("");
+    const [projectError, setProjectError] = useState("");
 
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [newTaskPriority, setNewTaskPriority] =
@@ -318,6 +320,7 @@ export default function ProjectDetailPage() {
         const trimmedTitle = projectTitle.trim();
 
         if (!trimmedTitle) {
+            setProjectError("Please enter a project title before saving.");
             return;
         }
 
@@ -326,6 +329,7 @@ export default function ProjectDetailPage() {
             deadline: projectDeadline,
         });
 
+        setProjectError("");
         setIsEditingProject(false);
         refreshProjectPlans();
     }
@@ -349,7 +353,7 @@ export default function ProjectDetailPage() {
         const trimmedTitle = newTaskTitle.trim();
 
         if (!trimmedTitle) {
-            setNewTaskError("Please type a task title first.");
+            setNewTaskError("Please enter a task title before adding it.");
             return;
         }
 
@@ -395,7 +399,10 @@ export default function ProjectDetailPage() {
                                         <input
                                             type="text"
                                             value={projectTitle}
-                                            onChange={(event) => setProjectTitle(event.target.value)}
+                                            onChange={(event) => {
+                                                setProjectTitle(event.target.value);
+                                                setProjectError("");
+                                            }}
                                             className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
                                         />
                                     </div>
@@ -405,6 +412,13 @@ export default function ProjectDetailPage() {
                                         value={projectDeadline}
                                         onChange={setProjectDeadline}
                                     />
+
+                                    {projectError ? (
+                                        <ErrorNotice
+                                            title="Project title required"
+                                            message={projectError}
+                                        />
+                                    ) : null}
 
                                     <div className="flex flex-col gap-3 sm:flex-row">
                                         <button
@@ -420,6 +434,7 @@ export default function ProjectDetailPage() {
                                             onClick={() => {
                                                 setProjectTitle(projectPlan.project.title);
                                                 setProjectDeadline(projectPlan.project.deadline);
+                                                setProjectError("");
                                                 setIsEditingProject(false);
                                             }}
                                             className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
@@ -602,8 +617,8 @@ export default function ProjectDetailPage() {
                     </div>
 
                     {newTaskError ? (
-                        <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
-                            {newTaskError}
+                        <div className="mt-4">
+                            <ErrorNotice title="Task title required" message={newTaskError} />
                         </div>
                     ) : null}
 

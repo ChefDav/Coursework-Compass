@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import CalendarDateField from "@/components/CalendarDateField";
+import ErrorNotice from "@/components/ErrorNotice";
 import EstimatedTimeField, {
     normaliseEstimatedTime,
 } from "@/components/EstimatedTimeField";
@@ -176,14 +177,16 @@ export default function TaskCard({
         setEditTitle(task.title);
         setEditPriority(normalisePriority(task.priority));
         setEditDueDate(task.dueDate || "");
-        setEditEstimatedTime(getDisplayEstimatedTime(task.estimatedTime, task.priority));
+        setEditEstimatedTime(
+            getDisplayEstimatedTime(task.estimatedTime, task.priority),
+        );
     }, [task]);
 
     function handleSaveEdit() {
         const trimmedTitle = editTitle.trim();
 
         if (!trimmedTitle) {
-            setEditError("Please type a task title before saving.");
+            setEditError("Please enter a task title before saving this change.");
             return;
         }
 
@@ -203,7 +206,9 @@ export default function TaskCard({
         setEditTitle(task.title);
         setEditPriority(normalisePriority(task.priority));
         setEditDueDate(task.dueDate || "");
-        setEditEstimatedTime(getDisplayEstimatedTime(task.estimatedTime, task.priority));
+        setEditEstimatedTime(
+            getDisplayEstimatedTime(task.estimatedTime, task.priority),
+        );
         setEditError("");
         setIsEditing(false);
     }
@@ -285,8 +290,11 @@ export default function TaskCard({
                     </div>
 
                     {editError ? (
-                        <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm font-bold text-red-300">
-                            {editError}
+                        <div className="mt-4">
+                            <ErrorNotice
+                                title="Task title required"
+                                message={editError}
+                            />
                         </div>
                     ) : null}
 
