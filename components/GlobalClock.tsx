@@ -6,6 +6,12 @@ import {
     useState,
     type PointerEvent as ReactPointerEvent,
 } from "react";
+import {
+    createTranslator,
+    getStoredLanguage,
+    listenForLanguageChange,
+    type Language,
+} from "@/lib/i18n";
 
 type ClockMode = "expanded" | "minimized" | "hidden";
 
@@ -17,10 +23,11 @@ type ClockPosition = {
 const CLOCK_MODE_KEY = "coursework-compass-clock-mode";
 const CLOCK_POSITION_KEY = "coursework-compass-clock-position";
 
-function formatTime(timeZone?: string) {
+function formatTime(timeZone?: string, language: Language = "en") {
     const now = new Date();
+    const locale = language === "zh" ? "zh-CN" : "en-GB";
 
-    return new Intl.DateTimeFormat("en-GB", {
+    return new Intl.DateTimeFormat(locale, {
         timeZone,
         hour: "2-digit",
         minute: "2-digit",
@@ -111,6 +118,7 @@ function readSavedPosition() {
 
 export default function GlobalClock() {
     const [hasMounted, setHasMounted] = useState(false);
+    const [language, setLanguage] = useState<Language>("en");
     const [mode, setMode] = useState<ClockMode>("minimized");
     const [position, setPosition] = useState<ClockPosition>({
         x: 16,
@@ -125,12 +133,19 @@ export default function GlobalClock() {
         startY: number;
     } | null>(null);
 
+    const t = createTranslator(language);
+
     useEffect(() => {
         const savedMode = window.localStorage.getItem(CLOCK_MODE_KEY);
 
+        setLanguage(getStoredLanguage());
         setMode(isClockMode(savedMode) ? savedMode : getDefaultMode());
         setPosition(readSavedPosition());
         setHasMounted(true);
+
+        const unsubscribeLanguage = listenForLanguageChange((nextLanguage) => {
+            setLanguage(nextLanguage);
+        });
 
         const timer = window.setInterval(() => {
             setTick((currentTick) => currentTick + 1);
@@ -152,6 +167,7 @@ export default function GlobalClock() {
         window.addEventListener("resize", handleResize);
 
         return () => {
+            unsubscribeLanguage();
             window.clearInterval(timer);
             window.removeEventListener("resize", handleResize);
         };
@@ -237,19 +253,17 @@ export default function GlobalClock() {
                 onClick={handleShowAgain}
                 className="fixed bottom-4 right-4 z-[60] rounded-2xl border border-cyan-400/30 bg-slate-950/95 px-4 py-3 text-xs font-black text-cyan-300 shadow-2xl shadow-cyan-950/40 backdrop-blur-md transition hover:border-cyan-300 hover:text-cyan-200"
             >
-                Show time
+                {t("showTime")}
             </button>
         );
     }
 
-    const clockStyle = {
-        left: position.x,
-        top: position.y,
-    };
-
     return (
         <section
-            style={clockStyle}
+            style={{
+                left: position.x,
+                top: position.y,
+            }}
             className="fixed z-[60] w-[min(18rem,calc(100vw-1.5rem))] rounded-[1.5rem] border border-cyan-400/30 bg-slate-950/95 p-3 text-white shadow-2xl shadow-cyan-950/40 backdrop-blur-md sm:w-80 sm:p-4"
         >
             <div className="flex items-start justify-between gap-3">
@@ -258,13 +272,13 @@ export default function GlobalClock() {
                     onPointerMove={handlePointerMove}
                     onPointerUp={handlePointerUp}
                     onPointerCancel={handlePointerUp}
-                    className="min-w-0 flex-1 cursor-grab rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2 active:cursor-grabbing"
+                    className="min-w-0 flex-1 cursor-grab touch-none rounded-2xl border border-slate-800 bg-slate-900/80 px-3 py-2 active:cursor-grabbing"
                 >
                     <p className="truncate text-xs font-black uppercase tracking-[0.16em] text-cyan-300">
-                        World clock
+                        {t("worldClock")}
                     </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                        Drag this area to move
+                    <p className="mt-1 truncate text-xs text-slate-500">
+                        {t("dragThisAreaToMove")}
                     </p>
                 </div>
 
@@ -272,17 +286,17 @@ export default function GlobalClock() {
                     <button
                         type="button"
                         onClick={handleExpandOrMinimise}
-                        className="rounded-xl border border-slate-700 px-3 py-2 text-xs font-bold text-slate-300 transition hover:border-cyan-400 hover:text-cyan-300"
+                        className="min-w-14 rounded-xl border border-slate-700 px-3 py-2 text-xs font-bold text-slate-300 transition hover:border-cyan-400 hover:text-cyan-300"
                     >
-                        {mode === "expanded" ? "Min" : "Open"}
+                        {mode === "expanded" ? t("minimise") : t("open")}
                     </button>
 
                     <button
                         type="button"
                         onClick={handleClose}
-                        className="rounded-xl border border-red-400/30 bg-red-400/10 px-3 py-2 text-xs font-bold text-red-300 transition hover:bg-red-400/20"
+                        className="min-w-14 rounded-xl border border-red-400/30 bg-red-400/10 px-3 py-2 text-xs font-bold text-red-300 transition hover:bg-red-400/20"
                     >
-                        Close
+                        {t("close")}
                     </button>
                 </div>
             </div>
@@ -290,45 +304,51 @@ export default function GlobalClock() {
             {mode === "minimized" ? (
                 <div className="mt-3 rounded-2xl border border-slate-800 bg-slate-900/80 p-3">
                     <div className="flex items-center justify-between gap-3">
-                        <div>
-                            <p className="text-xs font-bold text-slate-400">System time</p>
+                        <div className="min-w-0">
+                            <p className="text-xs font-bold text-slate-400">
+                                {t("systemTime")}
+                            </p>
                             <p className="mt-1 text-sm font-black text-white">
-                                {formatTime()}
+                                {formatTime(undefined, language)}
                             </p>
                         </div>
 
-                        <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.14em] text-cyan-300">
-              Local
+                        <span className="shrink-0 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.14em] text-cyan-300">
+              {language === "zh" ? "本地" : "Local"}
             </span>
                     </div>
                 </div>
             ) : (
                 <div className="mt-3 grid gap-2">
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3">
-                        <p className="text-xs font-bold text-slate-400">System time</p>
+                        <p className="text-xs font-bold text-slate-400">
+                            {t("systemTime")}
+                        </p>
                         <p className="mt-1 text-sm font-black text-white">
-                            {formatTime()}
+                            {formatTime(undefined, language)}
                         </p>
                     </div>
 
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3">
-                        <p className="text-xs font-bold text-slate-400">Beijing time</p>
+                        <p className="text-xs font-bold text-slate-400">
+                            {t("beijingTime")}
+                        </p>
                         <p className="mt-1 text-sm font-black text-white">
-                            {formatTime("Asia/Shanghai")}
+                            {formatTime("Asia/Shanghai", language)}
                         </p>
                     </div>
 
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3">
-                        <p className="text-xs font-bold text-slate-400">UTC time</p>
+                        <p className="text-xs font-bold text-slate-400">{t("utcTime")}</p>
                         <p className="mt-1 text-sm font-black text-white">
-                            {formatTime("UTC")}
+                            {formatTime("UTC", language)}
                         </p>
                     </div>
 
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3">
-                        <p className="text-xs font-bold text-slate-400">UAE time</p>
+                        <p className="text-xs font-bold text-slate-400">{t("uaeTime")}</p>
                         <p className="mt-1 text-sm font-black text-white">
-                            {formatTime("Asia/Dubai")}
+                            {formatTime("Asia/Dubai", language)}
                         </p>
                     </div>
                 </div>
