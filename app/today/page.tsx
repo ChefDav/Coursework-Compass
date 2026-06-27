@@ -3,118 +3,206 @@
 import { useEffect, useMemo, useState } from "react";
 import AppNav from "@/components/AppNav";
 import EmptyState from "@/components/EmptyState";
+import FeedbackPanel from "@/components/FeedbackPanel";
 import {
+    getProjectRouteId,
+    listenForProjectPlanUpdates,
     loadProjectPlans,
     updateTaskStatus,
-    type GeneratedProjectPlan,
     type CourseworkTask,
+    type GeneratedProjectPlan,
+    type TaskStatus,
 } from "@/lib/localStorage";
+import {
+    getStoredLanguage,
+    listenForLanguageChange,
+    type Language,
+} from "@/lib/i18n";
 
-type TodayTask = CourseworkTask & {
-    projectId: string;
-    projectTitle: string;
-    projectDeadline: string;
+type TodayTask = {
+    plan: GeneratedProjectPlan;
+    planIndex: number;
+    task: CourseworkTask;
+    taskIndex: number;
+    routeId: string;
+    daysLeft: number | null;
 };
 
-function slugifyTitle(title: string) {
-    return title
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
+const copy = {
+    en: {
+        eyebrow: "Today",
+        title: "Your daily coursework action list.",
+        subtitle:
+            "See active tasks from your saved projects and choose what to work on next.",
+        loading: "Loading today",
+        markDone: "Mark done",
+        openProject: "Open project",
+        dueDate: "Due date",
+        estimatedTime: "Estimated time",
+        priority: "Priority",
+        project: "Project",
+        noDate: "No date",
+        noEstimate: "Not set",
+        dueToday: "Due today",
+        overdue: "overdue",
+        dayLeft: "day left",
+        daysLeft: "days left",
+        activeTasks: "Active tasks",
+        activeTasksDescription:
+            "These tasks are pulled from saved projects in this browser.",
+        noProjectsEyebrow: "No projects yet",
+        noProjectsTitle: "Today has nothing to show because no project exists yet.",
+        noProjectsDescription:
+            "Create your first coursework project and Today will start showing the next useful tasks to work on.",
+        noTasksEyebrow: "Today is clear",
+        noTasksTitle: "Your Today page is clear.",
+        noTasksDescription:
+            "You do not have any active tasks due today. Create a project or check your project pages to plan future work.",
+        createProject: "Create first project",
+        tryTutorial: "Try guided tutorial",
+        tipsNoProjects: [
+            "Create one project first to activate your Today page.",
+            "The tutorial lets you practise without saving real data.",
+            "Today will become your daily action list once tasks exist.",
+            "Your saved data stays in this browser during the beta.",
+        ],
+        tipsNoTasks: [
+            "Tasks you mark as done will update project progress automatically.",
+            "If a project has no tasks, open its project detail page and add custom tasks.",
+            "Deadline labels help you spot urgent or overdue work.",
+            "Create more projects to compare progress across coursework.",
+        ],
+    },
+    zh: {
+        eyebrow: "今日任务",
+        title: "你的每日 coursework 行动清单。",
+        subtitle:
+            "查看已保存项目中的活跃任务，并决定接下来最应该处理什么。",
+        loading: "正在加载今日任务",
+        markDone: "标记完成",
+        openProject: "打开项目",
+        dueDate: "任务日期",
+        estimatedTime: "预计用时",
+        priority: "优先级",
+        project: "项目",
+        noDate: "未设置日期",
+        noEstimate: "未设置",
+        dueToday: "今天截止",
+        overdue: "已逾期",
+        dayLeft: "天剩余",
+        daysLeft: "天剩余",
+        activeTasks: "活跃任务",
+        activeTasksDescription:
+            "这些任务来自当前浏览器中已保存的项目。",
+        noProjectsEyebrow: "还没有项目",
+        noProjectsTitle: "Today 还没有内容，因为目前还没有项目。",
+        noProjectsDescription:
+            "创建第一个 coursework 项目后，Today 会开始显示接下来最值得处理的任务。",
+        noTasksEyebrow: "今天很干净",
+        noTasksTitle: "你的 Today 页面是空的。",
+        noTasksDescription:
+            "你今天没有需要处理的活跃任务。你可以创建项目，或打开项目页面规划后续工作。",
+        createProject: "创建第一个项目",
+        tryTutorial: "尝试引导测试",
+        tipsNoProjects: [
+            "先创建一个项目，Today 页面才会开始显示内容。",
+            "引导测试可以让你先练习流程，不会保存真实项目数据。",
+            "有任务后，Today 会变成你的每日行动清单。",
+            "测试版期间，你保存的数据只会留在当前浏览器中。",
+        ],
+        tipsNoTasks: [
+            "你标记为完成的任务会自动更新项目进度。",
+            "如果项目没有任务，可以打开项目详情页添加自定义任务。",
+            "截止日期标签可以帮助你发现紧急或逾期任务。",
+            "创建更多项目后，你可以对比不同 coursework 的进度。",
+        ],
+    },
+} as const;
+
+function isDone(task: CourseworkTask) {
+    return String(task.status).toLowerCase() === "done";
 }
 
-function getProjectRouteId(plan: GeneratedProjectPlan, index: number) {
-    return (
-        plan.id ||
-        plan.slug ||
-        plan.projectId ||
-        plan.project.id ||
-        plan.project.slug ||
-        plan.project.projectId ||
-        slugifyTitle(plan.project.title) ||
-        `project-${index}`
-    );
-}
-
-function parseDateValue(value?: string) {
-    if (!value) {
+function getDaysLeft(dateValue?: string) {
+    if (!dateValue) {
         return null;
     }
 
-    const cleanedValue = value.trim().replaceAll("/", "-");
-    const parts = cleanedValue.split("-").map((part) => Number(part));
+    const target = new Date(dateValue);
 
-    if (parts.length < 3 || parts.some((part) => Number.isNaN(part))) {
+    if (Number.isNaN(target.getTime())) {
         return null;
     }
 
-    const [year, month, day] = parts;
-
-    return new Date(year, month - 1, day);
-}
-
-function getDaysLeftLabel(dateValue?: string) {
-    const targetDate = parseDateValue(dateValue);
-
-    if (!targetDate) {
-        return "Days left: unknown";
-    }
-
-    const today = new Date();
-    const todayDate = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
+    const now = new Date();
+    const todayUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const targetUtc = Date.UTC(
+        target.getFullYear(),
+        target.getMonth(),
+        target.getDate(),
     );
 
-    const diffMs = targetDate.getTime() - todayDate.getTime();
-    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    return Math.ceil((targetUtc - todayUtc) / 86_400_000);
+}
+
+function formatDate(dateValue: string | undefined, language: Language) {
+    if (!dateValue) {
+        return copy[language].noDate;
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+        return copy[language].noDate;
+    }
+
+    return new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : "en-GB", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    }).format(date);
+}
+
+function getDueText(daysLeft: number | null, language: Language) {
+    const currentCopy = copy[language];
+
+    if (daysLeft === null) {
+        return currentCopy.noDate;
+    }
 
     if (daysLeft < 0) {
-        return `${Math.abs(daysLeft)} day${Math.abs(daysLeft) === 1 ? "" : "s"} overdue`;
+        const days = Math.abs(daysLeft);
+        return language === "zh"
+            ? `${currentCopy.overdue} ${days} 天`
+            : `${days} ${currentCopy.overdue}`;
     }
 
     if (daysLeft === 0) {
-        return "Due today";
+        return currentCopy.dueToday;
     }
 
-    if (daysLeft === 1) {
-        return "1 day left";
-    }
-
-    return `${daysLeft} days left`;
+    return language === "zh"
+        ? `${daysLeft} ${currentCopy.daysLeft}`
+        : `${daysLeft} ${daysLeft === 1 ? currentCopy.dayLeft : currentCopy.daysLeft}`;
 }
 
-function getDaysLeftClasses(dateValue?: string) {
-    const targetDate = parseDateValue(dateValue);
-
-    if (!targetDate) {
+function getDueTone(daysLeft: number | null) {
+    if (daysLeft === null) {
         return "border-slate-700 bg-slate-900 text-slate-300";
     }
 
-    const today = new Date();
-    const todayDate = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
-    );
-
-    const diffMs = targetDate.getTime() - todayDate.getTime();
-    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-    if (daysLeft < 0 || daysLeft <= 3) {
+    if (daysLeft < 0) {
         return "border-red-400/30 bg-red-400/10 text-red-300";
     }
 
-    if (daysLeft <= 10) {
+    if (daysLeft <= 3) {
         return "border-amber-400/30 bg-amber-400/10 text-amber-300";
     }
 
     return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
 }
 
-function getPriorityClasses(priority?: string) {
+function getPriorityTone(priority: string) {
     if (priority === "High") {
         return "border-red-400/30 bg-red-400/10 text-red-300";
     }
@@ -123,205 +211,239 @@ function getPriorityClasses(priority?: string) {
         return "border-amber-400/30 bg-amber-400/10 text-amber-300";
     }
 
-    if (priority === "Low") {
-        return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
-    }
-
-    return "border-slate-700 bg-slate-900 text-slate-300";
-}
-
-function sortTodayTasks(tasks: TodayTask[]) {
-    return [...tasks].sort((a, b) => {
-        const priorityOrder: Record<string, number> = {
-            High: 0,
-            Medium: 1,
-            Low: 2,
-        };
-
-        const aPriority = priorityOrder[a.priority ?? "Medium"] ?? 1;
-        const bPriority = priorityOrder[b.priority ?? "Medium"] ?? 1;
-
-        if (aPriority !== bPriority) {
-            return aPriority - bPriority;
-        }
-
-        const aDue = parseDateValue(a.dueDate || a.projectDeadline)?.getTime();
-        const bDue = parseDateValue(b.dueDate || b.projectDeadline)?.getTime();
-
-        if (!aDue || !bDue) {
-            return a.title.localeCompare(b.title);
-        }
-
-        return aDue - bDue;
-    });
+    return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
 }
 
 export default function TodayPage() {
-    const [projectPlans, setProjectPlans] = useState<GeneratedProjectPlan[]>([]);
+    const [language, setLanguage] = useState<Language>("en");
+    const [hasMounted, setHasMounted] = useState(false);
+    const [plans, setPlans] = useState<GeneratedProjectPlan[]>([]);
+
+    const currentCopy = copy[language];
 
     function refreshPlans() {
-        setProjectPlans(loadProjectPlans());
+        setPlans(loadProjectPlans());
     }
 
     useEffect(() => {
+        setLanguage(getStoredLanguage());
         refreshPlans();
-    }, []);
+        setHasMounted(true);
 
-    const todayTasks = useMemo(() => {
-        const activeTasks = projectPlans.flatMap((plan, index) => {
-            const projectRouteId = getProjectRouteId(plan, index);
-
-            return plan.tasks
-                .filter((task) => task.status !== "Done")
-                .map((task) => ({
-                    ...task,
-                    projectId: projectRouteId,
-                    projectTitle: plan.project.title,
-                    projectDeadline: plan.project.deadline,
-                }));
+        const unsubscribeLanguage = listenForLanguageChange((nextLanguage) => {
+            setLanguage(nextLanguage);
         });
 
-        return sortTodayTasks(activeTasks);
-    }, [projectPlans]);
+        const unsubscribePlans = listenForProjectPlanUpdates(() => {
+            refreshPlans();
+        });
 
-    function handleMarkDone(taskId: string) {
-        updateTaskStatus(taskId, "Done");
+        return () => {
+            unsubscribeLanguage();
+            unsubscribePlans();
+        };
+    }, []);
+
+    const todayTasks = useMemo<TodayTask[]>(() => {
+        return plans
+            .flatMap((plan, planIndex) => {
+                const routeId = getProjectRouteId(plan, planIndex);
+
+                return plan.tasks.map((task, taskIndex) => ({
+                    plan,
+                    planIndex,
+                    task,
+                    taskIndex,
+                    routeId,
+                    daysLeft: getDaysLeft(task.dueDate),
+                }));
+            })
+            .filter((item) => !item.task.archived && !isDone(item.task))
+            .sort((first, second) => {
+                const firstDays = first.daysLeft ?? 9999;
+                const secondDays = second.daysLeft ?? 9999;
+
+                if (firstDays !== secondDays) {
+                    return firstDays - secondDays;
+                }
+
+                return first.task.title.localeCompare(second.task.title);
+            });
+    }, [plans]);
+
+    function handleMarkDone(item: TodayTask) {
+        updateTaskStatus(item.plan.id, item.task.id, "Done" as TaskStatus);
         refreshPlans();
     }
 
     return (
-        <main className="min-h-screen bg-slate-950 text-white">
-            <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        <main className="min-h-screen bg-slate-950 px-4 py-6 text-white sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl">
                 <AppNav />
 
-                <div className="mb-10">
-                    <p className="mb-2 text-sm font-bold text-cyan-300">Today</p>
-                    <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
-                        Today&apos;s action list.
-                    </h1>
-                    <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
-                        Focus on the next visible tasks from your active coursework
-                        projects. Today is for action, not storage.
+                <header className="mb-8">
+                    <p className="mb-3 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
+                        {currentCopy.eyebrow}
                     </p>
-                </div>
+                    <h1 className="max-w-5xl text-4xl font-black tracking-tight sm:text-6xl">
+                        {currentCopy.title}
+                    </h1>
+                    <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:text-lg">
+                        {currentCopy.subtitle}
+                    </p>
+                </header>
 
-                {projectPlans.length === 0 ? (
+                {!hasMounted ? (
+                    <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-6">
+                        <p className="text-sm font-bold text-slate-400">
+                            {currentCopy.loading}
+                        </p>
+                    </section>
+                ) : plans.length === 0 ? (
                     <EmptyState
-                        eyebrow="No projects yet"
-                        title="Today has nothing to show because no project exists yet."
-                        description="Create your first coursework project and Today will start showing the next useful tasks to work on."
+                        eyebrow={currentCopy.noProjectsEyebrow}
+                        title={currentCopy.noProjectsTitle}
+                        description={currentCopy.noProjectsDescription}
                         icon="🌱"
                         actions={[
                             {
-                                label: "Create first project",
+                                label: currentCopy.createProject,
                                 href: "/projects/new",
                             },
                             {
-                                label: "Try guided tutorial",
+                                label: currentCopy.tryTutorial,
                                 href: "/test",
                                 variant: "secondary",
                             },
                         ]}
-                        tips={[
-                            "Create one project first to activate your Today page.",
-                            "The tutorial lets you practise without saving real data.",
-                            "Today will become your daily action list once tasks exist.",
-                            "Your saved data stays in this browser during the beta.",
-                        ]}
+                        tips={[...currentCopy.tipsNoProjects]}
                     />
                 ) : todayTasks.length === 0 ? (
                     <EmptyState
-                        eyebrow="Today is clear"
-                        title="No active tasks are waiting right now."
-                        description="You may have completed or archived your current work. Add a new custom task or open a project if you want to continue planning."
-                        icon="✨"
+                        eyebrow={currentCopy.noTasksEyebrow}
+                        title={currentCopy.noTasksTitle}
+                        description={currentCopy.noTasksDescription}
+                        icon="✅"
                         actions={[
                             {
-                                label: "View projects",
-                                href: "/projects",
+                                label: currentCopy.createProject,
+                                href: "/projects/new",
                             },
                             {
-                                label: "Create new project",
-                                href: "/projects/new",
+                                label: currentCopy.openProject,
+                                href: "/projects",
                                 variant: "secondary",
                             },
                         ]}
-                        tips={[
-                            "A clear Today page means there is no urgent visible task right now.",
-                            "Open a project to add new work if your plan has changed.",
-                            "Archived completed tasks stay hidden until new work is added.",
-                            "You can still use Dashboard to check overall progress.",
-                        ]}
+                        tips={[...currentCopy.tipsNoTasks]}
                     />
                 ) : (
-                    <section className="grid gap-5">
-                        {todayTasks.map((task) => {
-                            const dueDate = task.dueDate || task.projectDeadline;
+                    <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6">
+                        <div className="mb-6">
+                            <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
+                                {currentCopy.activeTasks}
+                            </p>
+                            <h2 className="text-2xl font-black text-white">
+                                {todayTasks.length} {currentCopy.activeTasks}
+                            </h2>
+                            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
+                                {currentCopy.activeTasksDescription}
+                            </p>
+                        </div>
 
-                            return (
-                                <div
-                                    key={`${task.projectId}-${task.id}`}
-                                    className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6"
+                        <div className="grid gap-4 lg:grid-cols-2">
+                            {todayTasks.map((item) => (
+                                <article
+                                    key={`${item.routeId}-${item.task.id}-${item.taskIndex}`}
+                                    className="rounded-[1.5rem] border border-slate-800 bg-slate-950/70 p-5"
                                 >
-                                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                                        <div>
-                                            <p className="mb-2 text-sm font-bold text-cyan-300">
-                                                {task.projectTitle}
+                                    <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                        <div className="min-w-0">
+                                            <p className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+                                                {currentCopy.project}
                                             </p>
-                                            <h2 className="text-2xl font-black text-white">
-                                                {task.title}
-                                            </h2>
-
-                                            <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-slate-400">
-                        <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1">
-                          Due: {dueDate || "Not set"}
-                        </span>
-
-                                                <span
-                                                    className={`rounded-full border px-3 py-1 ${getDaysLeftClasses(
-                                                        dueDate,
-                                                    )}`}
-                                                >
-                          {getDaysLeftLabel(dueDate)}
-                        </span>
-
-                                                <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1">
-                          Time: {task.estimatedTime || "Not set"}
-                        </span>
-
-                                                <span
-                                                    className={`rounded-full border px-3 py-1 ${getPriorityClasses(
-                                                        task.priority,
-                                                    )}`}
-                                                >
-                          {task.priority || "Medium"}
-                        </span>
-                                            </div>
+                                            <h3 className="text-xl font-black text-white">
+                                                {item.task.title}
+                                            </h3>
+                                            <p className="mt-2 text-sm leading-6 text-slate-400">
+                                                {item.plan.project.title}
+                                            </p>
                                         </div>
 
-                                        <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
-                                            <button
-                                                type="button"
-                                                onClick={() => handleMarkDone(task.id)}
-                                                className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
-                                            >
-                                                Mark done
-                                            </button>
+                                        <span
+                                            className={`w-fit rounded-full border px-3 py-1 text-xs font-black ${getDueTone(
+                                                item.daysLeft,
+                                            )}`}
+                                        >
+                      {getDueText(item.daysLeft, language)}
+                    </span>
+                                    </div>
 
-                                            <a
-                                                href={`/projects/${task.projectId}`}
-                                                className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                                    {item.task.description ? (
+                                        <p className="mb-4 text-sm leading-6 text-slate-300">
+                                            {item.task.description}
+                                        </p>
+                                    ) : null}
+
+                                    <div className="grid gap-3 sm:grid-cols-3">
+                                        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                                            <p className="text-xs font-bold text-slate-500">
+                                                {currentCopy.dueDate}
+                                            </p>
+                                            <p className="mt-2 text-sm font-black text-white">
+                                                {formatDate(item.task.dueDate, language)}
+                                            </p>
+                                        </div>
+
+                                        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                                            <p className="text-xs font-bold text-slate-500">
+                                                {currentCopy.estimatedTime}
+                                            </p>
+                                            <p className="mt-2 text-sm font-black text-white">
+                                                {item.task.estimatedTime || currentCopy.noEstimate}
+                                            </p>
+                                        </div>
+
+                                        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                                            <p className="text-xs font-bold text-slate-500">
+                                                {currentCopy.priority}
+                                            </p>
+                                            <p
+                                                className={`mt-2 w-fit rounded-full border px-3 py-1 text-xs font-black ${getPriorityTone(
+                                                    item.task.priority,
+                                                )}`}
                                             >
-                                                Open project
-                                            </a>
+                                                {item.task.priority}
+                                            </p>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+
+                                    <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleMarkDone(item)}
+                                            className="rounded-2xl bg-emerald-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
+                                        >
+                                            {currentCopy.markDone}
+                                        </button>
+
+                                        <a
+                                            href={`/projects/${item.routeId}`}
+                                            className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                                        >
+                                            {currentCopy.openProject}
+                                        </a>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
                     </section>
                 )}
-            </section>
+
+                <div className="mt-8">
+                    <FeedbackPanel />
+                </div>
+            </div>
         </main>
     );
 }

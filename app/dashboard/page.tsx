@@ -3,330 +3,514 @@
 import { useEffect, useMemo, useState } from "react";
 import AppNav from "@/components/AppNav";
 import EmptyState from "@/components/EmptyState";
-import { loadProjectPlans } from "@/lib/localStorage";
+import FeedbackPanel from "@/components/FeedbackPanel";
+import {
+    getProjectRouteId,
+    listenForProjectPlanUpdates,
+    loadProjectPlans,
+    type CourseworkTask,
+    type GeneratedProjectPlan,
+} from "@/lib/localStorage";
+import {
+    getStoredLanguage,
+    listenForLanguageChange,
+    type Language,
+} from "@/lib/i18n";
 
-type TaskStatus = "Todo" | "Done";
+const copy = {
+    en: {
+        eyebrow: "Dashboard",
+        title: "Your coursework command centre.",
+        subtitle:
+            "Track saved coursework projects, progress, active tasks, and deadline pressure from one clear workspace.",
+        loading: "Loading dashboard...",
+        savedProjects: "Saved projects",
+        averageProgress: "Average progress",
+        activeTasks: "Active tasks",
+        urgentTasks: "Urgent tasks",
+        projectOverview: "Project overview",
+        projectOverviewDescription:
+            "Open a saved project to edit tasks, check progress, and keep your coursework moving.",
+        openProject: "Open project",
+        viewToday: "View Today",
+        progress: "Progress",
+        deadline: "Deadline",
+        tasks: "Tasks",
+        active: "Active",
+        complete: "Complete",
+        noDeadline: "No deadline",
+        courseworkProject: "Coursework project",
+        dueToday: "Due today",
+        overdue: "overdue",
+        dayLeft: "day left",
+        daysLeft: "days left",
+        localBrowserStorage: "Local browser storage",
+        emptyEyebrow: "Dashboard is empty",
+        emptyTitle: "No coursework projects yet.",
+        emptyDescription:
+            "Your dashboard will become useful once you create your first coursework project. Start with a template, choose a deadline, and Coursework Compass will turn the project into a task plan.",
+        createFirstProject: "Create first project",
+        tryGuidedTutorial: "Try guided tutorial",
+        tips: [
+            "Best starting point: create one sample project first.",
+            "Your project data is stored locally in this browser during the beta.",
+            "Dashboard will show progress, risk, and active projects after you save a plan.",
+            "Student testers can use the tutorial before creating real project data.",
+        ],
+    },
+    zh: {
+        eyebrow: "仪表盘",
+        title: "你的 coursework 指挥中心。",
+        subtitle:
+            "在一个清晰的工作区里查看已保存项目、进度、活跃任务和截止日期压力。",
+        loading: "正在加载仪表盘...",
+        savedProjects: "已保存项目",
+        averageProgress: "平均进度",
+        activeTasks: "活跃任务",
+        urgentTasks: "紧急任务",
+        projectOverview: "项目总览",
+        projectOverviewDescription:
+            "打开已保存项目，编辑任务、查看进度，并继续推进 coursework。",
+        openProject: "打开项目",
+        viewToday: "查看今日任务",
+        progress: "进度",
+        deadline: "截止日期",
+        tasks: "任务",
+        active: "活跃",
+        complete: "完成",
+        noDeadline: "未设置截止日期",
+        courseworkProject: "Coursework 项目",
+        dueToday: "今天截止",
+        overdue: "已逾期",
+        dayLeft: "天剩余",
+        daysLeft: "天剩余",
+        localBrowserStorage: "浏览器本地存储",
+        emptyEyebrow: "仪表盘还是空的",
+        emptyTitle: "还没有 coursework 项目。",
+        emptyDescription:
+            "创建第一个 coursework 项目后，你的仪表盘才会开始发挥作用。你可以先选择模板、设置截止日期，然后让 Coursework Compass 把项目拆成清晰的任务计划。",
+        createFirstProject: "创建第一个项目",
+        tryGuidedTutorial: "尝试引导测试",
+        tips: [
+            "建议先创建一个示例项目作为起点。",
+            "测试版期间，你的项目数据只会保存在当前浏览器中。",
+            "保存计划后，仪表盘会显示进度、风险和活跃项目。",
+            "学生测试者可以先完成引导测试，再创建真实项目数据。",
+        ],
+    },
+} as const;
 
-type CourseworkTask = {
-    id: string;
-    title: string;
-    status: TaskStatus;
-    priority?: string;
-    dueDate?: string;
-    estimatedTime?: string;
-};
+function isDone(task: CourseworkTask) {
+    return String(task.status).toLowerCase() === "done";
+}
 
-type GeneratedProjectPlan = {
-    id?: string;
-    slug?: string;
-    projectId?: string;
-    project: {
-        id?: string;
-        slug?: string;
-        projectId?: string;
-        title: string;
-        deadline: string;
-        status?: string;
-        type?: string;
-    };
-    tasks: CourseworkTask[];
-    archivedTasks?: CourseworkTask[];
-    archivedTaskCount?: number;
-};
+function getVisibleTasks(plan: GeneratedProjectPlan) {
+    return plan.tasks.filter((task) => !task.archived);
+}
 
-function calculateProgress(tasks: CourseworkTask[]) {
-    if (tasks.length === 0) {
+function getActiveTasks(plan: GeneratedProjectPlan) {
+    return getVisibleTasks(plan).filter((task) => !isDone(task));
+}
+
+function getCompletedTasks(plan: GeneratedProjectPlan) {
+    return getVisibleTasks(plan).filter((task) => isDone(task));
+}
+
+function getProjectProgress(plan: GeneratedProjectPlan) {
+    const visibleTasks = getVisibleTasks(plan);
+
+    if (visibleTasks.length === 0) {
         return 0;
     }
 
-    const doneCount = tasks.filter((task) => task.status === "Done").length;
-    return Math.round((doneCount / tasks.length) * 100);
+    return Math.round((getCompletedTasks(plan).length / visibleTasks.length) * 100);
 }
 
-function getRiskLabel(deadline: string) {
-    const deadlineDate = new Date(deadline);
-    const today = new Date();
-
-    if (Number.isNaN(deadlineDate.getTime())) {
-        return "Unknown";
+function getDaysLeft(dateValue?: string) {
+    if (!dateValue) {
+        return null;
     }
 
-    const diffMs = deadlineDate.getTime() - today.getTime();
-    const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    const target = new Date(dateValue);
+
+    if (Number.isNaN(target.getTime())) {
+        return null;
+    }
+
+    const now = new Date();
+
+    const todayUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const targetUtc = Date.UTC(
+        target.getFullYear(),
+        target.getMonth(),
+        target.getDate(),
+    );
+
+    return Math.ceil((targetUtc - todayUtc) / 86_400_000);
+}
+
+function formatDate(dateValue: string | undefined, language: Language) {
+    if (!dateValue) {
+        return copy[language].noDeadline;
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+        return copy[language].noDeadline;
+    }
+
+    return new Intl.DateTimeFormat(language === "zh" ? "zh-CN" : "en-GB", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    }).format(date);
+}
+
+function getDeadlineText(daysLeft: number | null, language: Language) {
+    const currentCopy = copy[language];
+
+    if (daysLeft === null) {
+        return currentCopy.noDeadline;
+    }
 
     if (daysLeft < 0) {
-        return "Overdue";
+        const overdueDays = Math.abs(daysLeft);
+
+        return language === "zh"
+            ? `${currentCopy.overdue} ${overdueDays} 天`
+            : `${overdueDays} ${currentCopy.overdue}`;
     }
 
-    if (daysLeft <= 7) {
-        return "High";
+    if (daysLeft === 0) {
+        return currentCopy.dueToday;
     }
 
-    if (daysLeft <= 21) {
-        return "Medium";
-    }
-
-    return "Low";
+    return language === "zh"
+        ? `${daysLeft} ${currentCopy.daysLeft}`
+        : `${daysLeft} ${
+            daysLeft === 1 ? currentCopy.dayLeft : currentCopy.daysLeft
+        }`;
 }
 
-function getRiskClasses(risk: string) {
-    if (risk === "Overdue" || risk === "High") {
+function getDeadlineTone(daysLeft: number | null) {
+    if (daysLeft === null) {
+        return "border-slate-700 bg-slate-900 text-slate-300";
+    }
+
+    if (daysLeft < 0) {
         return "border-red-400/30 bg-red-400/10 text-red-300";
     }
 
-    if (risk === "Medium") {
+    if (daysLeft <= 3) {
         return "border-amber-400/30 bg-amber-400/10 text-amber-300";
     }
 
-    if (risk === "Low") {
-        return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
-    }
-
-    return "border-slate-700 bg-slate-900 text-slate-300";
+    return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
 }
 
-function formatDeadline(deadline: string) {
-    if (!deadline) {
-        return "No deadline";
-    }
-
-    return deadline;
-}
-
-function slugifyTitle(title: string) {
-    return title
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-}
-
-function getProjectRouteId(plan: GeneratedProjectPlan, index: number) {
+function getProjectType(plan: GeneratedProjectPlan, language: Language) {
     return (
-        plan.id ||
-        plan.slug ||
-        plan.projectId ||
-        plan.project.id ||
-        plan.project.slug ||
-        plan.project.projectId ||
-        slugifyTitle(plan.project.title) ||
-        `project-${index}`
+        plan.project.type ||
+        plan.project.courseworkType ||
+        plan.project.subject ||
+        copy[language].courseworkProject
     );
 }
 
 export default function DashboardPage() {
-    const [projectPlans, setProjectPlans] = useState<GeneratedProjectPlan[]>([]);
+    const [language, setLanguage] = useState<Language>("en");
+    const [hasMounted, setHasMounted] = useState(false);
+    const [plans, setPlans] = useState<GeneratedProjectPlan[]>([]);
+
+    const currentCopy = copy[language];
+
+    function refreshPlans() {
+        setPlans(loadProjectPlans());
+    }
 
     useEffect(() => {
-        setProjectPlans(loadProjectPlans() as GeneratedProjectPlan[]);
+        setLanguage(getStoredLanguage());
+        refreshPlans();
+        setHasMounted(true);
+
+        const unsubscribeLanguage = listenForLanguageChange((nextLanguage) => {
+            setLanguage(nextLanguage);
+        });
+
+        const unsubscribePlans = listenForProjectPlanUpdates(() => {
+            refreshPlans();
+        });
+
+        return () => {
+            unsubscribeLanguage();
+            unsubscribePlans();
+        };
     }, []);
 
-    const dashboardStats = useMemo(() => {
-        const totalProjects = projectPlans.length;
-        const totalTasks = projectPlans.reduce(
-            (total, plan) => total + plan.tasks.length,
-            0,
-        );
-        const doneTasks = projectPlans.reduce(
-            (total, plan) =>
-                total + plan.tasks.filter((task) => task.status === "Done").length,
-            0,
-        );
+    const stats = useMemo(() => {
+        const projectCount = plans.length;
+
+        const progressValues = plans.map((plan) => getProjectProgress(plan));
 
         const averageProgress =
-            totalProjects === 0
+            progressValues.length === 0
                 ? 0
                 : Math.round(
-                    projectPlans.reduce(
-                        (total, plan) => total + calculateProgress(plan.tasks),
-                        0,
-                    ) / totalProjects,
+                    progressValues.reduce((total, value) => total + value, 0) /
+                    progressValues.length,
                 );
 
+        const activeTaskCount = plans.reduce(
+            (total, plan) => total + getActiveTasks(plan).length,
+            0,
+        );
+
+        const urgentTaskCount = plans.reduce((total, plan) => {
+            const urgentTasks = getActiveTasks(plan).filter((task) => {
+                const daysLeft = getDaysLeft(task.dueDate);
+
+                return daysLeft !== null && daysLeft <= 3;
+            });
+
+            return total + urgentTasks.length;
+        }, 0);
+
         return {
-            totalProjects,
-            totalTasks,
-            doneTasks,
+            projectCount,
             averageProgress,
+            activeTaskCount,
+            urgentTaskCount,
         };
-    }, [projectPlans]);
+    }, [plans]);
 
     return (
-        <main className="min-h-screen bg-slate-950 text-white">
-            <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        <main className="min-h-screen bg-slate-950 px-4 py-6 text-white sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl">
                 <AppNav />
 
-                <div className="mb-10">
-                    <p className="mb-2 text-sm font-bold text-cyan-300">Dashboard</p>
-                    <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
-                        Your coursework command centre.
-                    </h1>
-                    <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
-                        Track all saved coursework projects, progress, active tasks, and
-                        deadline pressure from one place.
+                <header className="mb-8 rounded-[2rem] border border-slate-800 bg-slate-900/70 p-6 shadow-2xl shadow-cyan-950/20 sm:p-8">
+                    <p className="mb-3 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
+                        {currentCopy.eyebrow}
                     </p>
-                </div>
 
-                {projectPlans.length === 0 ? (
+                    <h1 className="max-w-5xl text-4xl font-black tracking-tight text-white sm:text-6xl">
+                        {currentCopy.title}
+                    </h1>
+
+                    <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:text-lg">
+                        {currentCopy.subtitle}
+                    </p>
+                </header>
+
+                {!hasMounted ? (
+                    <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-6">
+                        <p className="text-sm font-bold text-slate-400">
+                            {currentCopy.loading}
+                        </p>
+                    </section>
+                ) : plans.length === 0 ? (
                     <EmptyState
-                        eyebrow="Dashboard is empty"
-                        title="No coursework projects yet."
-                        description="Your dashboard will become useful once you create your first coursework project. Start with a template, choose a deadline, and Coursework Compass will turn the project into a task plan."
+                        eyebrow={currentCopy.emptyEyebrow}
+                        title={currentCopy.emptyTitle}
+                        description={currentCopy.emptyDescription}
                         icon="🧭"
                         actions={[
                             {
-                                label: "Create first project",
+                                label: currentCopy.createFirstProject,
                                 href: "/projects/new",
                             },
                             {
-                                label: "Try guided tutorial",
+                                label: currentCopy.tryGuidedTutorial,
                                 href: "/test",
                                 variant: "secondary",
                             },
                         ]}
-                        tips={[
-                            "Best starting point: create one sample project first.",
-                            "Your project data is stored locally in this browser during the beta.",
-                            "Dashboard will show progress, risk, and active projects after you save a plan.",
-                            "Student testers can use the tutorial before creating real project data.",
-                        ]}
+                        tips={[...currentCopy.tips]}
                     />
                 ) : (
-                    <>
-                        <section className="grid gap-4 md:grid-cols-4">
-                            <div className="rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5">
-                                <p className="text-sm font-bold text-cyan-300">Projects</p>
-                                <p className="mt-3 text-4xl font-black">
-                                    {dashboardStats.totalProjects}
+                    <div className="space-y-6">
+                        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                            <article className="rounded-[1.5rem] border border-slate-800 bg-slate-900 p-5 shadow-xl shadow-slate-950/30">
+                                <p className="text-sm font-bold text-slate-400">
+                                    {currentCopy.savedProjects}
                                 </p>
-                            </div>
+                                <p className="mt-3 text-4xl font-black text-white">
+                                    {stats.projectCount}
+                                </p>
+                            </article>
 
-                            <div className="rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5">
-                                <p className="text-sm font-bold text-emerald-300">
-                                    Tasks done
+                            <article className="rounded-[1.5rem] border border-slate-800 bg-slate-900 p-5 shadow-xl shadow-slate-950/30">
+                                <p className="text-sm font-bold text-slate-400">
+                                    {currentCopy.averageProgress}
                                 </p>
-                                <p className="mt-3 text-4xl font-black">
-                                    {dashboardStats.doneTasks}
+                                <p className="mt-3 text-4xl font-black text-cyan-300">
+                                    {stats.averageProgress}%
                                 </p>
-                            </div>
+                            </article>
 
-                            <div className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5">
-                                <p className="text-sm font-bold text-slate-300">
-                                    Total tasks
+                            <article className="rounded-[1.5rem] border border-slate-800 bg-slate-900 p-5 shadow-xl shadow-slate-950/30">
+                                <p className="text-sm font-bold text-slate-400">
+                                    {currentCopy.activeTasks}
                                 </p>
-                                <p className="mt-3 text-4xl font-black">
-                                    {dashboardStats.totalTasks}
+                                <p className="mt-3 text-4xl font-black text-emerald-300">
+                                    {stats.activeTaskCount}
                                 </p>
-                            </div>
+                            </article>
 
-                            <div className="rounded-[2rem] border border-fuchsia-400/30 bg-fuchsia-400/10 p-5">
-                                <p className="text-sm font-bold text-fuchsia-300">
-                                    Avg progress
+                            <article className="rounded-[1.5rem] border border-slate-800 bg-slate-900 p-5 shadow-xl shadow-slate-950/30">
+                                <p className="text-sm font-bold text-slate-400">
+                                    {currentCopy.urgentTasks}
                                 </p>
-                                <p className="mt-3 text-4xl font-black">
-                                    {dashboardStats.averageProgress}%
+                                <p className="mt-3 text-4xl font-black text-amber-300">
+                                    {stats.urgentTaskCount}
                                 </p>
-                            </div>
+                            </article>
                         </section>
 
-                        <section className="mt-10">
-                            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                        <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 shadow-2xl shadow-cyan-950/20 sm:p-6">
+                            <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                 <div>
-                                    <p className="mb-2 text-sm font-bold text-cyan-300">
-                                        Active overview
+                                    <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
+                                        {currentCopy.projectOverview}
                                     </p>
-                                    <h2 className="text-3xl font-black tracking-tight">
-                                        Current projects.
+
+                                    <h2 className="text-2xl font-black text-white">
+                                        {currentCopy.projectOverview}
                                     </h2>
+
+                                    <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
+                                        {currentCopy.projectOverviewDescription}
+                                    </p>
                                 </div>
 
-                                <a
-                                    href="/projects/new"
-                                    className="w-fit rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
-                                >
-                                    New project
-                                </a>
+                                <span className="w-fit rounded-full border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-amber-300">
+                  {currentCopy.localBrowserStorage}
+                </span>
                             </div>
 
-                            <div className="grid gap-5 md:grid-cols-2">
-                                {projectPlans.map((plan, index) => {
-                                    const projectRouteId = getProjectRouteId(plan, index);
-                                    const progress = calculateProgress(plan.tasks);
-                                    const risk = getRiskLabel(plan.project.deadline);
-                                    const todoCount = plan.tasks.filter(
-                                        (task) => task.status !== "Done",
-                                    ).length;
-                                    const doneCount = plan.tasks.filter(
-                                        (task) => task.status === "Done",
-                                    ).length;
+                            <div className="grid gap-4 lg:grid-cols-2">
+                                {plans.map((plan, index) => {
+                                    const routeId = getProjectRouteId(plan, index);
+                                    const visibleTasks = getVisibleTasks(plan);
+                                    const activeTasks = getActiveTasks(plan);
+                                    const completedTasks = getCompletedTasks(plan);
+                                    const progress = getProjectProgress(plan);
+                                    const daysLeft = getDaysLeft(plan.project.deadline);
 
                                     return (
-                                        <a
-                                            key={projectRouteId}
-                                            href={`/projects/${projectRouteId}`}
-                                            className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 transition hover:border-cyan-400/60 hover:bg-slate-900/80 sm:p-6"
+                                        <article
+                                            key={`${routeId}-${index}`}
+                                            className="rounded-[1.5rem] border border-slate-800 bg-slate-950/70 p-5 shadow-xl shadow-slate-950/30"
                                         >
-                                            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                                                <div>
-                                                    <h3 className="text-2xl font-black text-white">
+                                            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                                <div className="min-w-0">
+                                                    <h3 className="truncate text-xl font-black text-white">
                                                         {plan.project.title}
                                                     </h3>
-                                                    <p className="mt-2 text-sm text-slate-400">
-                                                        Deadline: {formatDeadline(plan.project.deadline)}
+
+                                                    <p className="mt-2 text-sm leading-6 text-slate-400">
+                                                        {getProjectType(plan, language)}
                                                     </p>
                                                 </div>
 
                                                 <span
-                                                    className={`w-fit rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.16em] ${getRiskClasses(
-                                                        risk,
+                                                    className={`w-fit rounded-full border px-3 py-1 text-xs font-black ${getDeadlineTone(
+                                                        daysLeft,
                                                     )}`}
                                                 >
-                          {risk}
+                          {getDeadlineText(daysLeft, language)}
                         </span>
                                             </div>
 
-                                            <div className="h-3 overflow-hidden rounded-full bg-slate-800">
-                                                <div
-                                                    className="h-full rounded-full bg-cyan-400 transition-all"
-                                                    style={{ width: `${progress}%` }}
-                                                />
+                                            <div className="mt-5">
+                                                <div className="mb-2 flex items-center justify-between gap-3">
+                                                    <p className="text-sm font-bold text-slate-400">
+                                                        {currentCopy.progress}
+                                                    </p>
+
+                                                    <p className="text-sm font-black text-cyan-300">
+                                                        {progress}%
+                                                    </p>
+                                                </div>
+
+                                                <div className="h-3 overflow-hidden rounded-full bg-slate-800">
+                                                    <div
+                                                        className="h-full rounded-full bg-cyan-400"
+                                                        style={{
+                                                            width: `${progress}%`,
+                                                        }}
+                                                    />
+                                                </div>
                                             </div>
 
-                                            <div className="mt-4 grid gap-3 text-sm text-slate-400 sm:grid-cols-3">
-                                                <p>
-                          <span className="font-bold text-slate-200">
-                            {progress}%
-                          </span>{" "}
-                                                    complete
-                                                </p>
-                                                <p>
-                          <span className="font-bold text-slate-200">
-                            {todoCount}
-                          </span>{" "}
-                                                    todo
-                                                </p>
-                                                <p>
-                          <span className="font-bold text-slate-200">
-                            {doneCount}
-                          </span>{" "}
-                                                    done
-                                                </p>
+                                            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                                                <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                                                    <p className="text-xs font-bold text-slate-500">
+                                                        {currentCopy.deadline}
+                                                    </p>
+                                                    <p className="mt-2 text-sm font-black text-white">
+                                                        {formatDate(plan.project.deadline, language)}
+                                                    </p>
+                                                </div>
+
+                                                <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                                                    <p className="text-xs font-bold text-slate-500">
+                                                        {currentCopy.tasks}
+                                                    </p>
+                                                    <p className="mt-2 text-sm font-black text-white">
+                                                        {visibleTasks.length}
+                                                    </p>
+                                                </div>
+
+                                                <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                                                    <p className="text-xs font-bold text-slate-500">
+                                                        {currentCopy.complete}
+                                                    </p>
+                                                    <p className="mt-2 text-sm font-black text-white">
+                                                        {completedTasks.length}
+                                                    </p>
+                                                </div>
                                             </div>
 
-                                            {plan.archivedTaskCount ? (
-                                                <p className="mt-3 text-xs font-bold text-emerald-300">
-                                                    {plan.archivedTaskCount} archived task
-                                                    {plan.archivedTaskCount === 1 ? "" : "s"}
-                                                </p>
-                                            ) : null}
-                                        </a>
+                                            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                                                <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                                                    <p className="text-xs font-bold text-slate-500">
+                                                        {currentCopy.active}
+                                                    </p>
+                                                    <p className="mt-2 text-sm font-black text-white">
+                                                        {activeTasks.length}
+                                                    </p>
+                                                </div>
+
+                                                <a
+                                                    href={`/projects/${routeId}`}
+                                                    className="rounded-2xl bg-cyan-400 px-5 py-4 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                                                >
+                                                    {currentCopy.openProject}
+                                                </a>
+                                            </div>
+                                        </article>
                                     );
                                 })}
                             </div>
+
+                            <div className="mt-6">
+                                <a
+                                    href="/today"
+                                    className="inline-flex rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                                >
+                                    {currentCopy.viewToday}
+                                </a>
+                            </div>
                         </section>
-                    </>
+                    </div>
                 )}
-            </section>
+
+                <div className="mt-8">
+                    <FeedbackPanel />
+                </div>
+            </div>
         </main>
     );
 }

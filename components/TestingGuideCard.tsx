@@ -112,65 +112,78 @@ export default function TestingGuideCard() {
     const currentCopy = copy[language];
 
     return (
-        <section className="rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 shadow-2xl shadow-emerald-950/20 sm:p-6">
-            <div className="mb-6">
-                <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-emerald-300">
-                    {currentCopy.eyebrow}
-                </p>
-                <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
-                    {currentCopy.title}
-                </h2>
-                <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
-                    {currentCopy.description}
-                </p>
-            </div>
+        <section className="relative overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950 p-5 text-white shadow-2xl shadow-cyan-950/30 sm:p-6 lg:p-8">
+            <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-28 -left-28 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
 
-            <div className="grid gap-4 lg:grid-cols-2">
-                {currentCopy.sections.map((section) => (
-                    <article
-                        key={section.title}
-                        className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4 sm:p-5"
-                    >
-                        <h3 className="mb-4 text-lg font-black text-white">
-                            {section.title}
-                        </h3>
+            <div className="relative z-10">
+                <div className="mb-7">
+                    <div className="mb-4 inline-flex rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
+                        {currentCopy.eyebrow}
+                    </div>
 
-                        <ol className="space-y-3">
-                            {section.items.map((item, index) => (
-                                <li key={item} className="flex gap-3">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-xs font-black text-emerald-300">
-                    {index + 1}
-                  </span>
-                                    <p className="text-sm leading-6 text-slate-300">{item}</p>
-                                </li>
-                            ))}
-                        </ol>
-                    </article>
-                ))}
-            </div>
+                    <h2 className="max-w-4xl text-3xl font-black tracking-tight text-white sm:text-4xl">
+                        {currentCopy.title}
+                    </h2>
 
-            <div className="mt-5 rounded-3xl border border-slate-800 bg-slate-950/70 p-4 sm:p-5">
-                <h3 className="mb-4 text-lg font-black text-white">
-                    {currentCopy.sampleTitle}
-                </h3>
+                    <p className="mt-4 max-w-5xl text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
+                        {currentCopy.description}
+                    </p>
+                </div>
 
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {currentCopy.samples.map((sample) => (
-                        <div
-                            key={sample}
-                            className="rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3 text-sm font-bold text-slate-300"
+                <div className="grid gap-4 lg:grid-cols-2">
+                    {currentCopy.sections.map((section) => (
+                        <article
+                            key={section.title}
+                            className="rounded-[1.75rem] border border-slate-800 bg-slate-900/90 p-5 shadow-xl shadow-slate-950/30"
                         >
-                            {sample}
-                        </div>
+                            <h3 className="mb-5 text-xl font-black text-white">
+                                {section.title}
+                            </h3>
+
+                            <ol className="space-y-4">
+                                {section.items.map((item, index) => (
+                                    <li key={item} className="flex gap-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-xs font-black text-emerald-300">
+                      {index + 1}
+                    </span>
+
+                                        <p className="pt-1 text-sm leading-6 text-slate-300">
+                                            {item}
+                                        </p>
+                                    </li>
+                                ))}
+                            </ol>
+                        </article>
                     ))}
                 </div>
-            </div>
 
-            <div className="mt-5 rounded-3xl border border-amber-400/30 bg-amber-400/10 p-4">
-                <p className="mb-2 text-sm font-bold text-amber-300">
-                    {currentCopy.noteTitle}
-                </p>
-                <p className="text-sm leading-6 text-slate-300">{currentCopy.note}</p>
+                <div className="mt-5 rounded-[1.75rem] border border-slate-800 bg-slate-900/90 p-5 shadow-xl shadow-slate-950/30">
+                    <h3 className="mb-5 text-xl font-black text-white">
+                        {currentCopy.sampleTitle}
+                    </h3>
+
+                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                        {currentCopy.samples.map((sample) => (
+                            <div
+                                key={sample}
+                                className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm font-bold leading-6 text-slate-200"
+                            >
+                                {sample}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="mt-5 rounded-[1.75rem] border border-amber-400/30 bg-amber-400/10 p-5">
+                    <p className="mb-2 text-sm font-black text-amber-300">
+                        {currentCopy.noteTitle}
+                    </p>
+
+                    <p className="text-sm leading-6 text-slate-300">
+                        {currentCopy.note}
+                    </p>
+                </div>
             </div>
         </section>
     );
