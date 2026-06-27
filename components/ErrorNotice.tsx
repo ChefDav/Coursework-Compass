@@ -1,14 +1,52 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+    createTranslator,
+    getStoredLanguage,
+    listenForLanguageChange,
+    type Language,
+    type TranslationKey,
+} from "@/lib/i18n";
+
 type ErrorNoticeProps = {
     title?: string;
-    message: string;
+    message?: string;
+    titleKey?: TranslationKey;
+    messageKey?: TranslationKey;
     tone?: "error" | "warning";
 };
 
 export default function ErrorNotice({
-                                        title = "Something needs attention",
+                                        title,
                                         message,
+                                        titleKey,
+                                        messageKey,
                                         tone = "error",
                                     }: ErrorNoticeProps) {
+    const [language, setLanguage] = useState<Language>("en");
+
+    useEffect(() => {
+        setLanguage(getStoredLanguage());
+
+        const unsubscribe = listenForLanguageChange((nextLanguage) => {
+            setLanguage(nextLanguage);
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+
+    const t = createTranslator(language);
+
+    const displayTitle =
+        titleKey ? t(titleKey) : title || t("somethingNeedsAttention");
+
+    const displayMessage = messageKey
+        ? t(messageKey)
+        : message || t("somethingNeedsAttention");
+
     const toneClasses =
         tone === "warning"
             ? "border-amber-400/30 bg-amber-400/10 text-amber-200"
@@ -29,8 +67,10 @@ export default function ErrorNotice({
                 </div>
 
                 <div className="min-w-0">
-                    <p className="text-sm font-black">{title}</p>
-                    <p className="mt-1 text-sm leading-6 text-slate-300">{message}</p>
+                    <p className="text-sm font-black">{displayTitle}</p>
+                    <p className="mt-1 text-sm leading-6 text-slate-300">
+                        {displayMessage}
+                    </p>
                 </div>
             </div>
         </div>

@@ -88,90 +88,96 @@ export default function AppNav() {
 
     return (
         <header className="mb-6 rounded-[1.5rem] border border-slate-800 bg-slate-900/85 p-3 shadow-2xl shadow-cyan-950/20 backdrop-blur-md sm:mb-8 sm:rounded-[2rem] sm:p-5">
-            <div className="flex items-start justify-between gap-3 lg:items-center">
-                <a href="/" className="group min-w-0">
-                    <p className="truncate text-lg font-black tracking-tight text-white transition group-hover:text-cyan-300 sm:text-xl">
-                        {t("appName")}
-                    </p>
-                    <p className="mt-1 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-slate-500 transition group-hover:text-cyan-400 sm:text-xs sm:tracking-[0.2em]">
-                        {t("versionLabel")}
-                    </p>
-                </a>
+            <div className="grid gap-5 xl:grid-cols-[minmax(15rem,22rem)_1fr] xl:items-start">
+                <div className="flex items-start justify-between gap-3 xl:block">
+                    <a href="/" className="group min-w-0">
+                        <p className="max-w-[18rem] truncate text-lg font-black tracking-tight text-white transition group-hover:text-cyan-300 sm:max-w-none sm:text-xl xl:whitespace-normal">
+                            {t("appName")}
+                        </p>
+                        <p className="mt-1 max-w-[12rem] text-[0.65rem] font-black uppercase tracking-[0.18em] text-slate-500 transition group-hover:text-cyan-400 sm:max-w-none sm:text-xs sm:tracking-[0.2em] xl:leading-5">
+                            {t("versionLabel")}
+                        </p>
+                    </a>
 
-                <details className="relative lg:hidden">
-                    <summary className="list-none rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm font-black text-cyan-300">
-                        {t("mainMenu")}
-                    </summary>
+                    <details className="relative xl:hidden">
+                        <summary className="list-none rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm font-black text-cyan-300">
+                            {t("mainMenu")}
+                        </summary>
 
-                    <div className="absolute right-0 z-40 mt-3 w-[min(20rem,calc(100vw-2rem))] rounded-[1.5rem] border border-slate-800 bg-slate-950 p-3 shadow-2xl shadow-cyan-950/40">
-                        <nav className="grid gap-2">
-                            {navItems.map((item) => {
-                                const isActive = isActivePath(pathname, item.href);
+                        <div className="absolute right-0 z-40 mt-3 w-[min(20rem,calc(100vw-2rem))] rounded-[1.5rem] border border-slate-800 bg-slate-950 p-3 shadow-2xl shadow-cyan-950/40">
+                            <nav className="grid gap-2">
+                                {navItems.map((item) => {
+                                    const isActive = isActivePath(pathname, item.href);
 
-                                return (
-                                    <a
-                                        key={item.href}
-                                        href={item.href}
-                                        className={`rounded-2xl px-4 py-3 text-sm font-bold transition ${
-                                            isActive
-                                                ? "bg-cyan-400 text-slate-950"
-                                                : item.href === "/"
-                                                    ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                                                    : "border border-slate-800 bg-slate-900 text-slate-300"
-                                        }`}
-                                    >
-                                        {t(item.labelKey)}
-                                    </a>
-                                );
-                            })}
+                                    return (
+                                        <a
+                                            key={item.href}
+                                            href={item.href}
+                                            className={`rounded-2xl px-4 py-3 text-sm font-bold transition ${
+                                                isActive
+                                                    ? "bg-cyan-400 text-slate-950"
+                                                    : item.href === "/"
+                                                        ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+                                                        : "border border-slate-800 bg-slate-900 text-slate-300"
+                                            }`}
+                                        >
+                                            {t(item.labelKey)}
+                                        </a>
+                                    );
+                                })}
 
-                            <LanguageSwitcher compact />
+                                <LanguageSwitcher compact />
 
-                            <button
-                                type="button"
-                                onClick={handleResetData}
-                                className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-left text-sm font-bold text-red-300 transition hover:bg-red-400/20"
-                            >
-                                {t("resetData")}
-                            </button>
-                        </nav>
+                                <button
+                                    type="button"
+                                    onClick={handleResetData}
+                                    className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-left text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                                >
+                                    {t("resetData")}
+                                </button>
+                            </nav>
+                        </div>
+                    </details>
+                </div>
+
+                <div className="hidden xl:grid xl:justify-items-end xl:gap-4">
+                    <nav className="flex flex-wrap justify-end gap-2">
+                        {navItems.map((item) => {
+                            const isActive = isActivePath(pathname, item.href);
+
+                            return (
+                                <a
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`whitespace-nowrap rounded-2xl px-4 py-3 text-sm font-bold transition 2xl:px-5 ${
+                                        isActive
+                                            ? "bg-cyan-400 text-slate-950"
+                                            : item.href === "/"
+                                                ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20"
+                                                : "border border-slate-800 bg-slate-950/70 text-slate-300 hover:border-cyan-400 hover:text-cyan-300"
+                                    }`}
+                                >
+                                    {t(item.labelKey)}
+                                </a>
+                            );
+                        })}
+                    </nav>
+
+                    <div className="flex flex-wrap items-center justify-end gap-3">
+                        <LanguageSwitcher />
+
+                        <button
+                            type="button"
+                            onClick={handleResetData}
+                            className="whitespace-nowrap rounded-2xl border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                        >
+                            {t("resetData")}
+                        </button>
                     </div>
-                </details>
-
-                <nav className="hidden flex-wrap items-center justify-end gap-2 lg:flex">
-                    {navItems.map((item) => {
-                        const isActive = isActivePath(pathname, item.href);
-
-                        return (
-                            <a
-                                key={item.href}
-                                href={item.href}
-                                className={`rounded-2xl px-4 py-3 text-sm font-bold transition ${
-                                    isActive
-                                        ? "bg-cyan-400 text-slate-950"
-                                        : item.href === "/"
-                                            ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20"
-                                            : "border border-slate-800 bg-slate-950/70 text-slate-300 hover:border-cyan-400 hover:text-cyan-300"
-                                }`}
-                            >
-                                {t(item.labelKey)}
-                            </a>
-                        );
-                    })}
-
-                    <LanguageSwitcher />
-
-                    <button
-                        type="button"
-                        onClick={handleResetData}
-                        className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
-                    >
-                        {t("resetData")}
-                    </button>
-                </nav>
+                </div>
             </div>
 
-            <details className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-3 sm:rounded-3xl sm:p-4 lg:hidden">
+            <details className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-3 sm:rounded-3xl sm:p-4 xl:hidden">
                 <summary className="list-none text-sm font-black text-amber-300">
                     {t("browserOnlyStorageTitle")}
                 </summary>
@@ -181,7 +187,7 @@ export default function AppNav() {
                 </p>
             </details>
 
-            <div className="mt-5 hidden rounded-3xl border border-amber-400/30 bg-amber-400/10 p-4 lg:block">
+            <div className="mt-5 hidden rounded-3xl border border-amber-400/30 bg-amber-400/10 p-4 xl:block">
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                     <div>
                         <p className="mb-1 text-sm font-black text-amber-300">
@@ -192,7 +198,7 @@ export default function AppNav() {
                         </p>
                     </div>
 
-                    <span className="w-fit rounded-full border border-amber-400/30 bg-slate-950/60 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-amber-300">
+                    <span className="w-fit whitespace-nowrap rounded-full border border-amber-400/30 bg-slate-950/60 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-amber-300">
             {t("localOnly")}
           </span>
                 </div>

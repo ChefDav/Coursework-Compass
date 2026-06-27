@@ -47,6 +47,31 @@ export const translations = {
         createNewProject: "Create new project",
         backToProjects: "Back to projects",
 
+        betaNoticeEyebrow: "Coursework Compass v1.3 Multilingual Foundation",
+        betaNoticeTitle: "A clearer bilingual testing version is now in progress.",
+        betaNoticeDescription:
+            "This version begins turning Coursework Compass into an English and Simplified Chinese coursework planner. The current foundation focuses on language switching, clearer global notices, and preparing the product for Chinese-speaking international school students.",
+        betaNoticeBadge: "v1.3",
+        betaCardOneNumber: "01",
+        betaCardOneTitle: "Plan coursework",
+        betaCardOneDescription:
+            "Choose a template, set a deadline, and generate a practical task plan for IA, EE, TOK, essays, EPQ, and more.",
+        betaCardTwoNumber: "02",
+        betaCardTwoTitle: "Edit your workflow",
+        betaCardTwoDescription:
+            "Add custom tasks, edit task title, due date, priority, estimated time, and delete tasks that do not fit your real project.",
+        betaCardThreeNumber: "03",
+        betaCardThreeTitle: "Test bilingually",
+        betaCardThreeDescription:
+            "Use the English interface or switch to Simplified Chinese as v1.3 gradually expands bilingual support across the product.",
+        importantDataNoteTitle: "Important data note",
+        importantDataNoteOne:
+            "Coursework Compass v1.3 still uses browser-only local storage. It does not use accounts or cloud sync yet.",
+        importantDataNoteTwo:
+            "This means your projects may disappear if you clear browser data, use another browser, use another device, or reset local data from the navigation bar.",
+        importantDataNoteThree:
+            "For testing, please use sample coursework information or non-sensitive project details. Cloud accounts and cross-device sync are planned for a later version.",
+
         browserOnlyStorageTitle: "Browser-only beta storage",
         browserOnlyStorageShort:
             "Your projects are saved in this browser only. They may not appear on another device, another browser, private browsing, or after clearing browser data. Avoid sensitive personal information during testing.",
@@ -140,6 +165,31 @@ export const translations = {
         createProject: "创建项目",
         createNewProject: "创建新项目",
         backToProjects: "返回项目列表",
+
+        betaNoticeEyebrow: "Coursework Compass v1.3 双语基础版",
+        betaNoticeTitle: "更清晰的双语测试版本正在开发中。",
+        betaNoticeDescription:
+            "这个版本开始把 Coursework Compass 升级为支持 English 和简体中文的 coursework 规划工具。当前重点是语言切换、全局提示双语化，并为中文国际学校学生的使用场景打基础。",
+        betaNoticeBadge: "v1.3",
+        betaCardOneNumber: "01",
+        betaCardOneTitle: "规划 coursework",
+        betaCardOneDescription:
+            "选择模板，设置截止日期，并为 IA、EE、TOK、论文、EPQ 等项目生成清晰的任务计划。",
+        betaCardTwoNumber: "02",
+        betaCardTwoTitle: "调整你的工作流",
+        betaCardTwoDescription:
+            "添加自定义任务，编辑任务标题、日期、优先级、预计用时，并删除不适合真实项目的任务。",
+        betaCardThreeNumber: "03",
+        betaCardThreeTitle: "双语测试体验",
+        betaCardThreeDescription:
+            "你可以使用英文界面，也可以切换到简体中文。v1.3 会逐步把更多页面升级为双语版本。",
+        importantDataNoteTitle: "重要数据说明",
+        importantDataNoteOne:
+            "Coursework Compass v1.3 仍然使用浏览器本地存储，目前还没有账号系统或云端同步。",
+        importantDataNoteTwo:
+            "这意味着如果你清除浏览器数据、更换浏览器、更换设备，或在导航栏中重置本地数据，之前保存的项目可能不会显示。",
+        importantDataNoteThree:
+            "测试时请使用示例 coursework 信息，或不包含敏感个人信息的项目内容。云端账号和跨设备同步会放在后续版本中规划。",
 
         browserOnlyStorageTitle: "浏览器本地测试存储",
         browserOnlyStorageShort:

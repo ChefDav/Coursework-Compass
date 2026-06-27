@@ -1,19 +1,42 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+    createTranslator,
+    getStoredLanguage,
+    listenForLanguageChange,
+    type Language,
+} from "@/lib/i18n";
+
 export default function BetaNotice() {
+    const [language, setLanguage] = useState<Language>("en");
+
+    useEffect(() => {
+        setLanguage(getStoredLanguage());
+
+        const unsubscribe = listenForLanguageChange((nextLanguage) => {
+            setLanguage(nextLanguage);
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+
+    const t = createTranslator(language);
+
     return (
         <section className="rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 shadow-2xl shadow-cyan-950/20 sm:p-6">
             <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                     <p className="mb-2 text-sm font-bold text-cyan-300">
-                        Coursework Compass v1.2 Student Testing Polish
+                        {t("betaNoticeEyebrow")}
                     </p>
                     <h2 className="text-2xl font-black sm:text-3xl">
-                        A clearer testing-ready version is now open.
+                        {t("betaNoticeTitle")}
                     </h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        This version focuses on making Coursework Compass easier for new
-                        students to understand, test, and use. You can create coursework
-                        projects, edit your plan, use the guided tutorial, and send short
-                        feedback after testing the workflow.
+                        {t("betaNoticeDescription")}
                     </p>
 
                     <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -21,78 +44,76 @@ export default function BetaNotice() {
                             href="/updates"
                             className="rounded-2xl bg-cyan-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
                         >
-                            View release notes
+                            {t("viewReleaseNotes")}
                         </a>
 
                         <a
                             href="/test"
                             className="rounded-2xl bg-emerald-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
                         >
-                            Join student test
+                            {t("joinStudentTest")}
                         </a>
 
                         <a
                             href="/projects/new"
                             className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-slate-400"
                         >
-                            Start planning
+                            {t("startPlanning")}
                         </a>
                     </div>
                 </div>
 
                 <span className="w-fit rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
-          v1.2
+          {t("betaNoticeBadge")}
         </span>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
                 <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
-                    <p className="mb-2 text-sm font-black text-cyan-300">01</p>
-                    <h3 className="mb-2 font-bold text-white">Plan coursework</h3>
+                    <p className="mb-2 text-sm font-black text-cyan-300">
+                        {t("betaCardOneNumber")}
+                    </p>
+                    <h3 className="mb-2 font-bold text-white">
+                        {t("betaCardOneTitle")}
+                    </h3>
                     <p className="text-sm leading-6 text-slate-400">
-                        Choose a template, set a deadline, and generate a practical task
-                        plan for IA, EE, TOK, essays, EPQ, and more.
+                        {t("betaCardOneDescription")}
                     </p>
                 </div>
 
                 <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
-                    <p className="mb-2 text-sm font-black text-cyan-300">02</p>
-                    <h3 className="mb-2 font-bold text-white">Edit your workflow</h3>
+                    <p className="mb-2 text-sm font-black text-cyan-300">
+                        {t("betaCardTwoNumber")}
+                    </p>
+                    <h3 className="mb-2 font-bold text-white">
+                        {t("betaCardTwoTitle")}
+                    </h3>
                     <p className="text-sm leading-6 text-slate-400">
-                        Add custom tasks, edit task title, due date, priority, estimated
-                        time, and delete tasks that do not fit your real project.
+                        {t("betaCardTwoDescription")}
                     </p>
                 </div>
 
                 <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
-                    <p className="mb-2 text-sm font-black text-cyan-300">03</p>
-                    <h3 className="mb-2 font-bold text-white">Test safely</h3>
+                    <p className="mb-2 text-sm font-black text-cyan-300">
+                        {t("betaCardThreeNumber")}
+                    </p>
+                    <h3 className="mb-2 font-bold text-white">
+                        {t("betaCardThreeTitle")}
+                    </h3>
                     <p className="text-sm leading-6 text-slate-400">
-                        The guided tutorial uses simulated data, so students can understand
-                        the workflow before creating a real project.
+                        {t("betaCardThreeDescription")}
                     </p>
                 </div>
             </div>
 
             <div className="mt-5 rounded-3xl border border-amber-400/30 bg-amber-400/10 p-4">
                 <p className="mb-2 text-sm font-bold text-amber-300">
-                    Important data note
+                    {t("importantDataNoteTitle")}
                 </p>
                 <div className="space-y-2 text-sm leading-6 text-slate-300">
-                    <p>
-                        Coursework Compass v1.2 does not use accounts or cloud sync yet.
-                        Your projects are saved only in this browser&apos;s local storage.
-                    </p>
-                    <p>
-                        This means your projects may disappear if you clear browser data,
-                        use another browser, use another device, or reset local data from
-                        the navigation bar.
-                    </p>
-                    <p>
-                        For testing, please use sample coursework information or non-sensitive
-                        project details. Cloud accounts and cross-device sync are planned
-                        for a later version.
-                    </p>
+                    <p>{t("importantDataNoteOne")}</p>
+                    <p>{t("importantDataNoteTwo")}</p>
+                    <p>{t("importantDataNoteThree")}</p>
                 </div>
             </div>
         </section>
