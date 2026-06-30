@@ -53,7 +53,7 @@ export const translations = {
         betaNoticeTitle: "A clearer bilingual testing version is now in progress.",
         betaNoticeDescription:
             "This version begins turning Coursework Compass into an English and Simplified Chinese coursework planner. The current foundation focuses on language switching, clearer global notices, and preparing the product for Chinese-speaking international school students.",
-        betaNoticeBadge: "v1.3",
+        betaNoticeBadge: "v1.3 beta",
         betaCardOneNumber: "01",
         betaCardOneTitle: "Plan coursework",
         betaCardOneDescription:
@@ -149,7 +149,7 @@ export const translations = {
 
     zh: {
         appName: "Coursework Compass",
-        versionLabel: "v1.3 双语基础版",
+        versionLabel: "v1.3 多语言基础版本",
 
         language: "语言",
         english: "English",
@@ -173,11 +173,11 @@ export const translations = {
         openDashboard: "打开仪表盘",
         openToday: "打开今日任务",
 
-        betaNoticeEyebrow: "Coursework Compass v1.3 双语基础版",
+        betaNoticeEyebrow: "Coursework Compass v1.3 多语言基础版本",
         betaNoticeTitle: "更清晰的双语测试版本正在完善中。",
         betaNoticeDescription:
             "这个版本开始把 Coursework Compass 升级为支持英文和简体中文的 coursework 规划工具。当前重点是语言切换、全局提示双语化，并为中文国际学校学生的使用场景打基础。",
-        betaNoticeBadge: "v1.3",
+        betaNoticeBadge: "v1.3 测试版",
         betaCardOneNumber: "01",
         betaCardOneTitle: "规划 coursework",
         betaCardOneDescription:

@@ -11,7 +11,8 @@ Coursework Compass is a local-first coursework planning app for international sc
 - Redesigned New Project Studio
 - 11 coursework templates
 - English / Simplified Chinese interface foundation
-- Browser `localStorage` beta storage
+- Improved date picker styling
+- Local-first browser storage beta
 
 ## Coursework Templates
 

@@ -94,7 +94,7 @@ const copy = {
         ],
     },
     zh: {
-        badge: "Coursework Compass v1.3 双语基础版",
+        badge: "Coursework Compass v1.3 多语言基础版本",
         title: "把混乱的 coursework 变成清晰的每日计划。",
         subtitle:
             "Coursework Compass 帮助 IB 和 A-Level 学生把大型项目拆成可执行的任务、截止日期、进度和每日行动。你可以用英文或简体中文创建计划、编辑任务并持续推进。",

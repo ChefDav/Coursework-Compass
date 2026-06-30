@@ -46,7 +46,7 @@ const copy = {
         explore: "Explore first",
     },
     zh: {
-        badge: "v1.3 双语基础版",
+        badge: "v1.3 多语言基础版本",
         title: "欢迎使用 Coursework Compass。",
         description:
             "Coursework Compass 帮助 IB 和 A-Level 学生把大型 coursework 项目拆成更清晰的任务、截止日期和每日行动。这个版本加入英文 / 简体中文基础，方便学生测试。",

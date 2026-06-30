@@ -51,7 +51,7 @@ const copy = {
     },
     zh: {
         eyebrow: "v1.3 学生测试反馈",
-        title: "帮助完善双语基础版。",
+        title: "帮助完善多语言基础版本。",
         description:
             "Coursework Compass 正在通过真实学生测试继续改进。反馈可以很短、真实、具体。哪怕只是一个让你困惑的按钮，也值得告诉我。",
         note:
@@ -70,7 +70,7 @@ const copy = {
         helper:
             "这会打开你的邮件应用，并预填一个反馈模板。发送前你可以继续编辑。",
         bodyIntro:
-            "我测试了 Coursework Compass v1.3 双语基础版，想分享一些反馈。",
+            "我测试了 Coursework Compass v1.3 多语言基础版本，想分享一些反馈。",
     },
 } as const;
 

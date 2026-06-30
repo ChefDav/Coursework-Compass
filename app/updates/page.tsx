@@ -14,7 +14,7 @@ const copy = {
         joinTest: "Join student test",
         createProject: "Create a project",
         backHome: "Back to home",
-        currentVersion: "Current version",
+        currentVersion: "Current version: v1.3",
         currentTitle: "v1.3 Multilingual Foundation",
         currentDescription:
             "This release focuses on bilingual interface foundations, the redesigned New Project Studio, clearer date controls, better empty states, and safer browser-only beta messaging.",
@@ -50,14 +50,14 @@ const copy = {
     },
     zh: {
         eyebrow: "更新日志",
-        title: "v1.3 双语基础版",
+        title: "v1.3 多语言基础版本",
         subtitle:
             "Coursework Compass v1.3 为英文 / 简体中文规划体验打基础，并进一步打磨学生测试流程。",
         joinTest: "参加学生测试",
         createProject: "创建项目",
         backHome: "返回首页",
-        currentVersion: "当前版本",
-        currentTitle: "v1.3 双语基础版",
+        currentVersion: "当前版本：v1.3",
+        currentTitle: "v1.3 多语言基础版本",
         currentDescription:
             "这个版本重点完成双语界面基础、新版 Project Studio、更清晰的日期控件、更好的空状态，以及更安全的浏览器本地测试存储提示。",
         highlightsTitle: "v1.3 更新内容",
@@ -93,6 +93,17 @@ const copy = {
 } as const;
 
 const releaseHistory = [
+    {
+        version: "v1.3",
+        title: {
+            en: "v1.3 Multilingual Foundation",
+            zh: "v1.3 多语言基础版本",
+        },
+        description: {
+            en: "This release builds the bilingual foundation for Coursework Compass, improves the project creation experience, expands templates, and prepares the app for student testing.",
+            zh: "这个版本为 Coursework Compass 建立了中英文界面基础，改进了项目创建体验，扩展了模板库，并让应用更适合学生测试。",
+        },
+    },
     {
         version: "v1.2",
         title: {
