@@ -132,7 +132,7 @@ export default function FeedbackPanel() {
     }, [currentCopy.bodyIntro, pageUrl, selectedType]);
 
     return (
-        <section className="rounded-[2rem] border border-fuchsia-400/30 bg-fuchsia-400/10 p-5 shadow-2xl shadow-fuchsia-950/20 sm:p-6">
+        <section className="cc-motion-fade-up rounded-[2rem] border border-fuchsia-400/30 bg-fuchsia-400/10 p-5 shadow-2xl shadow-fuchsia-950/20 sm:p-6">
             <div className="mb-5">
                 <p className="mb-2 text-sm font-bold text-fuchsia-300">
                     {currentCopy.eyebrow}
@@ -163,7 +163,7 @@ export default function FeedbackPanel() {
                                 key={type.value}
                                 type="button"
                                 onClick={() => setSelectedType(type.value)}
-                                className={`w-full rounded-2xl border px-4 py-3 text-left text-sm font-bold transition ${
+                                className={`cc-interactive-button w-full rounded-2xl border px-4 py-3 text-left text-sm font-bold transition ${
                                     selectedType === type.value
                                         ? "border-fuchsia-300 bg-fuchsia-400 text-slate-950"
                                         : "cc-button-secondary hover:border-fuchsia-400 hover:text-fuchsia-300"
@@ -188,7 +188,7 @@ export default function FeedbackPanel() {
 
                     <a
                         href={feedbackMailto}
-                        className="mt-5 inline-block rounded-2xl bg-fuchsia-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-fuchsia-300"
+                        className="cc-interactive-button mt-5 inline-block rounded-2xl bg-fuchsia-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-fuchsia-300"
                     >
                         {currentCopy.action}
                     </a>

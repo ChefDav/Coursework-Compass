@@ -447,11 +447,11 @@ export default function ProjectDetailPage() {
 
     if (!hasMounted) {
         return (
-            <main className="cc-page-gradient cc-text-main">
+            <main className="cc-page-gradient cc-ambient-drift cc-text-main">
                 <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                     <AppNav />
 
-                    <section className="rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-6 shadow-2xl shadow-cyan-950/20 sm:p-8">
+                    <section className="cc-motion-fade-up rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-6 shadow-2xl shadow-cyan-950/20 sm:p-8">
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             {currentCopy.loadingEyebrow}
                         </p>
@@ -469,7 +469,7 @@ export default function ProjectDetailPage() {
 
     if (!projectInfo) {
         return (
-            <main className="cc-page-gradient cc-text-main">
+            <main className="cc-page-gradient cc-ambient-drift cc-text-main">
                 <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                     <AppNav />
 
@@ -576,11 +576,11 @@ export default function ProjectDetailPage() {
     }
 
     return (
-        <main className="cc-page-gradient cc-text-main">
+        <main className="cc-page-gradient cc-ambient-drift cc-text-main">
             <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                 <AppNav />
 
-                <section className="mb-10 rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 shadow-2xl shadow-cyan-950/20 sm:p-8">
+                <section className="cc-motion-fade-up mb-10 rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 shadow-2xl shadow-cyan-950/20 sm:p-8">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0">
                             <p className="mb-2 text-sm font-bold text-cyan-300">
@@ -706,7 +706,7 @@ export default function ProjectDetailPage() {
 
                         <div className="cc-progress-track h-4 overflow-hidden rounded-full">
                             <div
-                                className="h-full rounded-full bg-cyan-400 transition-all"
+                                className="cc-progress-fill h-full rounded-full bg-cyan-400 transition-all"
                                 style={{ width: `${progress}%` }}
                             />
                         </div>
@@ -730,7 +730,7 @@ export default function ProjectDetailPage() {
                     </div>
 
                     {completedTasksCount > 0 ? (
-                        <div className="mt-6 rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-4">
+                        <div className="cc-motion-scale-in mt-6 rounded-3xl border border-emerald-400/30 bg-emerald-400/10 p-4">
                             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                                 <div>
                                     <p className="mb-1 text-sm font-bold text-emerald-300">
@@ -744,7 +744,7 @@ export default function ProjectDetailPage() {
                                 <button
                                     type="button"
                                     onClick={handleArchiveCompletedTasks}
-                                    className="rounded-2xl bg-emerald-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
+                                    className="cc-interactive-button rounded-2xl bg-emerald-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
                                 >
                                     {currentCopy.archiveCompletedTasks}
                                 </button>
@@ -753,7 +753,7 @@ export default function ProjectDetailPage() {
                     ) : null}
                 </section>
 
-                <section className="cc-card mb-10 rounded-[2rem] p-5 sm:p-6">
+                <section className="cc-card cc-motion-fade-up mb-10 rounded-[2rem] p-5 sm:p-6">
                     <p className="mb-2 text-sm font-bold text-emerald-300">
                         {currentCopy.addCustomTask}
                     </p>
@@ -831,13 +831,13 @@ export default function ProjectDetailPage() {
                     <button
                         type="button"
                         onClick={handleAddCustomTask}
-                        className="mt-5 rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
+                        className="cc-interactive-button mt-5 rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
                     >
                         {currentCopy.addTask}
                     </button>
                 </section>
 
-                <section className="space-y-5">
+                <section className="cc-motion-fade-up space-y-5">
                     <div className="mb-6">
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             {currentCopy.projectTasks}

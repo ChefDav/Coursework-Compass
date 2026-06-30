@@ -48,7 +48,7 @@ export default function LanguageSwitcher({
                                 key={item.code}
                                 type="button"
                                 onClick={() => handleChangeLanguage(item.code)}
-                                className={`rounded-xl px-3 py-2 text-xs font-black transition ${
+                                className={`cc-interactive-button rounded-xl px-3 py-2 text-xs font-black transition ${
                                     isActive
                                         ? "cc-button-primary"
                                         : "cc-button-secondary"
@@ -78,7 +78,7 @@ export default function LanguageSwitcher({
                             key={item.code}
                             type="button"
                             onClick={() => handleChangeLanguage(item.code)}
-                            className={`rounded-xl px-3 py-2 text-xs font-black transition ${
+                            className={`cc-interactive-button rounded-xl px-3 py-2 text-xs font-black transition ${
                                 isActive
                                     ? "cc-button-primary"
                                     : "cc-button-secondary"

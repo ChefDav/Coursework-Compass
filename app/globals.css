@@ -209,6 +209,199 @@ html[data-theme="light"][data-background="exam-focus"] {
   --background: var(--cc-bg);
 }
 
+/* Coursework Compass motion system */
+:root {
+  --cc-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --cc-ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+  --cc-duration-fast: 120ms;
+  --cc-duration-standard: 220ms;
+  --cc-duration-slow: 420ms;
+  --cc-hover-lift: -2px;
+  --cc-press-scale: 0.985;
+}
+
+@keyframes ccFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ccFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ccScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ccSlideSoft {
+  from {
+    opacity: 0;
+    transform: translateX(-0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes ccToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.65rem) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ccModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ccSoftPulse {
+  0%,
+  100% {
+    opacity: 0.78;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes ccAmbientDrift {
+  from {
+    background-position:
+      -1px -1px,
+      -1px -1px,
+      0 0,
+      0 0,
+      0 0,
+      0 0;
+  }
+
+  to {
+    background-position:
+      -1px -1px,
+      -1px -1px,
+      0.75rem 0.5rem,
+      -0.6rem 0.75rem,
+      0.35rem -0.5rem,
+      0 0;
+  }
+}
+
+.cc-motion-fade-up {
+  animation: ccFadeUp var(--cc-duration-slow) var(--cc-ease-emphasized) both;
+}
+
+.cc-motion-fade-in {
+  animation: ccFadeIn var(--cc-duration-standard) var(--cc-ease-standard) both;
+}
+
+.cc-motion-scale-in {
+  animation: ccScaleIn var(--cc-duration-standard) var(--cc-ease-emphasized) both;
+}
+
+.cc-motion-slide-soft {
+  animation: ccSlideSoft var(--cc-duration-standard) var(--cc-ease-emphasized) both;
+}
+
+.cc-motion-stagger > .cc-motion-stagger-item {
+  animation: ccFadeUp var(--cc-duration-slow) var(--cc-ease-emphasized) both;
+  animation-delay: calc(var(--cc-stagger-index, 0) * 55ms);
+}
+
+.cc-interactive,
+.cc-interactive-card,
+.cc-interactive-button {
+  transition:
+    transform var(--cc-duration-standard) var(--cc-ease-standard),
+    background-color var(--cc-duration-standard) var(--cc-ease-standard),
+    border-color var(--cc-duration-standard) var(--cc-ease-standard),
+    color var(--cc-duration-standard) var(--cc-ease-standard),
+    box-shadow var(--cc-duration-standard) var(--cc-ease-standard),
+    opacity var(--cc-duration-standard) var(--cc-ease-standard);
+  will-change: transform;
+}
+
+.cc-interactive:hover,
+.cc-interactive-card:hover,
+.cc-interactive-button:hover {
+  transform: translateY(var(--cc-hover-lift));
+}
+
+.cc-interactive:active,
+.cc-interactive-card:active,
+.cc-interactive-button:active {
+  transform: translateY(0) scale(var(--cc-press-scale));
+}
+
+.cc-interactive-card:hover {
+  border-color: var(--cc-border-strong);
+  background: var(--cc-card-hover);
+  box-shadow: var(--cc-shadow), var(--cc-glow);
+}
+
+.cc-progress-track {
+  overflow: hidden;
+}
+
+.cc-progress-fill {
+  transform-origin: left center;
+  transition:
+    width var(--cc-duration-slow) var(--cc-ease-emphasized),
+    background-color var(--cc-duration-standard) var(--cc-ease-standard);
+}
+
+.cc-toast-motion {
+  animation: ccToastIn var(--cc-duration-slow) var(--cc-ease-emphasized) both;
+}
+
+.cc-modal-motion {
+  animation: ccModalIn var(--cc-duration-slow) var(--cc-ease-emphasized) both;
+}
+
+.cc-soft-pulse {
+  animation: ccSoftPulse 2.8s var(--cc-ease-standard) infinite;
+}
+
+.cc-ambient-drift {
+  animation: ccAmbientDrift 32s var(--cc-ease-standard) infinite alternate;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -292,7 +485,34 @@ button {
   *,
   *::before,
   *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .cc-motion-fade-up,
+  .cc-motion-fade-in,
+  .cc-motion-scale-in,
+  .cc-motion-slide-soft,
+  .cc-motion-stagger > .cc-motion-stagger-item,
+  .cc-toast-motion,
+  .cc-modal-motion,
+  .cc-soft-pulse,
+  .cc-ambient-drift {
+    animation: none !important;
+  }
+
+  .cc-interactive,
+  .cc-interactive-card,
+  .cc-interactive-button,
+  .cc-interactive:hover,
+  .cc-interactive-card:hover,
+  .cc-interactive-button:hover,
+  .cc-interactive:active,
+  .cc-interactive-card:active,
+  .cc-interactive-button:active {
+    transform: none !important;
   }
 }
 
@@ -384,18 +604,18 @@ button {
   background: var(--cc-card);
   box-shadow: var(--cc-shadow);
   transition:
-    background-color 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease;
+    background-color var(--cc-duration-standard) var(--cc-ease-standard),
+    border-color var(--cc-duration-standard) var(--cc-ease-standard),
+    color var(--cc-duration-standard) var(--cc-ease-standard),
+    box-shadow var(--cc-duration-standard) var(--cc-ease-standard),
+    transform var(--cc-duration-standard) var(--cc-ease-standard);
 }
 
 .cc-card-hover:hover {
   border-color: var(--cc-border-strong);
   background: var(--cc-card-hover);
   box-shadow: var(--cc-shadow), var(--cc-glow);
-  transform: translateY(-1px);
+  transform: translateY(var(--cc-hover-lift));
 }
 
 .cc-border {
@@ -451,6 +671,25 @@ button {
   gap: 0.5rem;
   border: 1px solid transparent;
   font-weight: 800;
+  transition:
+    transform var(--cc-duration-standard) var(--cc-ease-standard),
+    background-color var(--cc-duration-standard) var(--cc-ease-standard),
+    border-color var(--cc-duration-standard) var(--cc-ease-standard),
+    color var(--cc-duration-standard) var(--cc-ease-standard),
+    box-shadow var(--cc-duration-standard) var(--cc-ease-standard),
+    opacity var(--cc-duration-standard) var(--cc-ease-standard);
+}
+
+.cc-button-primary:not(:disabled):hover,
+.cc-button-secondary:not(:disabled):hover,
+.cc-button-danger:not(:disabled):hover {
+  transform: translateY(var(--cc-hover-lift));
+}
+
+.cc-button-primary:not(:disabled):active,
+.cc-button-secondary:not(:disabled):active,
+.cc-button-danger:not(:disabled):active {
+  transform: translateY(0) scale(var(--cc-press-scale));
 }
 
 .cc-button-primary {

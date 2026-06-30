@@ -71,7 +71,7 @@ export default function AppNav() {
     }
 
     return (
-        <header className="cc-panel mb-6 rounded-[1.5rem] p-3 backdrop-blur-md sm:mb-8 sm:rounded-[2rem] sm:p-5">
+        <header className="cc-panel cc-motion-fade-up mb-6 rounded-[1.5rem] p-3 backdrop-blur-md sm:mb-8 sm:rounded-[2rem] sm:p-5">
             <div className="grid gap-5 xl:grid-cols-[minmax(15rem,22rem)_1fr] xl:items-start">
                 <div className="flex items-start justify-between gap-3 xl:block">
                     <Link href="/" className="group min-w-0">
@@ -84,11 +84,11 @@ export default function AppNav() {
                     </Link>
 
                     <details className="relative xl:hidden">
-                        <summary className="list-none rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm font-black text-cyan-300">
+                        <summary className="cc-interactive-button list-none rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm font-black text-cyan-300">
                             {t("mainMenu")}
                         </summary>
 
-                        <div className="cc-panel-strong absolute right-0 z-40 mt-3 w-[min(20rem,calc(100vw-2rem))] rounded-[1.5rem] p-3">
+                        <div className="cc-panel-strong cc-motion-scale-in absolute right-0 z-40 mt-3 w-[min(20rem,calc(100vw-2rem))] rounded-[1.5rem] p-3">
                             <nav className="grid gap-2">
                                 {navItems.map((item) => {
                                     const isActive = isActivePath(pathname, item.href);
@@ -97,7 +97,7 @@ export default function AppNav() {
                                         <Link
                                             key={item.href}
                                             href={item.href}
-                                            className={`rounded-2xl px-4 py-3 text-sm font-bold transition ${
+                                            className={`cc-interactive-button rounded-2xl px-4 py-3 text-sm font-bold transition ${
                                                 isActive
                                                     ? "cc-button-primary"
                                                     : item.href === "/"
@@ -116,7 +116,7 @@ export default function AppNav() {
                                 <button
                                     type="button"
                                     onClick={handleResetData}
-                                    className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-left text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                                    className="cc-interactive-button rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-left text-sm font-bold text-red-300 transition hover:bg-red-400/20"
                                 >
                                     {t("resetData")}
                                 </button>
@@ -134,7 +134,7 @@ export default function AppNav() {
                                 <Link
                                     key={item.href}
                                     href={item.href}
-                                    className={`min-w-[6.75rem] whitespace-nowrap rounded-2xl px-3 py-3 text-center text-sm font-bold transition ${
+                                    className={`cc-interactive-button min-w-[6.75rem] whitespace-nowrap rounded-2xl px-3 py-3 text-center text-sm font-bold transition ${
                                             isActive
                                             ? "cc-button-primary"
                                             : item.href === "/"
@@ -155,7 +155,7 @@ export default function AppNav() {
                         <button
                             type="button"
                             onClick={handleResetData}
-                            className="whitespace-nowrap rounded-2xl border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                            className="cc-interactive-button whitespace-nowrap rounded-2xl border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
                         >
                             {t("resetData")}
                         </button>

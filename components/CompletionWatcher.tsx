@@ -82,8 +82,8 @@ export default function CompletionWatcher() {
     ).length;
 
     return (
-        <section className="cc-modal-overlay fixed inset-0 z-[80] flex items-center justify-center px-4 py-6 backdrop-blur-md">
-            <div className="cc-panel-strong relative w-full max-w-2xl overflow-hidden rounded-[2rem] border-emerald-400/30 p-5 sm:p-8">
+        <section className="cc-modal-overlay cc-motion-fade-in fixed inset-0 z-[80] flex items-center justify-center px-4 py-6 backdrop-blur-md">
+            <div className="cc-panel-strong cc-modal-motion relative w-full max-w-2xl overflow-hidden rounded-[2rem] border-emerald-400/30 p-5 sm:p-8">
                 <div className="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-emerald-400/20 blur-3xl" />
                 <div className="absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
 
@@ -143,7 +143,7 @@ export default function CompletionWatcher() {
                         <button
                             type="button"
                             onClick={handleArchiveCompletedTasks}
-                            className="rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
+                            className="cc-interactive-button rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
                         >
                             {currentCopy.archive}
                         </button>

@@ -193,7 +193,7 @@ export default function SaveSuccessToast() {
         : localiseText(toast.actionLabel, language);
 
     return (
-        <section className="cc-panel-strong fixed bottom-4 left-3 right-3 z-[70] rounded-[1.5rem] border-emerald-400/30 p-4 backdrop-blur-md sm:bottom-6 sm:left-auto sm:right-6 sm:w-[28rem] sm:rounded-[1.75rem]">
+        <section className="cc-panel-strong cc-toast-motion fixed bottom-4 left-3 right-3 z-[70] rounded-[1.5rem] border-emerald-400/30 p-4 backdrop-blur-md sm:bottom-6 sm:left-auto sm:right-6 sm:w-[28rem] sm:rounded-[1.75rem]">
             <div className="flex gap-3 sm:gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-400/10 text-lg sm:h-12 sm:w-12 sm:text-xl">
                     ✓
@@ -222,14 +222,14 @@ export default function SaveSuccessToast() {
                     {toast.actionHref && displayActionLabel ? (
                         <Link
                             href={toast.actionHref}
-                            className="mt-4 inline-block rounded-2xl bg-emerald-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
+                            className="cc-interactive-button mt-4 inline-block rounded-2xl bg-emerald-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
                         >
                             {displayActionLabel}
                         </Link>
                     ) : null}
 
                     <div className="cc-progress-track mt-4 h-1 overflow-hidden rounded-full">
-                        <div className="h-full w-full origin-left animate-[saveToastBar_4.2s_linear_forwards] rounded-full bg-emerald-400" />
+                        <div className="cc-progress-fill h-full w-full origin-left animate-[saveToastBar_4.2s_linear_forwards] rounded-full bg-emerald-400" />
                     </div>
                 </div>
             </div>

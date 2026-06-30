@@ -12,7 +12,7 @@ export default function ProjectCard({ project, detailsHref }: ProjectCardProps) 
     const isCompleted = project.status === "Completed";
 
     return (
-        <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
+        <div className="cc-interactive-card cc-motion-fade-up rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
             <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                     <div className="mb-2 flex flex-wrap items-center gap-3">
@@ -46,7 +46,7 @@ export default function ProjectCard({ project, detailsHref }: ProjectCardProps) 
                 <div className="mt-5">
                     <Link
                         href={detailsHref}
-                        className="block rounded-xl border border-slate-700 px-4 py-3 text-center text-sm font-bold transition hover:border-cyan-400 hover:text-cyan-300 sm:inline-block"
+                        className="cc-interactive-button block rounded-xl border border-slate-700 px-4 py-3 text-center text-sm font-bold transition hover:border-cyan-400 hover:text-cyan-300 sm:inline-block"
                     >
                         View details
                     </Link>

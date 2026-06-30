@@ -1132,7 +1132,7 @@ export default function NewProjectForm() {
 
     return (
         <section className="space-y-6">
-            <header className="cc-card relative overflow-hidden rounded-[2.5rem] p-6 sm:p-8 lg:p-10">
+            <header className="cc-card cc-motion-fade-up relative overflow-hidden rounded-[2.5rem] p-6 sm:p-8 lg:p-10">
                 <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" />
                 <div className="pointer-events-none absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-emerald-400/10 blur-3xl" />
 
@@ -1170,7 +1170,7 @@ export default function NewProjectForm() {
 
             <div className="grid gap-6 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
                 <div className="space-y-6">
-                    <section className="cc-card rounded-[2rem] p-5 sm:p-6">
+                    <section className="cc-card cc-motion-fade-up rounded-[2rem] p-5 sm:p-6">
                         <div className="mb-6">
                             <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                                 {currentCopy.templateStep}
@@ -1193,7 +1193,7 @@ export default function NewProjectForm() {
                                             setSelectedTemplateId(template.id);
                                             clearGeneratedState();
                                         }}
-                                        className={`group relative min-h-48 overflow-hidden rounded-[1.75rem] border p-5 text-left transition ${
+                                        className={`cc-interactive-card group relative min-h-48 overflow-hidden rounded-[1.75rem] border p-5 text-left transition ${
                                             isActive
                                                 ? "border-cyan-400 bg-cyan-400/10 shadow-xl shadow-cyan-950/30"
                                                 : "cc-surface-inset hover:border-cyan-400/50"
@@ -1236,7 +1236,7 @@ export default function NewProjectForm() {
                         </div>
                     </section>
 
-                    <section className="cc-card rounded-[2rem] p-5 sm:p-6">
+                    <section className="cc-card cc-motion-fade-up rounded-[2rem] p-5 sm:p-6">
                         <div className="mb-6">
                             <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                                 {currentCopy.setupStep}
@@ -1296,7 +1296,7 @@ export default function NewProjectForm() {
                                                     setPlanningIntensity(option.value);
                                                     clearGeneratedState();
                                                 }}
-                                                className={`rounded-2xl border p-4 text-left transition ${
+                                                className={`cc-interactive-card rounded-2xl border p-4 text-left transition ${
                                                     isActive
                                                         ? "border-emerald-400 bg-emerald-400/10"
                                                         : "cc-surface-inset hover:border-emerald-400/50"
@@ -1340,7 +1340,7 @@ export default function NewProjectForm() {
                                     type="button"
                                     onClick={handleSaveProject}
                                     disabled={!generatedPlan}
-                                    className={`rounded-2xl px-5 py-4 text-sm font-black transition ${
+                                    className={`cc-interactive-button rounded-2xl px-5 py-4 text-sm font-black transition ${
                                         generatedPlan
                                             ? "bg-emerald-400 text-slate-950 hover:bg-emerald-300"
                                             : "cc-button-secondary cursor-not-allowed opacity-60"
@@ -1351,7 +1351,7 @@ export default function NewProjectForm() {
                             </div>
 
                             {savedRouteId ? (
-                                <div className="rounded-[1.5rem] border border-emerald-400/30 bg-emerald-400/10 p-5">
+                                <div className="cc-motion-scale-in rounded-[1.5rem] border border-emerald-400/30 bg-emerald-400/10 p-5">
                                     <p className="text-sm font-black text-emerald-300">
                                         {currentCopy.savedTitle}
                                     </p>
@@ -1362,7 +1362,7 @@ export default function NewProjectForm() {
 
                                     <Link
                                         href={`/projects/${savedRouteId}`}
-                                        className="mt-4 inline-block rounded-2xl bg-emerald-400 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-emerald-300"
+                                        className="cc-interactive-button mt-4 inline-block rounded-2xl bg-emerald-400 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-emerald-300"
                                     >
                                         {currentCopy.openProject}
                                     </Link>
@@ -1373,7 +1373,7 @@ export default function NewProjectForm() {
                 </div>
 
                 <aside className="xl:sticky xl:top-6 xl:self-start">
-                    <section className="cc-card overflow-hidden rounded-[2rem]">
+                    <section className="cc-card cc-motion-fade-up overflow-hidden rounded-[2rem]">
                         <div className="cc-surface-inset border-b p-5 sm:p-6">
                             <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                                 {currentCopy.previewStep}
@@ -1450,7 +1450,7 @@ export default function NewProjectForm() {
                                         {generatedPlan.tasks.map((item, index) => (
                                             <article
                                                 key={item.id || `${item.title}-${index}`}
-                                                className="cc-surface-inset relative grid gap-4 rounded-[1.5rem] p-4 sm:grid-cols-[2.75rem_minmax(0,1fr)]"
+                                                className="cc-surface-inset cc-motion-fade-up relative grid gap-4 rounded-[1.5rem] p-4 sm:grid-cols-[2.75rem_minmax(0,1fr)]"
                                             >
                                                 <div className="relative z-10 flex h-11 w-11 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 text-sm font-black text-cyan-300">
                                                     {index + 1}

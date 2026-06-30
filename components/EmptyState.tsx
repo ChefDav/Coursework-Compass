@@ -318,7 +318,7 @@ export default function EmptyState({
             : tips.map((tip) => localiseText(tip, language));
 
     return (
-        <section className="cc-card overflow-hidden rounded-[2rem] p-5 sm:p-8">
+        <section className="cc-card cc-motion-fade-up overflow-hidden rounded-[2rem] p-5 sm:p-8">
             <div className="relative">
                 <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-400/10 blur-3xl" />
                 <div className="absolute -bottom-28 -left-28 h-56 w-56 rounded-full bg-emerald-400/10 blur-3xl" />
@@ -351,7 +351,7 @@ export default function EmptyState({
                                     <Link
                                         key={`${action.href}-${action.label}`}
                                         href={action.href}
-                                        className={getActionClasses(action.variant)}
+                                        className={`${getActionClasses(action.variant)} cc-interactive-button`}
                                     >
                                         {displayLabel}
                                     </Link>
@@ -370,7 +370,7 @@ export default function EmptyState({
                                 {displayTips.map((tip) => (
                                     <div
                                         key={tip}
-                                        className="cc-surface-muted rounded-2xl p-4"
+                                        className="cc-surface-muted cc-motion-fade-up rounded-2xl p-4"
                                     >
                                         <p className="cc-text-muted text-sm leading-6">{tip}</p>
                                     </div>

@@ -335,7 +335,7 @@ export default function TaskCard({
 
     return (
         <article
-            className={`rounded-[2rem] border p-5 transition sm:p-6 ${
+            className={`cc-interactive-card cc-motion-fade-up rounded-[2rem] border p-5 transition sm:p-6 ${
                 isDone
                     ? "border-emerald-400/30 bg-emerald-400/10"
                     : "cc-card"
@@ -488,7 +488,7 @@ export default function TaskCard({
                                     setIsConfirmingDelete(true);
                                     setIsEditing(false);
                                 }}
-                                className="rounded-2xl border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                                className="cc-interactive-button rounded-2xl border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
                             >
                                 {currentCopy.delete}
                             </button>
@@ -498,7 +498,7 @@ export default function TaskCard({
                                 onClick={handleToggleStatus}
                                 className={
                                     isDone
-                                        ? "rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-5 py-3 text-sm font-bold text-emerald-200 transition hover:bg-emerald-400/20"
+                                        ? "cc-interactive-button rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-5 py-3 text-sm font-bold text-emerald-200 transition hover:bg-emerald-400/20"
                                         : "cc-button-primary rounded-2xl px-5 py-3 text-sm"
                                 }
                             >
@@ -508,7 +508,7 @@ export default function TaskCard({
                     </div>
 
                     {isConfirmingDelete ? (
-                        <div className="mt-5 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
+                        <div className="cc-motion-scale-in mt-5 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
                             <p className="text-sm font-bold text-red-300">
                                 {currentCopy.deletePrompt}
                             </p>
@@ -517,7 +517,7 @@ export default function TaskCard({
                                 <button
                                     type="button"
                                     onClick={handleConfirmDelete}
-                                    className="rounded-2xl bg-red-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-red-300"
+                                    className="cc-interactive-button rounded-2xl bg-red-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-red-300"
                                 >
                                     {currentCopy.confirmDelete}
                                 </button>

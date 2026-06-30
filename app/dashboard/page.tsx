@@ -279,11 +279,11 @@ export default function DashboardPage() {
     }, [plans]);
 
     return (
-        <main className="cc-page-gradient cc-text-main px-4 py-6 sm:px-6 lg:px-8">
+        <main className="cc-page-gradient cc-ambient-drift cc-text-main px-4 py-6 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
                 <AppNav />
 
-                <header className="cc-card mb-8 rounded-[2rem] p-6 sm:p-8">
+                <header className="cc-card cc-motion-fade-up mb-8 rounded-[2rem] p-6 sm:p-8">
                     <p className="mb-3 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                         {currentCopy.eyebrow}
                     </p>
@@ -297,7 +297,7 @@ export default function DashboardPage() {
                     </p>
                 </header>
 
-                <section className="cc-card mb-8 rounded-[2rem] p-5 sm:p-6">
+                <section className="cc-card cc-motion-fade-up mb-8 rounded-[2rem] p-5 sm:p-6">
                     <div className="mb-5">
                         <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                             {currentCopy.personaliseWorkspace}
@@ -312,7 +312,7 @@ export default function DashboardPage() {
                 </section>
 
                 {!hasMounted ? (
-                    <section className="cc-card rounded-[2rem] p-6">
+                    <section className="cc-card cc-motion-fade-up rounded-[2rem] p-6">
                         <p className="cc-text-subtle text-sm font-bold">
                             {currentCopy.loading}
                         </p>
@@ -339,7 +339,7 @@ export default function DashboardPage() {
                 ) : (
                     <div className="space-y-6">
                         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                            <article className="cc-card rounded-[1.5rem] p-5">
+                            <article className="cc-card cc-interactive-card cc-motion-fade-up rounded-[1.5rem] p-5">
                                 <p className="cc-text-subtle text-sm font-bold">
                                     {currentCopy.savedProjects}
                                 </p>
@@ -348,7 +348,7 @@ export default function DashboardPage() {
                                 </p>
                             </article>
 
-                            <article className="cc-card rounded-[1.5rem] p-5">
+                            <article className="cc-card cc-interactive-card cc-motion-fade-up rounded-[1.5rem] p-5">
                                 <p className="cc-text-subtle text-sm font-bold">
                                     {currentCopy.averageProgress}
                                 </p>
@@ -357,7 +357,7 @@ export default function DashboardPage() {
                                 </p>
                             </article>
 
-                            <article className="cc-card rounded-[1.5rem] p-5">
+                            <article className="cc-card cc-interactive-card cc-motion-fade-up rounded-[1.5rem] p-5">
                                 <p className="cc-text-subtle text-sm font-bold">
                                     {currentCopy.activeTasks}
                                 </p>
@@ -366,7 +366,7 @@ export default function DashboardPage() {
                                 </p>
                             </article>
 
-                            <article className="cc-card rounded-[1.5rem] p-5">
+                            <article className="cc-card cc-interactive-card cc-motion-fade-up rounded-[1.5rem] p-5">
                                 <p className="cc-text-subtle text-sm font-bold">
                                     {currentCopy.urgentTasks}
                                 </p>
@@ -376,7 +376,7 @@ export default function DashboardPage() {
                             </article>
                         </section>
 
-                        <section className="cc-card rounded-[2rem] p-5 sm:p-6">
+                        <section className="cc-card cc-motion-fade-up rounded-[2rem] p-5 sm:p-6">
                             <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                 <div>
                                     <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
@@ -409,7 +409,7 @@ export default function DashboardPage() {
                                     return (
                                         <article
                                             key={`${routeId}-${index}`}
-                                            className="cc-surface-inset rounded-[1.5rem] p-5"
+                                            className="cc-surface-inset cc-interactive-card cc-motion-fade-up rounded-[1.5rem] p-5"
                                         >
                                             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                                 <div className="min-w-0">
@@ -444,7 +444,7 @@ export default function DashboardPage() {
 
                                                 <div className="cc-progress-track h-3 overflow-hidden rounded-full">
                                                     <div
-                                                        className="h-full rounded-full bg-cyan-400"
+                                                        className="cc-progress-fill h-full rounded-full bg-cyan-400"
                                                         style={{
                                                             width: `${progress}%`,
                                                         }}

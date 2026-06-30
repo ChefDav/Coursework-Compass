@@ -94,7 +94,7 @@ export default function TestingGuideCard() {
     const currentCopy = copy[language];
 
     return (
-        <section className="cc-panel-strong relative overflow-hidden rounded-[2rem] p-5 sm:p-6 lg:p-8">
+        <section className="cc-panel-strong cc-motion-fade-up relative overflow-hidden rounded-[2rem] p-5 sm:p-6 lg:p-8">
             <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-28 -left-28 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
 
@@ -117,7 +117,7 @@ export default function TestingGuideCard() {
                     {currentCopy.sections.map((section) => (
                         <article
                             key={section.title}
-                            className="cc-card rounded-[1.75rem] p-5"
+                            className="cc-card cc-interactive-card cc-motion-fade-up rounded-[1.75rem] p-5"
                         >
                             <h3 className="cc-text-main mb-5 text-xl font-black">
                                 {section.title}
@@ -140,7 +140,7 @@ export default function TestingGuideCard() {
                     ))}
                 </div>
 
-                <div className="cc-card mt-5 rounded-[1.75rem] p-5">
+                <div className="cc-card cc-motion-fade-up mt-5 rounded-[1.75rem] p-5">
                     <h3 className="cc-text-main mb-5 text-xl font-black">
                         {currentCopy.sampleTitle}
                     </h3>

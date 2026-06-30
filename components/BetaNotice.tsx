@@ -9,7 +9,7 @@ export default function BetaNotice() {
     const t = createTranslator(language);
 
     return (
-        <section className="rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 shadow-2xl shadow-cyan-950/20 sm:p-6">
+        <section className="cc-motion-fade-up rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 shadow-2xl shadow-cyan-950/20 sm:p-6">
             <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                     <p className="mb-2 text-sm font-bold text-cyan-300">
@@ -32,7 +32,7 @@ export default function BetaNotice() {
 
                         <Link
                             href="/test"
-                            className="rounded-2xl bg-emerald-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
+                            className="cc-interactive-button rounded-2xl bg-emerald-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
                         >
                             {t("joinStudentTest")}
                         </Link>
@@ -52,7 +52,7 @@ export default function BetaNotice() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
-                <div className="cc-surface-inset rounded-3xl p-4">
+                <div className="cc-surface-inset cc-motion-fade-up rounded-3xl p-4">
                     <p className="mb-2 text-sm font-black text-cyan-300">
                         {t("betaCardOneNumber")}
                     </p>
@@ -64,7 +64,7 @@ export default function BetaNotice() {
                     </p>
                 </div>
 
-                <div className="cc-surface-inset rounded-3xl p-4">
+                <div className="cc-surface-inset cc-motion-fade-up rounded-3xl p-4">
                     <p className="mb-2 text-sm font-black text-cyan-300">
                         {t("betaCardTwoNumber")}
                     </p>
@@ -76,7 +76,7 @@ export default function BetaNotice() {
                     </p>
                 </div>
 
-                <div className="cc-surface-inset rounded-3xl p-4">
+                <div className="cc-surface-inset cc-motion-fade-up rounded-3xl p-4">
                     <p className="mb-2 text-sm font-black text-cyan-300">
                         {t("betaCardThreeNumber")}
                     </p>

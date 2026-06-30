@@ -196,11 +196,11 @@ export default function HomePage() {
     const currentCopy = copy[language];
 
     return (
-        <main className="cc-page-gradient cc-text-main">
+        <main className="cc-page-gradient cc-ambient-drift cc-text-main">
             <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                 <AppNav />
 
-                <section className="grid gap-10 py-12 md:grid-cols-[1.2fr_0.8fr] md:items-center md:py-20">
+                <section className="cc-motion-fade-up grid gap-10 py-12 md:grid-cols-[1.2fr_0.8fr] md:items-center md:py-20">
                     <div>
                         <div className="mb-5 inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
                             {currentCopy.badge}
@@ -235,7 +235,7 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    <div className="cc-card rounded-[2rem] border-cyan-400/20 p-5 sm:p-6">
+                    <div className="cc-card cc-motion-scale-in rounded-[2rem] border-cyan-400/20 p-5 sm:p-6">
                         <div className="mb-5">
                             <p className="mb-2 text-sm font-bold text-cyan-300">
                                 {currentCopy.missionEyebrow}
@@ -260,7 +260,7 @@ export default function HomePage() {
                                 </div>
 
                                 <div className="cc-progress-track h-3 overflow-hidden rounded-full">
-                                    <div className="h-full w-[72%] rounded-full bg-cyan-400" />
+                                    <div className="cc-progress-fill h-full w-[72%] rounded-full bg-cyan-400" />
                                 </div>
 
                                 <p className="cc-text-subtle mt-2 text-xs">
@@ -306,7 +306,7 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                <section className="rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-6 shadow-2xl shadow-emerald-950/20 sm:p-8">
+                <section className="cc-motion-fade-up rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-6 shadow-2xl shadow-emerald-950/20 sm:p-8">
                     <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:items-center">
                         <div>
                             <p className="mb-2 text-sm font-bold text-emerald-300">
@@ -323,7 +323,7 @@ export default function HomePage() {
                         <div className="flex flex-col gap-4">
                             <Link
                                 href="/test"
-                                className="rounded-[1.75rem] bg-emerald-400 px-8 py-6 text-center text-lg font-black text-slate-950 shadow-2xl shadow-emerald-950/40 transition hover:bg-emerald-300"
+                                className="cc-interactive-button rounded-[1.75rem] bg-emerald-400 px-8 py-6 text-center text-lg font-black text-slate-950 shadow-2xl shadow-emerald-950/40 transition hover:bg-emerald-300"
                             >
                                 {currentCopy.joinTest}
                             </Link>
@@ -384,7 +384,7 @@ export default function HomePage() {
                         {currentCopy.workflowSteps.map((step) => (
                             <div
                                 key={step.number}
-                                className="cc-card-hover rounded-[2rem] p-5 sm:p-6"
+                                className="cc-card-hover cc-motion-fade-up rounded-[2rem] p-5 sm:p-6"
                             >
                                 <p className="mb-4 text-sm font-black text-cyan-300">
                                     {step.number}
@@ -414,7 +414,7 @@ export default function HomePage() {
                         {currentCopy.featureCards.map((feature) => (
                             <div
                                 key={feature.title}
-                                className="rounded-[2rem] border border-cyan-400/20 bg-cyan-400/10 p-5 sm:p-6"
+                                className="cc-interactive-card cc-motion-fade-up rounded-[2rem] border border-cyan-400/20 bg-cyan-400/10 p-5 sm:p-6"
                             >
                                 <h3 className="cc-text-main mb-3 text-xl font-black">
                                     {feature.title}
@@ -452,7 +452,7 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                <section className="mt-20 rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-6 sm:p-8">
+                <section className="cc-motion-fade-up mt-20 rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-6 sm:p-8">
                     <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:items-center">
                         <div>
                             <p className="mb-2 text-sm font-bold text-emerald-300">
@@ -469,7 +469,7 @@ export default function HomePage() {
                         <div className="flex flex-col gap-4">
                             <Link
                                 href="/projects/new"
-                                className="rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
+                                className="cc-interactive-button rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
                             >
                                 {currentCopy.createProject}
                             </Link>

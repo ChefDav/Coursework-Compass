@@ -80,7 +80,7 @@ export default function BackgroundSwitcher() {
     const currentCopy = copy[language];
 
     return (
-        <div className="cc-surface-inset rounded-[1.5rem] p-4 sm:p-5">
+        <div className="cc-surface-inset cc-motion-fade-up rounded-[1.5rem] p-4 sm:p-5">
             <div className="mb-4 flex items-center justify-between gap-3">
                 <p className="cc-text-subtle text-xs font-black uppercase tracking-[0.16em]">
                     {currentCopy.label}
@@ -101,7 +101,7 @@ export default function BackgroundSwitcher() {
                             type="button"
                             onClick={() => handleChangeBackground(preset)}
                             aria-pressed={isActive}
-                            className={`cc-focus-ring min-h-20 rounded-2xl border p-3 text-left transition ${
+                            className={`cc-focus-ring cc-interactive-card min-h-20 rounded-2xl border p-3 text-left transition ${
                                 isActive
                                     ? "border-cyan-300 bg-cyan-400/10 shadow-[0_0_0_1px_rgba(34,211,238,0.22)]"
                                     : "border-[var(--cc-border)] bg-[var(--cc-panel-soft)] hover:border-[var(--cc-accent)]"

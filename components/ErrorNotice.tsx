@@ -42,7 +42,7 @@ export default function ErrorNotice({
             : "border-red-400/30 bg-red-400/10 text-red-300";
 
     return (
-        <div className={`rounded-2xl border p-4 ${toneClasses}`} role="alert">
+        <div className={`cc-motion-scale-in rounded-2xl border p-4 ${toneClasses}`} role="alert">
             <div className="flex gap-3">
                 <div
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-sm font-black ${iconClasses}`}

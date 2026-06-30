@@ -90,7 +90,7 @@ export default function ThemeSwitcher({
                                 type="button"
                                 onClick={() => handleChangeTheme(option.value)}
                                 aria-pressed={isActive}
-                                className={`rounded-xl px-3 py-2 text-xs font-black transition ${
+                                className={`cc-interactive-button rounded-xl px-3 py-2 text-xs font-black transition ${
                                     isActive
                                         ? "cc-button-primary"
                                         : "cc-button-secondary"
@@ -124,7 +124,7 @@ export default function ThemeSwitcher({
                             type="button"
                             onClick={() => handleChangeTheme(option.value)}
                             aria-pressed={isActive}
-                            className={`rounded-xl px-3 py-2 text-xs font-black transition ${
+                            className={`cc-interactive-button rounded-xl px-3 py-2 text-xs font-black transition ${
                                 isActive
                                     ? "cc-button-primary"
                                     : "cc-button-secondary"

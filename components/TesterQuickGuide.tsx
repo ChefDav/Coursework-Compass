@@ -85,7 +85,7 @@ export default function TesterQuickGuide() {
     const currentCopy = copy[language];
 
     return (
-        <section className="cc-card rounded-[2rem] p-5 sm:p-6">
+        <section className="cc-card cc-motion-fade-up rounded-[2rem] p-5 sm:p-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                     <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
@@ -120,7 +120,7 @@ export default function TesterQuickGuide() {
                 {currentCopy.steps.map((step) => (
                     <article
                         key={step.number}
-                        className="cc-surface-inset rounded-3xl p-4"
+                        className="cc-surface-inset cc-motion-fade-up rounded-3xl p-4"
                     >
                         <p className="mb-3 text-sm font-black text-cyan-300">
                             {step.number}
