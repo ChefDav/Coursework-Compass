@@ -222,7 +222,6 @@ function getDeadlineTone(daysLeft: number | null) {
 
 function getProjectType(plan: GeneratedProjectPlan, language: Language) {
     return (
-        plan.project.type ||
         plan.project.courseworkType ||
         plan.project.subject ||
         copy[language].courseworkProject

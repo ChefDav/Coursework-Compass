@@ -6,7 +6,9 @@ import ErrorNotice from "@/components/ErrorNotice";
 import EstimatedTimeField, {
     normaliseEstimatedTime,
 } from "@/components/EstimatedTimeField";
+import { useStoredLanguage } from "@/lib/clientStores";
 import type { CourseworkTask, TaskStatus } from "@/lib/localStorage";
+import type { Language } from "@/lib/i18n";
 
 type TaskPriority = "Low" | "Medium" | "High";
 
@@ -18,6 +20,71 @@ type TaskCardProps = {
 };
 
 const priorityOptions: TaskPriority[] = ["Low", "Medium", "High"];
+
+const copy = {
+    en: {
+        editTask: "Edit task",
+        updateTask: "Update this task.",
+        taskTitle: "Task title",
+        priority: "Priority",
+        status: "Status",
+        dueDate: "Due date",
+        estimatedTime: "Estimated time",
+        saveChanges: "Save changes",
+        cancel: "Cancel",
+        edit: "Edit",
+        delete: "Delete",
+        confirmDelete: "Confirm delete",
+        deletePrompt: "Delete this task? This cannot be undone.",
+        markDone: "Mark done",
+        markAsTodo: "Mark as todo",
+        taskTitleRequired: "Task title required",
+        titleError: "Please enter a task title before saving this change.",
+        notSet: "Not set",
+        unknownDays: "Days left: unknown",
+        dueToday: "Due today",
+        dayLeft: "day left",
+        daysLeft: "days left",
+        overdue: "overdue",
+        low: "Low",
+        medium: "Medium",
+        high: "High",
+        todo: "Todo",
+        inProgress: "In progress",
+        done: "Done",
+    },
+    zh: {
+        editTask: "编辑任务",
+        updateTask: "更新这个任务。",
+        taskTitle: "任务标题",
+        priority: "优先级",
+        status: "状态",
+        dueDate: "任务日期",
+        estimatedTime: "预计用时",
+        saveChanges: "保存更改",
+        cancel: "取消",
+        edit: "编辑",
+        delete: "删除",
+        confirmDelete: "确认删除",
+        deletePrompt: "要删除这个任务吗？此操作不能撤销。",
+        markDone: "标记完成",
+        markAsTodo: "恢复待办",
+        taskTitleRequired: "需要填写任务标题",
+        titleError: "请先输入任务标题，再保存这个更改。",
+        notSet: "未设置",
+        unknownDays: "剩余天数：未知",
+        dueToday: "今天截止",
+        dayLeft: "天剩余",
+        daysLeft: "天剩余",
+        overdue: "已逾期",
+        low: "低",
+        medium: "中",
+        high: "高",
+        todo: "待办",
+        inProgress: "进行中",
+        done: "已完成",
+    },
+} as const;
 
 function isTaskPriority(value: string | undefined): value is TaskPriority {
     return value === "Low" || value === "Medium" || value === "High";
@@ -86,11 +153,40 @@ function parseDateValue(value?: string) {
     return new Date(year, month - 1, day);
 }
 
-function getDaysLeftLabel(dateValue?: string) {
+function getPriorityLabel(priority: string | undefined, language: Language) {
+    const currentCopy = copy[language];
+
+    if (priority === "High") {
+        return currentCopy.high;
+    }
+
+    if (priority === "Low") {
+        return currentCopy.low;
+    }
+
+    return currentCopy.medium;
+}
+
+function getStatusLabel(status: string | undefined, language: Language) {
+    const currentCopy = copy[language];
+
+    if (status === "Done") {
+        return currentCopy.done;
+    }
+
+    if (status === "In Progress") {
+        return currentCopy.inProgress;
+    }
+
+    return currentCopy.todo;
+}
+
+function getDaysLeftLabel(dateValue: string | undefined, language: Language) {
+    const currentCopy = copy[language];
     const targetDate = parseDateValue(dateValue);
 
     if (!targetDate) {
-        return "Days left: unknown";
+        return currentCopy.unknownDays;
     }
 
     const today = new Date();
@@ -105,18 +201,22 @@ function getDaysLeftLabel(dateValue?: string) {
 
     if (daysLeft < 0) {
         const overdueDays = Math.abs(daysLeft);
-        return `${overdueDays} day${overdueDays === 1 ? "" : "s"} overdue`;
+        if (language === "zh") {
+            return `${overdueDays} 天${currentCopy.overdue}`;
+        }
+
+        return `${overdueDays} day${overdueDays === 1 ? "" : "s"} ${currentCopy.overdue}`;
     }
 
     if (daysLeft === 0) {
-        return "Due today";
+        return currentCopy.dueToday;
     }
 
     if (daysLeft === 1) {
-        return "1 day left";
+        return `1 ${currentCopy.dayLeft}`;
     }
 
-    return `${daysLeft} days left`;
+    return `${daysLeft} ${currentCopy.daysLeft}`;
 }
 
 function getDaysLeftClasses(dateValue?: string) {
@@ -153,6 +253,8 @@ export default function TaskCard({
                                      onUpdateStatus,
                                      onDeleteTask,
                                  }: TaskCardProps) {
+    const language = useStoredLanguage();
+    const currentCopy = copy[language];
     const [isEditing, setIsEditing] = useState(false);
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
     const taskEditKey = [
@@ -195,7 +297,7 @@ export default function TaskCard({
         const trimmedTitle = editTitle.trim();
 
         if (!trimmedTitle) {
-            setEditError("Please enter a task title before saving this change.");
+            setEditError(currentCopy.titleError);
             return;
         }
 
@@ -242,16 +344,18 @@ export default function TaskCard({
             {isEditing ? (
                 <div>
                     <div className="mb-5">
-                        <p className="mb-2 text-sm font-bold text-cyan-300">Edit task</p>
+                        <p className="mb-2 text-sm font-bold text-cyan-300">
+                            {currentCopy.editTask}
+                        </p>
                         <h3 className="text-2xl font-black text-white">
-                            Update this task.
+                            {currentCopy.updateTask}
                         </h3>
                     </div>
 
                     <div className="grid gap-4">
                         <div>
                             <label className="mb-2 block text-xs font-bold text-slate-300">
-                                Task title
+                                {currentCopy.taskTitle}
                             </label>
                             <input
                                 type="text"
@@ -267,7 +371,7 @@ export default function TaskCard({
                         <div className="grid gap-4 md:grid-cols-3">
                             <div>
                                 <label className="mb-2 block text-xs font-bold text-slate-300">
-                                    Priority
+                                    {currentCopy.priority}
                                 </label>
                                 <select
                                     value={editPriority}
@@ -278,20 +382,20 @@ export default function TaskCard({
                                 >
                                     {priorityOptions.map((priority) => (
                                         <option key={priority} value={priority}>
-                                            {priority}
+                                            {getPriorityLabel(priority, language)}
                                         </option>
                                     ))}
                                 </select>
                             </div>
 
                             <CalendarDateField
-                                label="Due date"
+                                label={currentCopy.dueDate}
                                 value={editDueDate}
                                 onChange={setEditDueDate}
                             />
 
                             <EstimatedTimeField
-                                label="Estimated time"
+                                label={currentCopy.estimatedTime}
                                 value={editEstimatedTime}
                                 onChange={setEditEstimatedTime}
                             />
@@ -301,7 +405,7 @@ export default function TaskCard({
                     {editError ? (
                         <div className="mt-4">
                             <ErrorNotice
-                                title="Task title required"
+                                title={currentCopy.taskTitleRequired}
                                 message={editError}
                             />
                         </div>
@@ -313,7 +417,7 @@ export default function TaskCard({
                             onClick={handleSaveEdit}
                             className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
                         >
-                            Save changes
+                            {currentCopy.saveChanges}
                         </button>
 
                         <button
@@ -321,7 +425,7 @@ export default function TaskCard({
                             onClick={handleCancelEdit}
                             className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
                         >
-                            Cancel
+                            {currentCopy.cancel}
                         </button>
                     </div>
                 </div>
@@ -339,11 +443,11 @@ export default function TaskCard({
 
                             <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold">
                 <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1 text-slate-300">
-                  Estimated time: {displayEstimatedTime}
+                  {currentCopy.estimatedTime}: {displayEstimatedTime}
                 </span>
 
                                 <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1 text-slate-300">
-                  Due date: {dueDate || "Not set"}
+                  {currentCopy.dueDate}: {dueDate || currentCopy.notSet}
                 </span>
 
                                 <span
@@ -351,7 +455,7 @@ export default function TaskCard({
                                         dueDate,
                                     )}`}
                                 >
-                  {getDaysLeftLabel(dueDate)}
+                  {getDaysLeftLabel(dueDate, language)}
                 </span>
 
                                 <span
@@ -359,7 +463,9 @@ export default function TaskCard({
                                         task.priority,
                                     )}`}
                                 >
-                  {isDone ? "Done" : task.priority || "Medium"}
+                  {isDone
+                      ? getStatusLabel(task.status, language)
+                      : getPriorityLabel(task.priority, language)}
                 </span>
                             </div>
                         </div>
@@ -373,7 +479,7 @@ export default function TaskCard({
                                 }}
                                 className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
                             >
-                                Edit
+                                {currentCopy.edit}
                             </button>
 
                             <button
@@ -384,7 +490,7 @@ export default function TaskCard({
                                 }}
                                 className="rounded-2xl border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
                             >
-                                Delete
+                                {currentCopy.delete}
                             </button>
 
                             <button
@@ -396,7 +502,7 @@ export default function TaskCard({
                                         : "rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
                                 }
                             >
-                                {isDone ? "Mark as todo" : "Mark done"}
+                                {isDone ? currentCopy.markAsTodo : currentCopy.markDone}
                             </button>
                         </div>
                     </div>
@@ -404,7 +510,7 @@ export default function TaskCard({
                     {isConfirmingDelete ? (
                         <div className="mt-5 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
                             <p className="text-sm font-bold text-red-300">
-                                Delete this task? This cannot be undone.
+                                {currentCopy.deletePrompt}
                             </p>
 
                             <div className="mt-4 flex flex-col gap-3 sm:flex-row">
@@ -413,7 +519,7 @@ export default function TaskCard({
                                     onClick={handleConfirmDelete}
                                     className="rounded-2xl bg-red-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-red-300"
                                 >
-                                    Confirm delete
+                                    {currentCopy.confirmDelete}
                                 </button>
 
                                 <button
@@ -421,7 +527,7 @@ export default function TaskCard({
                                     onClick={() => setIsConfirmingDelete(false)}
                                     className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
                                 >
-                                    Cancel
+                                    {currentCopy.cancel}
                                 </button>
                             </div>
                         </div>

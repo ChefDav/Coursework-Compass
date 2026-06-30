@@ -46,6 +46,8 @@ export const translations = {
         createProject: "Create project",
         createNewProject: "Create new project",
         backToProjects: "Back to projects",
+        openDashboard: "Open dashboard",
+        openToday: "Open Today",
 
         betaNoticeEyebrow: "Coursework Compass v1.3 Multilingual Foundation",
         betaNoticeTitle: "A clearer bilingual testing version is now in progress.",
@@ -63,7 +65,7 @@ export const translations = {
         betaCardThreeNumber: "03",
         betaCardThreeTitle: "Test bilingually",
         betaCardThreeDescription:
-            "Use the English interface or switch to Simplified Chinese as v1.3 gradually expands bilingual support across the product.",
+            "Use the English interface or switch to Simplified Chinese as v1.3 expands bilingual support across the product.",
         importantDataNoteTitle: "Important data note",
         importantDataNoteOne:
             "Coursework Compass v1.3 still uses browser-only local storage. It does not use accounts or cloud sync yet.",
@@ -97,10 +99,12 @@ export const translations = {
         delete: "Delete",
         cancel: "Cancel",
         close: "Close",
+        save: "Save",
         saveChanges: "Save changes",
         confirmDelete: "Confirm delete",
         markDone: "Mark done",
         markAsTodo: "Mark as todo",
+        reopen: "Reopen",
         addTask: "Add task",
         archiveCompletedTasks: "Archive completed tasks",
 
@@ -120,6 +124,7 @@ export const translations = {
         medium: "Medium",
         high: "High",
         todo: "Todo",
+        inProgress: "In progress",
         done: "Done",
 
         projectNotFound: "Project not found",
@@ -165,11 +170,13 @@ export const translations = {
         createProject: "创建项目",
         createNewProject: "创建新项目",
         backToProjects: "返回项目列表",
+        openDashboard: "打开仪表盘",
+        openToday: "打开今日任务",
 
         betaNoticeEyebrow: "Coursework Compass v1.3 双语基础版",
-        betaNoticeTitle: "更清晰的双语测试版本正在开发中。",
+        betaNoticeTitle: "更清晰的双语测试版本正在完善中。",
         betaNoticeDescription:
-            "这个版本开始把 Coursework Compass 升级为支持 English 和简体中文的 coursework 规划工具。当前重点是语言切换、全局提示双语化，并为中文国际学校学生的使用场景打基础。",
+            "这个版本开始把 Coursework Compass 升级为支持英文和简体中文的 coursework 规划工具。当前重点是语言切换、全局提示双语化，并为中文国际学校学生的使用场景打基础。",
         betaNoticeBadge: "v1.3",
         betaCardOneNumber: "01",
         betaCardOneTitle: "规划 coursework",
@@ -182,7 +189,7 @@ export const translations = {
         betaCardThreeNumber: "03",
         betaCardThreeTitle: "双语测试体验",
         betaCardThreeDescription:
-            "你可以使用英文界面，也可以切换到简体中文。v1.3 会逐步把更多页面升级为双语版本。",
+            "你可以使用英文界面，也可以切换到简体中文。v1.3 会把更多页面升级为双语版本。",
         importantDataNoteTitle: "重要数据说明",
         importantDataNoteOne:
             "Coursework Compass v1.3 仍然使用浏览器本地存储，目前还没有账号系统或云端同步。",
@@ -212,10 +219,12 @@ export const translations = {
         delete: "删除",
         cancel: "取消",
         close: "关闭",
+        save: "保存",
         saveChanges: "保存更改",
         confirmDelete: "确认删除",
         markDone: "标记完成",
         markAsTodo: "恢复待办",
+        reopen: "重新打开",
         addTask: "添加任务",
         archiveCompletedTasks: "归档已完成任务",
 
@@ -235,12 +244,13 @@ export const translations = {
         medium: "中",
         high: "高",
         todo: "待办",
+        inProgress: "进行中",
         done: "已完成",
 
         projectNotFound: "未找到项目",
         projectNotSavedHere: "这个项目没有保存在当前浏览器中。",
         projectNotSavedHereDescription:
-            "当前浏览器中找不到这个项目。它可能已被删除、重置，或保存在另一台设备 / 另一个浏览器中。",
+            "当前浏览器中找不到这个项目。它可能已被删除、重置，或保存在另一台设备/另一个浏览器中。",
 
         noProjectsYet: "还没有项目",
         noActiveTasks: "暂无待办任务",

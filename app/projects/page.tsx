@@ -146,7 +146,6 @@ function formatDate(dateValue: string | undefined, language: Language) {
 
 function getProjectType(plan: GeneratedProjectPlan, language: Language) {
     return (
-        plan.project.type ||
         plan.project.courseworkType ||
         plan.project.subject ||
         copy[language].courseworkProject

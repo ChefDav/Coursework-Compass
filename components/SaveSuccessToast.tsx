@@ -30,31 +30,42 @@ const zhKnownText: Record<string, string> = {
     "Task added locally": "任务已添加到本地",
     "Task deleted locally": "任务已从本地删除",
     "Project deleted locally": "项目已从本地删除",
+    "Project deleted": "项目已删除",
     "Completed tasks archived": "已完成任务已归档",
+    "Archived tasks restored": "已归档任务已恢复",
     "Project details saved": "项目详情已保存",
+    "Task changes saved": "任务更改已保存",
+    "Task marked done": "任务已标记完成",
+    "Task restored": "任务已恢复",
+    "Completed tasks kept": "已完成任务已保留",
+    "Local data reset": "本地数据已重置",
 
     "Your changes have been saved locally in this browser.":
         "你的更改已保存在当前浏览器中。",
-    "Your coursework plan is saved in this browser.":
-        "你的 coursework 计划已保存在当前浏览器中。",
+    "Changes saved locally in this browser.":
+        "更改已保存在当前浏览器中。",
     "Your coursework plan is saved in this browser. You can now view it in Dashboard, Projects, or Today.":
         "你的 coursework 计划已保存在当前浏览器中。现在可以在仪表盘、项目列表或今日任务中查看。",
-    "Your project has been saved locally in this browser.":
-        "你的项目已保存在当前浏览器中。",
-    "Your project has been updated locally in this browser.":
-        "你的项目已在当前浏览器中更新。",
-    "Your task has been updated locally in this browser.":
-        "你的任务已在当前浏览器中更新。",
-    "Your task has been added locally in this browser.":
-        "你的任务已添加并保存在当前浏览器中。",
-    "Your task has been deleted locally in this browser.":
-        "你的任务已从当前浏览器中删除。",
-    "Your project has been deleted locally in this browser.":
-        "你的项目已从当前浏览器中删除。",
-    "Completed tasks have been archived locally in this browser.":
-        "已完成任务已在当前浏览器中归档。",
-    "Project details have been saved locally in this browser.":
-        "项目详情已保存在当前浏览器中。",
+    "Your new task has been added. Today, Dashboard, and this project have been updated.":
+        "你的新任务已添加。今日任务、仪表盘和当前项目都已更新。",
+    "Your task edits have been saved locally in this browser.":
+        "你的任务编辑已保存在当前浏览器中。",
+    "Nice work. Your progress has been saved and recalculated.":
+        "做得好。你的进度已保存并重新计算。",
+    "This task has been restored to todo and your progress has been updated.":
+        "这个任务已恢复为待办，项目进度也已更新。",
+    "The task has been removed and project progress has been recalculated.":
+        "这个任务已删除，项目进度已重新计算。",
+    "Completed tasks have been archived so the active workspace stays clean.":
+        "已完成任务已归档，活跃工作区会保持清爽。",
+    "Archived tasks have been restored to the active project because new work was added.":
+        "因为添加了新工作，已归档任务已恢复到活跃项目中。",
+    "Completed tasks will stay visible in this project. You can add new work later if the project changes.":
+        "已完成任务会继续显示在这个项目中。如果项目之后有变化，你仍然可以添加新工作。",
+    "Your project title, deadline, or settings have been updated.":
+        "你的项目标题、截止日期或设置已更新。",
+    "All local Coursework Compass projects have been removed from this browser.":
+        "当前浏览器中的所有 Coursework Compass 本地项目都已删除。",
 
     "Open dashboard": "打开仪表盘",
     "Open Dashboard": "打开仪表盘",

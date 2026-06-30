@@ -3,85 +3,347 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import FeedbackPanel from "@/components/FeedbackPanel";
+import { useStoredLanguage } from "@/lib/clientStores";
+import type { Language } from "@/lib/i18n";
 
 type TutorialStep = 0 | 1 | 2 | 3 | 4;
-
 type PriorityLevel = "Low" | "Medium" | "High";
+
+type LocalisedText = {
+    en: string;
+    zh: string;
+};
 
 type DemoTask = {
     id: string;
-    title: string;
+    title: LocalisedText;
     priority: PriorityLevel;
     time: string;
     status: "Todo" | "Done";
 };
 
+const copy = {
+    en: {
+        headerEyebrow: "Coursework Compass Tutorial",
+        headerTitle: "Guided student testing flow.",
+        headerDescription:
+            "This tutorial is separate from the real app. It uses simulated tasks, so students can learn the workflow without changing real project data.",
+        mainSite: "Main site",
+        progress: "Tutorial progress",
+        version: "v1.3",
+        step: "Step",
+        stepLabels: [
+            "Choose sample",
+            "Try planner",
+            "Review",
+            "Feedback",
+            "Complete",
+        ],
+        sampleStep: "Step 1",
+        sampleTitle: "Choose a sample project.",
+        sampleDescription:
+            "Pick one sample project to use for the tutorial. This does not create a real project and does not save anything to the browser.",
+        template: "Template",
+        deadline: "Deadline",
+        intensity: "Intensity",
+        continuePlanner: "Continue to planner tutorial",
+        reset: "Reset tutorial",
+        plannerStep: "Step 2",
+        plannerTitle: "Try the planner controls yourself.",
+        plannerDescription:
+            "This is a simulated project board. Use the cards and form yourself; it does not affect real saved data.",
+        tutorialProject: "Tutorial project",
+        actionsCompleted: "Tutorial actions completed",
+        taskTitle: "Task title",
+        priority: "Priority",
+        estimatedTime: "Estimated time",
+        addTask: "Add this task",
+        edit: "Edit",
+        save: "Save",
+        cancel: "Cancel",
+        delete: "Delete",
+        confirmDelete: "Confirm delete",
+        deletePrompt: "Delete this tutorial task?",
+        markDone: "Mark done",
+        markTodo: "Mark todo",
+        done: "Done",
+        todo: "Todo",
+        newTaskPlaceholder: "e.g. Ask teacher for feedback",
+        titleError: "Please type a task title first.",
+        editError: "Please type a task title before saving.",
+        checklistTitle: "Complete these four real interactions.",
+        checklistItems: [
+            "Mark a task as done",
+            "Add your own task using the form",
+            "Open Edit and save a change",
+            "Delete a task with confirmation",
+        ],
+        continueReview: "Continue to review",
+        unlockNote:
+            "The continue button unlocks only after the student actually uses the tutorial controls.",
+        reviewStep: "Step 3",
+        reviewTitle: "Review what you tested.",
+        reviewDescription:
+            "You have now walked through the core planner ideas in a safe tutorial space. Before sending feedback, think about what felt useful, confusing, missing, or unrealistic.",
+        completedActions: "Completed tutorial actions",
+        feedbackIdeas: "Feedback ideas",
+        feedbackPrompts: [
+            "Was the workflow easy to understand?",
+            "Did the edit form feel natural?",
+            "Was adding a custom task clear?",
+            "Was delete confirmation useful?",
+            "Would you return to this website?",
+        ],
+        prepareFeedback: "Prepare feedback form",
+        backPlanner: "Back to planner tutorial",
+        preparingFeedback: "Preparing feedback",
+        feedbackTitle: "Building your feedback portal.",
+        loadingProgress: "Loading progress",
+        finalStep: "Final step",
+        sendFeedback: "Send your feedback.",
+        sendFeedbackDescription:
+            "Short feedback is enough. One clear sentence can help shape the next version of Coursework Compass.",
+        finished: "I finished the test",
+        completeBadge: "Tutorial complete",
+        completeTitle: "Congrats, you completed the guided test.",
+        completeDescription:
+            "You have finished the tutorial route and helped test the core Coursework Compass workflow. Now you are ready to begin the real planning journey.",
+        completeCards: [
+            {
+                title: "You explored planning",
+                description:
+                    "You saw how a large coursework project can become visible tasks.",
+            },
+            {
+                title: "You tested controls",
+                description:
+                    "You tried task completion, adding, editing, and deleting.",
+            },
+            {
+                title: "You shaped the product",
+                description:
+                    "Your feedback helps decide what Coursework Compass becomes next.",
+            },
+        ],
+        returnHome: "Return to main menu",
+        startReal: "Officially start the journey",
+        tryAgain: "Try tutorial again",
+        low: "Low",
+        medium: "Medium",
+        high: "High",
+        loadingMessages: [
+            "Sorting coursework chaos into small steps...",
+            "Checking the deadline pressure...",
+            "Sharpening the task list...",
+            "Preparing the feedback portal...",
+            "Polishing the student testing route...",
+            "Almost there...",
+        ],
+    },
+    zh: {
+        headerEyebrow: "Coursework Compass 教程",
+        headerTitle: "引导式学生测试流程。",
+        headerDescription:
+            "这个教程独立于真实应用，使用模拟任务，让学生在不改变真实项目数据的情况下学习工作流。",
+        mainSite: "主站",
+        progress: "教程进度",
+        version: "v1.3",
+        step: "步骤",
+        stepLabels: [
+            "选择示例",
+            "试用规划器",
+            "回顾",
+            "反馈",
+            "完成",
+        ],
+        sampleStep: "步骤 1",
+        sampleTitle: "选择一个示例项目。",
+        sampleDescription:
+            "选择一个示例项目用于教程。这不会创建真实项目，也不会向浏览器保存数据。",
+        template: "模板",
+        deadline: "截止日期",
+        intensity: "规划强度",
+        continuePlanner: "继续进入规划器教程",
+        reset: "重置教程",
+        plannerStep: "步骤 2",
+        plannerTitle: "自己试用规划器控件。",
+        plannerDescription:
+            "这是一个模拟项目面板。请自己操作卡片和表单；它不会影响真实保存的数据。",
+        tutorialProject: "教程项目",
+        actionsCompleted: "已完成教程动作",
+        taskTitle: "任务标题",
+        priority: "优先级",
+        estimatedTime: "预计用时",
+        addTask: "添加这个任务",
+        edit: "编辑",
+        save: "保存",
+        cancel: "取消",
+        delete: "删除",
+        confirmDelete: "确认删除",
+        deletePrompt: "要删除这个教程任务吗？",
+        markDone: "标记完成",
+        markTodo: "恢复待办",
+        done: "已完成",
+        todo: "待办",
+        newTaskPlaceholder: "例如：请老师给反馈",
+        titleError: "请先输入任务标题。",
+        editError: "请先输入任务标题，再保存。",
+        checklistTitle: "完成这四个真实交互。",
+        checklistItems: [
+            "把一个任务标记完成",
+            "用表单添加自己的任务",
+            "打开编辑并保存一次更改",
+            "通过确认步骤删除一个任务",
+        ],
+        continueReview: "继续回顾",
+        unlockNote:
+            "只有当学生真的使用过教程控件后，继续按钮才会解锁。",
+        reviewStep: "步骤 3",
+        reviewTitle: "回顾你测试了什么。",
+        reviewDescription:
+            "你已经在安全的教程空间走过核心规划流程。发送反馈前，可以想想哪里有用、哪里困惑、哪里缺失或不够真实。",
+        completedActions: "已完成的教程动作",
+        feedbackIdeas: "反馈思路",
+        feedbackPrompts: [
+            "这个流程容易理解吗？",
+            "编辑表单用起来自然吗？",
+            "添加自定义任务是否清楚？",
+            "删除确认是否有帮助？",
+            "你会再次使用这个网站吗？",
+        ],
+        prepareFeedback: "准备反馈表单",
+        backPlanner: "返回规划器教程",
+        preparingFeedback: "正在准备反馈",
+        feedbackTitle: "正在构建你的反馈入口。",
+        loadingProgress: "加载进度",
+        finalStep: "最后一步",
+        sendFeedback: "发送你的反馈。",
+        sendFeedbackDescription:
+            "简短反馈就足够。一句清楚的话也能帮助塑造 Coursework Compass 的下一个版本。",
+        finished: "我完成了测试",
+        completeBadge: "教程完成",
+        completeTitle: "恭喜，你完成了引导测试。",
+        completeDescription:
+            "你已经完成教程路线，并帮助测试了 Coursework Compass 的核心工作流。现在可以开始真实规划。",
+        completeCards: [
+            {
+                title: "你体验了规划",
+                description:
+                    "你看到了大型 coursework 如何变成可见任务。",
+            },
+            {
+                title: "你测试了控件",
+                description:
+                    "你尝试了完成、添加、编辑和删除任务。",
+            },
+            {
+                title: "你影响了产品",
+                description:
+                    "你的反馈会帮助决定 Coursework Compass 下一步变成什么样。",
+            },
+        ],
+        returnHome: "返回主菜单",
+        startReal: "正式开始规划",
+        tryAgain: "再试一次教程",
+        low: "低",
+        medium: "中",
+        high: "高",
+        loadingMessages: [
+            "正在把 coursework 混乱拆成小步骤...",
+            "正在检查截止日期压力...",
+            "正在打磨任务清单...",
+            "正在准备反馈入口...",
+            "正在优化学生测试路线...",
+            "马上就好...",
+        ],
+    },
+} as const;
+
 const sampleProjects = [
     {
         id: "biology-ia",
-        name: "Sample Biology IA",
+        name: { en: "Sample Biology IA", zh: "示例 Biology IA" },
         template: "Biology IA",
-        deadline: "3 to 4 weeks from today",
-        intensity: "Balanced",
-        description:
-            "Good for testing science coursework planning, data collection, analysis, and evaluation tasks.",
+        deadline: {
+            en: "3 to 4 weeks from today",
+            zh: "从今天起 3 到 4 周",
+        },
+        intensity: { en: "Balanced", zh: "平衡" },
+        description: {
+            en: "Good for testing science coursework planning, data collection, analysis, and evaluation tasks.",
+            zh: "适合测试科学 coursework 的规划、数据收集、分析和 evaluation 任务。",
+        },
     },
     {
         id: "math-ia",
-        name: "Sample Math IA",
+        name: { en: "Sample Math IA", zh: "示例 Math IA" },
         template: "Math IA",
-        deadline: "Around one month from today",
-        intensity: "Balanced",
-        description:
-            "Good for testing research question planning, exploration structure, data, graphs, and reflection.",
+        deadline: {
+            en: "Around one month from today",
+            zh: "大约从今天起一个月",
+        },
+        intensity: { en: "Balanced", zh: "平衡" },
+        description: {
+            en: "Good for testing research question planning, exploration structure, data, graphs, and reflection.",
+            zh: "适合测试 research question、探究结构、数据、图表和 reflection。",
+        },
     },
     {
         id: "extended-essay",
-        name: "Sample Extended Essay",
+        name: { en: "Sample Extended Essay", zh: "示例 Extended Essay" },
         template: "Extended Essay",
-        deadline: "6 to 8 weeks from today",
-        intensity: "Light or Balanced",
-        description:
-            "Good for testing long-term planning, research stages, source tracking, drafting, and revision.",
+        deadline: {
+            en: "6 to 8 weeks from today",
+            zh: "从今天起 6 到 8 周",
+        },
+        intensity: { en: "Light or Balanced", zh: "轻量或平衡" },
+        description: {
+            en: "Good for testing long-term planning, research stages, source tracking, drafting, and revision.",
+            zh: "适合测试长期规划、研究阶段、资料追踪、起草和修改。",
+        },
     },
 ];
 
 const initialDemoTasks: DemoTask[] = [
     {
         id: "task-1",
-        title: "Refine the research question",
+        title: {
+            en: "Refine the research question",
+            zh: "优化 research question",
+        },
         priority: "High",
         time: "45 min",
         status: "Todo",
     },
     {
         id: "task-2",
-        title: "Create a short evidence or data collection plan",
+        title: {
+            en: "Create a short evidence or data collection plan",
+            zh: "创建简短证据或数据收集计划",
+        },
         priority: "Medium",
         time: "1 hour",
         status: "Todo",
     },
     {
         id: "task-3",
-        title: "Draft the first analysis paragraph",
+        title: {
+            en: "Draft the first analysis paragraph",
+            zh: "起草第一段分析",
+        },
         priority: "Medium",
         time: "1.5 hours",
         status: "Todo",
     },
 ];
 
-const loadingMessages = [
-    "Sorting coursework chaos into tiny boxes...",
-    "Checking whether the deadline monster has been weakened...",
-    "Sharpening the task list...",
-    "Preparing the feedback portal...",
-    "Polishing the student testing route...",
-    "Almost there...",
-];
-
 const priorityOptions: PriorityLevel[] = ["Low", "Medium", "High"];
 
-function getPriorityClasses(priority: DemoTask["priority"]) {
+function localText(value: LocalisedText, language: Language) {
+    return value[language];
+}
+
+function getPriorityClasses(priority: PriorityLevel) {
     if (priority === "High") {
         return "border-red-400/30 bg-red-400/10 text-red-300";
     }
@@ -93,24 +355,16 @@ function getPriorityClasses(priority: DemoTask["priority"]) {
     return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
 }
 
-function getStepLabel(step: TutorialStep) {
-    if (step === 0) {
-        return "Choose sample";
+function getPriorityLabel(priority: PriorityLevel, language: Language) {
+    if (priority === "High") {
+        return copy[language].high;
     }
 
-    if (step === 1) {
-        return "Try planner";
+    if (priority === "Medium") {
+        return copy[language].medium;
     }
 
-    if (step === 2) {
-        return "Review";
-    }
-
-    if (step === 3) {
-        return "Feedback";
-    }
-
-    return "Complete";
+    return copy[language].low;
 }
 
 function isPriorityLevel(value: string): value is PriorityLevel {
@@ -118,6 +372,8 @@ function isPriorityLevel(value: string): value is PriorityLevel {
 }
 
 export default function StudentTestingPage() {
+    const language = useStoredLanguage();
+    const currentCopy = copy[language];
     const [step, setStep] = useState<TutorialStep>(0);
     const [selectedProjectId, setSelectedProjectId] = useState(
         sampleProjects[0].id,
@@ -140,7 +396,6 @@ export default function StudentTestingPage() {
     const [editPriority, setEditPriority] = useState<PriorityLevel>("Medium");
     const [editTime, setEditTime] = useState("");
     const [editError, setEditError] = useState("");
-
     const [deleteCandidateId, setDeleteCandidateId] = useState("");
 
     const [loadingProgress, setLoadingProgress] = useState(0);
@@ -181,7 +436,7 @@ export default function StudentTestingPage() {
 
         const messageTimer = window.setInterval(() => {
             setLoadingMessageIndex((currentIndex) => {
-                return (currentIndex + 1) % loadingMessages.length;
+                return (currentIndex + 1) % currentCopy.loadingMessages.length;
             });
         }, 900);
 
@@ -189,7 +444,7 @@ export default function StudentTestingPage() {
             window.clearInterval(progressTimer);
             window.clearInterval(messageTimer);
         };
-    }, [showFeedback, step]);
+    }, [currentCopy.loadingMessages.length, showFeedback, step]);
 
     useEffect(() => {
         if (step !== 3 || loadingProgress < 100) {
@@ -231,7 +486,7 @@ export default function StudentTestingPage() {
         const trimmedTime = newTaskTime.trim() || "30 min";
 
         if (!trimmedTitle) {
-            setNewTaskError("Please type a task title first.");
+            setNewTaskError(currentCopy.titleError);
             return;
         }
 
@@ -239,7 +494,10 @@ export default function StudentTestingPage() {
             ...currentTasks,
             {
                 id: `custom-${Date.now().toString(36)}`,
-                title: trimmedTitle,
+                title: {
+                    en: trimmedTitle,
+                    zh: trimmedTitle,
+                },
                 priority: newTaskPriority,
                 time: trimmedTime,
                 status: "Todo",
@@ -255,7 +513,7 @@ export default function StudentTestingPage() {
 
     function handleStartEdit(task: DemoTask) {
         setEditingTaskId(task.id);
-        setEditTitle(task.title);
+        setEditTitle(localText(task.title, language));
         setEditPriority(task.priority);
         setEditTime(task.time);
         setEditError("");
@@ -275,7 +533,7 @@ export default function StudentTestingPage() {
         const trimmedTime = editTime.trim() || "30 min";
 
         if (!trimmedTitle) {
-            setEditError("Please type a task title before saving.");
+            setEditError(currentCopy.editError);
             return;
         }
 
@@ -287,7 +545,10 @@ export default function StudentTestingPage() {
 
                 return {
                     ...task,
-                    title: trimmedTitle,
+                    title: {
+                        ...task.title,
+                        [language]: trimmedTitle,
+                    },
                     priority: editPriority,
                     time: trimmedTime,
                 };
@@ -296,20 +557,6 @@ export default function StudentTestingPage() {
 
         setHasEditedTask(true);
         handleCancelEdit();
-    }
-
-    function handleAskDelete(taskId: string) {
-        setDeleteCandidateId(taskId);
-        setEditingTaskId("");
-    }
-
-    function handleConfirmDelete(taskId: string) {
-        setDemoTasks((currentTasks) =>
-            currentTasks.filter((task) => task.id !== taskId),
-        );
-
-        setDeleteCandidateId("");
-        setHasDeletedTask(true);
     }
 
     function handleResetTutorial() {
@@ -344,15 +591,13 @@ export default function StudentTestingPage() {
                 <header className="mb-10 flex flex-col gap-5 rounded-[2rem] border border-slate-800 bg-slate-900/70 p-5 shadow-2xl shadow-cyan-950/20 sm:p-6 md:flex-row md:items-center md:justify-between">
                     <div>
                         <p className="mb-2 text-sm font-bold text-cyan-300">
-                            Coursework Compass Tutorial
+                            {currentCopy.headerEyebrow}
                         </p>
                         <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-                            Guided student testing flow.
+                            {currentCopy.headerTitle}
                         </h1>
                         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-                            This tutorial is separate from the real app. It uses simulated
-                            tasks, so students can learn the workflow without changing real
-                            project data.
+                            {currentCopy.headerDescription}
                         </p>
                     </div>
 
@@ -360,7 +605,7 @@ export default function StudentTestingPage() {
                         href="/"
                         className="w-fit rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
                     >
-                        Main site
+                        {currentCopy.mainSite}
                     </Link>
                 </header>
 
@@ -368,28 +613,20 @@ export default function StudentTestingPage() {
                     <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div>
                             <p className="mb-2 text-sm font-bold text-cyan-300">
-                                Tutorial progress
+                                {currentCopy.progress}
                             </p>
                             <h2 className="text-2xl font-black sm:text-3xl">
-                                {getStepLabel(step)}
+                                {currentCopy.stepLabels[step]}
                             </h2>
                         </div>
 
                         <div className="rounded-full border border-cyan-400/30 bg-slate-950/70 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
-                            v1.2
+                            {currentCopy.version}
                         </div>
                     </div>
 
                     <div className="grid gap-3 md:grid-cols-5">
-                        {(
-                            [
-                                "Choose sample",
-                                "Try planner",
-                                "Review",
-                                "Feedback",
-                                "Complete",
-                            ] as const
-                        ).map((label, index) => {
+                        {currentCopy.stepLabels.map((label, index) => {
                             const isActive = index === step;
                             const isComplete = index < step;
 
@@ -405,7 +642,7 @@ export default function StudentTestingPage() {
                                     }`}
                                 >
                                     <p className="mb-1 text-xs font-black uppercase tracking-[0.2em]">
-                                        Step {index + 1}
+                                        {currentCopy.step} {index + 1}
                                     </p>
                                     <p className="text-sm font-bold">{label}</p>
                                 </div>
@@ -416,13 +653,14 @@ export default function StudentTestingPage() {
 
                 {step === 0 ? (
                     <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-8">
-                        <p className="mb-2 text-sm font-bold text-emerald-300">Step 1</p>
+                        <p className="mb-2 text-sm font-bold text-emerald-300">
+                            {currentCopy.sampleStep}
+                        </p>
                         <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                            Choose a sample project.
+                            {currentCopy.sampleTitle}
                         </h2>
                         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                            Pick one sample project to use for the tutorial. This does not
-                            create a real project and does not save anything to the browser.
+                            {currentCopy.sampleDescription}
                         </p>
 
                         <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -440,23 +678,31 @@ export default function StudentTestingPage() {
                                                 : "border-slate-800 bg-slate-950/70 text-slate-300 hover:border-emerald-400 hover:text-emerald-300"
                                         }`}
                                     >
-                                        <h3 className="text-xl font-black">{project.name}</h3>
+                                        <h3 className="text-xl font-black">
+                                            {localText(project.name, language)}
+                                        </h3>
                                         <div className="mt-4 space-y-2 text-sm leading-6">
                                             <p>
-                                                <span className="font-bold">Template:</span>{" "}
+                                                <span className="font-bold">
+                                                    {currentCopy.template}:
+                                                </span>{" "}
                                                 {project.template}
                                             </p>
                                             <p>
-                                                <span className="font-bold">Deadline:</span>{" "}
-                                                {project.deadline}
+                                                <span className="font-bold">
+                                                    {currentCopy.deadline}:
+                                                </span>{" "}
+                                                {localText(project.deadline, language)}
                                             </p>
                                             <p>
-                                                <span className="font-bold">Intensity:</span>{" "}
-                                                {project.intensity}
+                                                <span className="font-bold">
+                                                    {currentCopy.intensity}:
+                                                </span>{" "}
+                                                {localText(project.intensity, language)}
                                             </p>
                                         </div>
                                         <p className="mt-4 text-sm leading-6">
-                                            {project.description}
+                                            {localText(project.description, language)}
                                         </p>
                                     </button>
                                 );
@@ -469,7 +715,7 @@ export default function StudentTestingPage() {
                                 onClick={() => setStep(1)}
                                 className="rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
                             >
-                                Continue to planner tutorial
+                                {currentCopy.continuePlanner}
                             </button>
 
                             <button
@@ -477,7 +723,7 @@ export default function StudentTestingPage() {
                                 onClick={handleResetTutorial}
                                 className="rounded-2xl border border-slate-700 px-6 py-4 font-bold text-white transition hover:border-slate-400"
                             >
-                                Reset tutorial
+                                {currentCopy.reset}
                             </button>
                         </div>
                     </section>
@@ -486,25 +732,24 @@ export default function StudentTestingPage() {
                 {step === 1 ? (
                     <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
                         <div className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6">
-                            <p className="mb-2 text-sm font-bold text-cyan-300">Step 2</p>
+                            <p className="mb-2 text-sm font-bold text-cyan-300">
+                                {currentCopy.plannerStep}
+                            </p>
                             <h2 className="text-3xl font-black tracking-tight">
-                                Try the planner controls yourself.
+                                {currentCopy.plannerTitle}
                             </h2>
                             <p className="mt-3 text-sm leading-6 text-slate-300">
-                                This is a simulated project board for{" "}
-                                <span className="font-bold text-white">
-                  {selectedProject.name}
-                </span>
-                                . You need to interact with the cards and form yourself. This
-                                does not affect real saved data.
+                                {currentCopy.plannerDescription}
                             </p>
 
                             <div className="mt-6 rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-4">
-                                <div className="mb-3 flex items-center justify-between">
-                                    <p className="font-bold text-white">{selectedProject.name}</p>
+                                <div className="mb-3 flex items-center justify-between gap-3">
+                                    <p className="font-bold text-white">
+                                        {localText(selectedProject.name, language)}
+                                    </p>
                                     <span className="rounded-full border border-cyan-400/30 bg-slate-950/70 px-3 py-1 text-xs font-bold text-cyan-300">
-                    Tutorial project
-                  </span>
+                                        {currentCopy.tutorialProject}
+                                    </span>
                                 </div>
 
                                 <div className="h-3 overflow-hidden rounded-full bg-slate-800">
@@ -514,107 +759,83 @@ export default function StudentTestingPage() {
                                     />
                                 </div>
 
-                                <p className="mt-2 text-xs text-slate-400">
-                                    Tutorial actions completed: {completedActions}/4
+                                <p className="mt-2 text-xs font-bold text-cyan-200">
+                                    {currentCopy.actionsCompleted}: {completedActions}/4
                                 </p>
                             </div>
 
                             <div className="mt-5 space-y-4">
                                 {demoTasks.map((task) => {
                                     const isEditing = editingTaskId === task.id;
-                                    const isConfirmingDelete = deleteCandidateId === task.id;
+                                    const isDeleting = deleteCandidateId === task.id;
+                                    const isDone = task.status === "Done";
 
                                     return (
-                                        <div
+                                        <article
                                             key={task.id}
-                                            className={`rounded-3xl border p-4 ${
-                                                task.status === "Done"
+                                            className={`rounded-[1.5rem] border p-4 ${
+                                                isDone
                                                     ? "border-emerald-400/30 bg-emerald-400/10"
                                                     : "border-slate-800 bg-slate-950/70"
                                             }`}
                                         >
                                             {isEditing ? (
-                                                <div>
-                                                    <p className="mb-3 text-sm font-bold text-cyan-300">
-                                                        Edit this task
-                                                    </p>
+                                                <div className="grid gap-3">
+                                                    <input
+                                                        value={editTitle}
+                                                        onChange={(event) => {
+                                                            setEditTitle(event.target.value);
+                                                            setEditError("");
+                                                        }}
+                                                        className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
+                                                    />
 
-                                                    <div className="grid gap-3 md:grid-cols-[1.2fr_0.7fr_0.7fr]">
-                                                        <div>
-                                                            <label className="mb-2 block text-xs font-bold text-slate-300">
-                                                                Task title
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                value={editTitle}
-                                                                onChange={(event) => {
-                                                                    setEditTitle(event.target.value);
-                                                                    setEditError("");
-                                                                }}
-                                                                className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
-                                                            />
-                                                        </div>
-
-                                                        <div>
-                                                            <label className="mb-2 block text-xs font-bold text-slate-300">
-                                                                Priority
-                                                            </label>
-                                                            <select
-                                                                value={editPriority}
-                                                                onChange={(event) => {
-                                                                    if (!isPriorityLevel(event.target.value)) {
-                                                                        return;
-                                                                    }
-
+                                                    <div className="grid gap-3 sm:grid-cols-2">
+                                                        <select
+                                                            value={editPriority}
+                                                            onChange={(event) => {
+                                                                if (isPriorityLevel(event.target.value)) {
                                                                     setEditPriority(event.target.value);
-                                                                }}
-                                                                className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
-                                                            >
-                                                                {priorityOptions.map((priority) => (
-                                                                    <option key={priority} value={priority}>
-                                                                        {priority}
-                                                                    </option>
-                                                                ))}
-                                                            </select>
-                                                        </div>
+                                                                }
+                                                            }}
+                                                            className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
+                                                        >
+                                                            {priorityOptions.map((priority) => (
+                                                                <option key={priority} value={priority}>
+                                                                    {getPriorityLabel(priority, language)}
+                                                                </option>
+                                                            ))}
+                                                        </select>
 
-                                                        <div>
-                                                            <label className="mb-2 block text-xs font-bold text-slate-300">
-                                                                Time
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                value={editTime}
-                                                                onChange={(event) => {
-                                                                    setEditTime(event.target.value);
-                                                                    setEditError("");
-                                                                }}
-                                                                className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
-                                                            />
-                                                        </div>
+                                                        <input
+                                                            value={editTime}
+                                                            onChange={(event) =>
+                                                                setEditTime(event.target.value)
+                                                            }
+                                                            className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
+                                                        />
                                                     </div>
 
                                                     {editError ? (
-                                                        <div className="mt-3 rounded-2xl border border-red-400/30 bg-red-400/10 p-3 text-sm font-bold text-red-300">
+                                                        <p className="rounded-2xl border border-red-400/30 bg-red-400/10 p-3 text-sm font-bold text-red-300">
                                                             {editError}
-                                                        </div>
+                                                        </p>
                                                     ) : null}
 
-                                                    <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                                                    <div className="flex flex-col gap-3 sm:flex-row">
                                                         <button
                                                             type="button"
                                                             onClick={() => handleSaveEdit(task.id)}
-                                                            className="rounded-xl bg-cyan-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                                                            className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
                                                         >
-                                                            Save edit
+                                                            {currentCopy.save}
                                                         </button>
-
                                                         <button
                                                             type="button"
                                                             onClick={handleCancelEdit}
-                                                            className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-bold text-white transition hover:border-slate-400"
+                                                            className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
                                                         >
-                                                            Cancel
+                                                            {currentCopy.cancel}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -624,87 +845,94 @@ export default function StudentTestingPage() {
                                                         <div>
                                                             <h3
                                                                 className={`text-lg font-black ${
-                                                                    task.status === "Done"
+                                                                    isDone
                                                                         ? "text-emerald-200 line-through"
                                                                         : "text-white"
                                                                 }`}
                                                             >
-                                                                {task.title}
+                                                                {localText(task.title, language)}
                                                             </h3>
-                                                            <p className="mt-1 text-sm text-slate-400">
-                                                                Estimated time: {task.time}
-                                                            </p>
+                                                            <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold">
+                                                                <span
+                                                                    className={`rounded-full border px-3 py-1 ${getPriorityClasses(
+                                                                        task.priority,
+                                                                    )}`}
+                                                                >
+                                                                    {getPriorityLabel(task.priority, language)}
+                                                                </span>
+                                                                <span className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-slate-300">
+                                                                    {task.time}
+                                                                </span>
+                                                                <span className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-slate-300">
+                                                                    {isDone ? currentCopy.done : currentCopy.todo}
+                                                                </span>
+                                                            </div>
                                                         </div>
 
-                                                        <div
-                                                            className={`w-fit rounded-full border px-3 py-1 text-xs font-bold ${getPriorityClasses(
-                                                                task.priority,
-                                                            )}`}
-                                                        >
-                                                            {task.status === "Done" ? "Done" : task.priority}
+                                                        <div className="flex flex-col gap-3 sm:flex-row">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleToggleTaskStatus(task.id)}
+                                                                className="rounded-2xl bg-emerald-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
+                                                            >
+                                                                {isDone
+                                                                    ? currentCopy.markTodo
+                                                                    : currentCopy.markDone}
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleStartEdit(task)}
+                                                                className="rounded-2xl border border-slate-700 px-4 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                                                            >
+                                                                {currentCopy.edit}
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setDeleteCandidateId(task.id);
+                                                                    setEditingTaskId("");
+                                                                }}
+                                                                className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                                                            >
+                                                                {currentCopy.delete}
+                                                            </button>
                                                         </div>
                                                     </div>
 
-                                                    <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleToggleTaskStatus(task.id)}
-                                                            className={`rounded-xl px-4 py-3 text-sm font-bold transition ${
-                                                                task.status === "Done"
-                                                                    ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-200 hover:bg-emerald-400/20"
-                                                                    : "bg-cyan-400 text-slate-950 hover:bg-cyan-300"
-                                                            }`}
-                                                        >
-                                                            {task.status === "Done"
-                                                                ? "Mark as todo"
-                                                                : "Mark done"}
-                                                        </button>
-
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleStartEdit(task)}
-                                                            className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
-                                                        >
-                                                            Edit
-                                                        </button>
-
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleAskDelete(task.id)}
-                                                            className="rounded-xl border border-red-400/30 px-4 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/10"
-                                                        >
-                                                            Delete
-                                                        </button>
-                                                    </div>
-
-                                                    {isConfirmingDelete ? (
+                                                    {isDeleting ? (
                                                         <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
                                                             <p className="text-sm font-bold text-red-300">
-                                                                Delete this tutorial task?
+                                                                {currentCopy.deletePrompt}
                                                             </p>
-
                                                             <div className="mt-3 flex flex-col gap-3 sm:flex-row">
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => handleConfirmDelete(task.id)}
-                                                                    className="rounded-xl bg-red-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-red-300"
+                                                                    onClick={() => {
+                                                                        setDemoTasks((currentTasks) =>
+                                                                            currentTasks.filter(
+                                                                                (item) => item.id !== task.id,
+                                                                            ),
+                                                                        );
+                                                                        setDeleteCandidateId("");
+                                                                        setHasDeletedTask(true);
+                                                                    }}
+                                                                    className="rounded-2xl bg-red-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-red-300"
                                                                 >
-                                                                    Confirm delete
+                                                                    {currentCopy.confirmDelete}
                                                                 </button>
-
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => setDeleteCandidateId("")}
-                                                                    className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-bold text-white transition hover:border-slate-400"
+                                                                    className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
                                                                 >
-                                                                    Cancel
+                                                                    {currentCopy.cancel}
                                                                 </button>
                                                             </div>
                                                         </div>
                                                     ) : null}
                                                 </div>
                                             )}
-                                        </div>
+                                        </article>
                                     );
                                 })}
                             </div>
@@ -713,128 +941,92 @@ export default function StudentTestingPage() {
                         <aside className="space-y-5">
                             <div className="rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
                                 <p className="mb-2 text-sm font-bold text-emerald-300">
-                                    Add a custom task
+                                    {currentCopy.addTask}
                                 </p>
-                                <h2 className="text-2xl font-black">
-                                    Type your own task.
-                                </h2>
+                                <div className="grid gap-3">
+                                    <input
+                                        value={newTaskTitle}
+                                        onChange={(event) => {
+                                            setNewTaskTitle(event.target.value);
+                                            setNewTaskError("");
+                                        }}
+                                        placeholder={currentCopy.newTaskPlaceholder}
+                                        className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-300"
+                                    />
 
-                                <div className="mt-5 space-y-4">
-                                    <div>
-                                        <label className="mb-2 block text-xs font-bold text-slate-300">
-                                            Task title
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={newTaskTitle}
-                                            onChange={(event) => {
-                                                setNewTaskTitle(event.target.value);
-                                                setNewTaskError("");
-                                            }}
-                                            placeholder="e.g. Ask teacher for feedback"
-                                            className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-300"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="mb-2 block text-xs font-bold text-slate-300">
-                                            Priority
-                                        </label>
+                                    <div className="grid gap-3 sm:grid-cols-2">
                                         <select
                                             value={newTaskPriority}
                                             onChange={(event) => {
-                                                if (!isPriorityLevel(event.target.value)) {
-                                                    return;
+                                                if (isPriorityLevel(event.target.value)) {
+                                                    setNewTaskPriority(event.target.value);
                                                 }
-
-                                                setNewTaskPriority(event.target.value);
                                             }}
                                             className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-emerald-300"
                                         >
                                             {priorityOptions.map((priority) => (
                                                 <option key={priority} value={priority}>
-                                                    {priority}
+                                                    {getPriorityLabel(priority, language)}
                                                 </option>
                                             ))}
                                         </select>
-                                    </div>
 
-                                    <div>
-                                        <label className="mb-2 block text-xs font-bold text-slate-300">
-                                            Estimated time
-                                        </label>
                                         <input
-                                            type="text"
                                             value={newTaskTime}
-                                            onChange={(event) => setNewTaskTime(event.target.value)}
+                                            onChange={(event) =>
+                                                setNewTaskTime(event.target.value)
+                                            }
                                             className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-emerald-300"
                                         />
                                     </div>
+
+                                    {newTaskError ? (
+                                        <p className="rounded-2xl border border-red-400/30 bg-red-400/10 p-3 text-sm font-bold text-red-300">
+                                            {newTaskError}
+                                        </p>
+                                    ) : null}
+
+                                    <button
+                                        type="button"
+                                        onClick={handleAddTask}
+                                        className="rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
+                                    >
+                                        {currentCopy.addTask}
+                                    </button>
                                 </div>
-
-                                {newTaskError ? (
-                                    <div className="mt-4 rounded-2xl border border-red-400/30 bg-red-400/10 p-3 text-sm font-bold text-red-300">
-                                        {newTaskError}
-                                    </div>
-                                ) : null}
-
-                                <button
-                                    type="button"
-                                    onClick={handleAddTask}
-                                    className="mt-5 w-full rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
-                                >
-                                    Add this task
-                                </button>
                             </div>
 
                             <div className="rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-6">
                                 <p className="mb-2 text-sm font-bold text-cyan-300">
-                                    Action checklist
+                                    {currentCopy.progress}
                                 </p>
                                 <h2 className="text-2xl font-black">
-                                    Complete these four real interactions.
+                                    {currentCopy.checklistTitle}
                                 </h2>
 
                                 <div className="mt-5 space-y-3 text-sm font-bold">
-                                    <div
-                                        className={`rounded-2xl border p-3 ${
-                                            hasMarkedDone
-                                                ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                                                : "border-slate-800 bg-slate-950/70 text-slate-400"
-                                        }`}
-                                    >
-                                        {hasMarkedDone ? "✓ " : ""}Mark a task as done
-                                    </div>
+                                    {currentCopy.checklistItems.map((item, index) => {
+                                        const isComplete = [
+                                            hasMarkedDone,
+                                            hasAddedTask,
+                                            hasEditedTask,
+                                            hasDeletedTask,
+                                        ][index];
 
-                                    <div
-                                        className={`rounded-2xl border p-3 ${
-                                            hasAddedTask
-                                                ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                                                : "border-slate-800 bg-slate-950/70 text-slate-400"
-                                        }`}
-                                    >
-                                        {hasAddedTask ? "✓ " : ""}Add your own task using the form
-                                    </div>
-
-                                    <div
-                                        className={`rounded-2xl border p-3 ${
-                                            hasEditedTask
-                                                ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                                                : "border-slate-800 bg-slate-950/70 text-slate-400"
-                                        }`}
-                                    >
-                                        {hasEditedTask ? "✓ " : ""}Open Edit and save a change
-                                    </div>
-
-                                    <div
-                                        className={`rounded-2xl border p-3 ${
-                                            hasDeletedTask
-                                                ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                                                : "border-slate-800 bg-slate-950/70 text-slate-400"
-                                        }`}
-                                    >
-                                        {hasDeletedTask ? "✓ " : ""}Delete a task with confirmation
-                                    </div>
+                                        return (
+                                            <div
+                                                key={item}
+                                                className={`rounded-2xl border p-3 ${
+                                                    isComplete
+                                                        ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+                                                        : "border-slate-800 bg-slate-950/70 text-slate-400"
+                                                }`}
+                                            >
+                                                {isComplete ? "✓ " : ""}
+                                                {item}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
 
                                 <button
@@ -847,12 +1039,11 @@ export default function StudentTestingPage() {
                                             : "cursor-not-allowed bg-slate-800 text-slate-500"
                                     }`}
                                 >
-                                    Continue to review
+                                    {currentCopy.continueReview}
                                 </button>
 
                                 <p className="mt-3 text-xs leading-5 text-slate-400">
-                                    The continue button unlocks only after the student actually
-                                    uses the tutorial controls.
+                                    {currentCopy.unlockNote}
                                 </p>
                             </div>
                         </aside>
@@ -861,40 +1052,36 @@ export default function StudentTestingPage() {
 
                 {step === 2 ? (
                     <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-8">
-                        <p className="mb-2 text-sm font-bold text-fuchsia-300">Step 3</p>
+                        <p className="mb-2 text-sm font-bold text-fuchsia-300">
+                            {currentCopy.reviewStep}
+                        </p>
                         <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                            Review what you tested.
+                            {currentCopy.reviewTitle}
                         </h2>
                         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                            You have now walked through the core planner ideas in a safe
-                            tutorial space. Before sending feedback, think about what felt
-                            useful, confusing, missing, or unrealistic.
+                            {currentCopy.reviewDescription}
                         </p>
 
                         <div className="mt-6 grid gap-4 md:grid-cols-2">
                             <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-5">
                                 <p className="mb-2 text-sm font-bold text-emerald-300">
-                                    Completed tutorial actions
+                                    {currentCopy.completedActions}
                                 </p>
                                 <div className="space-y-2 text-sm leading-6 text-slate-300">
-                                    <p>• Chose a sample project</p>
-                                    <p>• Marked a task as done</p>
-                                    <p>• Added a custom task by typing it yourself</p>
-                                    <p>• Edited a task using the edit form</p>
-                                    <p>• Deleted a task with confirmation</p>
+                                    {currentCopy.checklistItems.map((item) => (
+                                        <p key={item}>- {item}</p>
+                                    ))}
                                 </div>
                             </div>
 
                             <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-5">
                                 <p className="mb-2 text-sm font-bold text-fuchsia-300">
-                                    Feedback ideas
+                                    {currentCopy.feedbackIdeas}
                                 </p>
                                 <div className="space-y-2 text-sm leading-6 text-slate-300">
-                                    <p>• Was the workflow easy to understand?</p>
-                                    <p>• Did the edit form feel natural?</p>
-                                    <p>• Was adding a custom task clear?</p>
-                                    <p>• Was delete confirmation useful?</p>
-                                    <p>• Would you return to this website?</p>
+                                    {currentCopy.feedbackPrompts.map((item) => (
+                                        <p key={item}>- {item}</p>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -905,7 +1092,7 @@ export default function StudentTestingPage() {
                                 onClick={handleStartFeedbackStep}
                                 className="rounded-2xl bg-fuchsia-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-fuchsia-300"
                             >
-                                Prepare feedback form
+                                {currentCopy.prepareFeedback}
                             </button>
 
                             <button
@@ -913,7 +1100,7 @@ export default function StudentTestingPage() {
                                 onClick={() => setStep(1)}
                                 className="rounded-2xl border border-slate-700 px-6 py-4 font-bold text-white transition hover:border-slate-400"
                             >
-                                Back to planner tutorial
+                                {currentCopy.backPlanner}
                             </button>
                         </div>
                     </section>
@@ -924,19 +1111,19 @@ export default function StudentTestingPage() {
                         {!showFeedback ? (
                             <div>
                                 <p className="mb-2 text-sm font-bold text-fuchsia-300">
-                                    Preparing feedback
+                                    {currentCopy.preparingFeedback}
                                 </p>
                                 <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                                    Building your feedback portal.
+                                    {currentCopy.feedbackTitle}
                                 </h2>
                                 <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                                    {loadingMessages[loadingMessageIndex]}
+                                    {currentCopy.loadingMessages[loadingMessageIndex]}
                                 </p>
 
                                 <div className="mt-8">
                                     <div className="mb-3 flex items-center justify-between">
                                         <p className="text-sm font-bold text-slate-300">
-                                            Loading progress
+                                            {currentCopy.loadingProgress}
                                         </p>
                                         <p className="text-sm font-black text-fuchsia-300">
                                             {loadingProgress}%
@@ -955,14 +1142,13 @@ export default function StudentTestingPage() {
                             <div>
                                 <div className="mb-8">
                                     <p className="mb-2 text-sm font-bold text-fuchsia-300">
-                                        Final step
+                                        {currentCopy.finalStep}
                                     </p>
                                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                                        Send your feedback.
+                                        {currentCopy.sendFeedback}
                                     </h2>
                                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                                        Short feedback is enough. One clear sentence can help shape
-                                        the next version of Coursework Compass.
+                                        {currentCopy.sendFeedbackDescription}
                                     </p>
                                 </div>
 
@@ -974,7 +1160,7 @@ export default function StudentTestingPage() {
                                         onClick={() => setStep(4)}
                                         className="rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
                                     >
-                                        I finished the test
+                                        {currentCopy.finished}
                                     </button>
 
                                     <button
@@ -982,7 +1168,7 @@ export default function StudentTestingPage() {
                                         onClick={handleResetTutorial}
                                         className="rounded-2xl border border-slate-700 px-6 py-4 font-bold text-white transition hover:border-slate-400"
                                     >
-                                        Restart tutorial
+                                        {currentCopy.reset}
                                     </button>
                                 </div>
                             </div>
@@ -994,63 +1180,35 @@ export default function StudentTestingPage() {
                     <section className="relative overflow-hidden rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-6 shadow-2xl shadow-emerald-950/30 sm:p-10">
                         <div className="absolute -left-16 -top-16 h-40 w-40 rounded-full bg-cyan-400/20 blur-3xl" />
                         <div className="absolute -bottom-16 -right-16 h-48 w-48 rounded-full bg-fuchsia-400/20 blur-3xl" />
-                        <div className="absolute right-10 top-10 h-4 w-4 animate-ping rounded-full bg-emerald-300" />
-                        <div className="absolute bottom-12 left-12 h-3 w-3 animate-pulse rounded-full bg-cyan-300" />
 
                         <div className="relative z-10">
                             <div className="mb-6 inline-flex rounded-full border border-emerald-400/30 bg-slate-950/70 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
-                                Tutorial complete
+                                {currentCopy.completeBadge}
                             </div>
 
                             <h2 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
-                                Congrats, you completed the guided test.
+                                {currentCopy.completeTitle}
                             </h2>
 
                             <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
-                                You have finished the tutorial route and helped test the core
-                                Coursework Compass workflow. Now you are ready to begin the real
-                                planning journey.
+                                {currentCopy.completeDescription}
                             </p>
 
                             <div className="mt-8 grid gap-4 md:grid-cols-3">
-                                <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-5">
-                                    <p className="mb-2 text-sm font-black text-emerald-300">
-                                        01
-                                    </p>
-                                    <h3 className="font-bold text-white">
-                                        You explored planning
-                                    </h3>
-                                    <p className="mt-2 text-sm leading-6 text-slate-400">
-                                        You saw how a large coursework project can become visible
-                                        tasks.
-                                    </p>
-                                </div>
-
-                                <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-5">
-                                    <p className="mb-2 text-sm font-black text-emerald-300">
-                                        02
-                                    </p>
-                                    <h3 className="font-bold text-white">
-                                        You tested controls
-                                    </h3>
-                                    <p className="mt-2 text-sm leading-6 text-slate-400">
-                                        You tried real tutorial interactions for task completion,
-                                        adding, editing, and deleting.
-                                    </p>
-                                </div>
-
-                                <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-5">
-                                    <p className="mb-2 text-sm font-black text-emerald-300">
-                                        03
-                                    </p>
-                                    <h3 className="font-bold text-white">
-                                        You shaped the product
-                                    </h3>
-                                    <p className="mt-2 text-sm leading-6 text-slate-400">
-                                        Your feedback helps decide what Coursework Compass becomes
-                                        next.
-                                    </p>
-                                </div>
+                                {currentCopy.completeCards.map((card, index) => (
+                                    <div
+                                        key={card.title}
+                                        className="rounded-3xl border border-slate-800 bg-slate-950/70 p-5"
+                                    >
+                                        <p className="mb-2 text-sm font-black text-emerald-300">
+                                            {String(index + 1).padStart(2, "0")}
+                                        </p>
+                                        <h3 className="font-bold text-white">{card.title}</h3>
+                                        <p className="mt-2 text-sm leading-6 text-slate-400">
+                                            {card.description}
+                                        </p>
+                                    </div>
+                                ))}
                             </div>
 
                             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -1058,14 +1216,14 @@ export default function StudentTestingPage() {
                                     href="/"
                                     className="rounded-[1.75rem] bg-emerald-400 px-8 py-5 text-center text-lg font-black text-slate-950 shadow-2xl shadow-emerald-950/40 transition hover:bg-emerald-300"
                                 >
-                                    Return to main menu
+                                    {currentCopy.returnHome}
                                 </Link>
 
                                 <Link
                                     href="/projects/new"
                                     className="rounded-[1.75rem] border border-slate-700 px-8 py-5 text-center text-lg font-black text-white transition hover:border-cyan-400 hover:text-cyan-300"
                                 >
-                                    Officially start the journey
+                                    {currentCopy.startReal}
                                 </Link>
 
                                 <button
@@ -1073,7 +1231,7 @@ export default function StudentTestingPage() {
                                     onClick={handleResetTutorial}
                                     className="rounded-[1.75rem] border border-slate-700 px-8 py-5 text-center text-lg font-black text-white transition hover:border-slate-400"
                                 >
-                                    Try tutorial again
+                                    {currentCopy.tryAgain}
                                 </button>
                             </div>
                         </div>

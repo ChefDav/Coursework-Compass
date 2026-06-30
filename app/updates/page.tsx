@@ -1,65 +1,98 @@
+"use client";
+
 import Link from "next/link";
 import AppNav from "@/components/AppNav";
 import FeedbackPanel from "@/components/FeedbackPanel";
+import { useStoredLanguage } from "@/lib/clientStores";
 
-const currentFeatures = [
-    "Create coursework projects from subject templates",
-    "Generate structured task plans based on deadline and planning intensity",
-    "Track projects through Dashboard, Projects, Today, and Project Details",
-    "Mark tasks as done and restore them back to todo",
-    "Add custom tasks for real coursework needs",
-    "Edit task title, priority, due date, and estimated time",
-    "Delete individual tasks and whole projects safely",
-    "Use calendar picker for project deadlines and task due dates",
-    "Automatically normalise estimated time, such as 60 min to 1 hour",
-    "Show days left and overdue status for project and task deadlines",
-    "Archive completed tasks and restore archived tasks when new work is added",
-    "Use clearer save success messages after project and task changes",
-    "See clearer empty states on Dashboard, Projects, and Today",
-    "Read clearer browser-only local storage notices across the product",
-    "Use a mobile-friendly navigation menu and improved mobile layout foundation",
-    "Use the draggable, collapsible world clock widget",
-    "Use the isolated guided tutorial sandbox for student testing",
-    "See the v1.2 onboarding popup on first visit",
-    "See unified inline error messages for missing project and task titles",
-    "Send structured student testing feedback",
-];
+const copy = {
+    en: {
+        eyebrow: "Release notes",
+        title: "v1.3 Multilingual Foundation",
+        subtitle:
+            "Coursework Compass v1.3 lays the groundwork for an English / Simplified Chinese planning experience and polishes the student testing flow.",
+        joinTest: "Join student test",
+        createProject: "Create a project",
+        backHome: "Back to home",
+        currentVersion: "Current version",
+        currentTitle: "v1.3 Multilingual Foundation",
+        currentDescription:
+            "This release focuses on bilingual interface foundations, the redesigned New Project Studio, clearer date controls, better empty states, and safer browser-only beta messaging.",
+        highlightsTitle: "What changed in v1.3",
+        highlights: [
+            "English / Simplified Chinese interface foundation",
+            "Redesigned New Project Studio",
+            "Expanded coursework template library",
+            "Improved date picker styling",
+            "Bilingual empty states and testing guidance",
+            "Better student testing readiness",
+            "Browser-only beta storage reminder",
+        ],
+        testingTitle: "Testing focus",
+        testingDescription:
+            "Students should test the language switcher, create a project from the Studio, open the saved project, edit tasks, check mobile layout, and confirm that local-storage reminders are clear.",
+        historyTitle: "Version history",
+        historySubtitle: "Older release notes are kept for context.",
+        limitationsTitle: "Current limitations",
+        limitations: [
+            "Projects are saved only in the current browser during beta.",
+            "There is no account system or cloud sync yet.",
+            "Students should avoid sensitive personal information while testing.",
+            "Feedback is still collected through email templates.",
+        ],
+        nextTitle: "Coming next",
+        next: [
+            "Use student testing feedback to guide the next feature pass.",
+            "Continue improving Chinese copy where student wording feels unnatural.",
+            "Plan account and sync features carefully after the local beta is stable.",
+        ],
+        released: "Released",
+    },
+    zh: {
+        eyebrow: "更新日志",
+        title: "v1.3 双语基础版",
+        subtitle:
+            "Coursework Compass v1.3 为英文 / 简体中文规划体验打基础，并进一步打磨学生测试流程。",
+        joinTest: "参加学生测试",
+        createProject: "创建项目",
+        backHome: "返回首页",
+        currentVersion: "当前版本",
+        currentTitle: "v1.3 双语基础版",
+        currentDescription:
+            "这个版本重点完成双语界面基础、新版 Project Studio、更清晰的日期控件、更好的空状态，以及更安全的浏览器本地测试存储提示。",
+        highlightsTitle: "v1.3 更新内容",
+        highlights: [
+            "英文 / 简体中文界面基础",
+            "重新设计的新建项目 Project Studio",
+            "扩展 coursework 模板库",
+            "改进日期选择器样式",
+            "双语空状态和测试指引",
+            "更适合学生测试的细节打磨",
+            "浏览器本地 beta 存储提醒",
+        ],
+        testingTitle: "测试重点",
+        testingDescription:
+            "学生可以重点测试语言切换、从 Studio 创建项目、打开已保存项目、编辑任务、检查移动端布局，并确认本地存储提醒是否清楚。",
+        historyTitle: "版本历史",
+        historySubtitle: "旧版本记录会保留，方便了解产品演进。",
+        limitationsTitle: "当前限制",
+        limitations: [
+            "beta 期间，项目只保存在当前浏览器中。",
+            "目前还没有账号系统或云端同步。",
+            "测试时请避免输入敏感个人信息。",
+            "反馈仍然通过邮件模板收集。",
+        ],
+        nextTitle: "下一步",
+        next: [
+            "根据真实学生测试反馈决定下一轮功能。",
+            "继续优化中文表达，让学生读起来更自然。",
+            "本地 beta 稳定后，再谨慎规划账号和同步功能。",
+        ],
+        released: "已发布",
+    },
+} as const;
 
-const whatToTest = [
-    "Open the website and read the v1.2 onboarding popup",
-    "Check the browser-only local storage notice",
-    "Open the guided tutorial from the homepage",
-    "Choose a sample project inside the tutorial",
-    "Complete the hands-on simulated planner actions",
-    "Watch the feedback loading screen reach 100%",
-    "Return to the main menu from the completion screen",
-    "Create a real project from the normal product flow",
-    "Open Dashboard, Projects, Today, and Project Details",
-    "Add a custom task inside Project Details",
-    "Edit task title, priority, due date, and estimated time",
-    "Try estimated time conversion, such as 60 min to 1 hour",
-    "Mark a task as done and restore it back to todo",
-    "Delete a task and delete a project",
-    "Check that days left appears correctly in Today and Project Details",
-    "Clear browser data or use Reset data to check empty states",
-];
-
-const mobileChecklist = [
-    "Open the website on a phone or small screen",
-    "Check whether the mobile navigation menu is easy to open",
-    "Check whether the onboarding popup fits the screen",
-    "Check whether buttons are easy to tap",
-    "Check whether project cards are readable",
-    "Check whether Project Details is usable on mobile",
-    "Check whether task edit controls fit properly",
-    "Check whether calendar and estimated time fields are usable",
-    "Check whether empty states are clear and not cramped",
-    "Check whether the save success toast does not block important actions",
-    "Check whether the clock widget can be minimized, hidden, and moved",
-    "Report any page that feels cramped, confusing, or difficult to use",
-];
-
-const recentUpdates = [
+const releaseHistory = [
     {
         version: "v1.2",
         title: "Student Testing Polish",
@@ -104,35 +137,10 @@ const recentUpdates = [
     },
 ];
 
-const currentLimitations = [
-    "Project data is currently stored locally in the browser.",
-    "There is no account system yet.",
-    "Cloud sync across devices is planned for a later version.",
-    "The guided test tutorial uses simulated data and does not save real project data.",
-    "Feedback is currently collected through email templates.",
-    "AI-generated adaptive planning is not included yet.",
-    "Students should avoid entering sensitive personal information during testing.",
-];
-
-const nextSteps = [
-    "Run full v1.2 testing with real students",
-    "Collect Year 12 and Year 13 feedback",
-    "Use student feedback to plan v1.3",
-    "Improve the feedback system after real testing",
-    "Add more subject-specific templates based on student demand",
-    "Prepare Chinese language support",
-    "Explore theme switching after the testing release is stable",
-    "Design the future cloud account version carefully",
-];
-
-const stabilityNotes = [
-    "v1.2 is now in stabilisation mode.",
-    "No major data-layer rewrites should be made before student testing.",
-    "Future updates should be smaller, slower, and tested with a clear checklist.",
-    "Testing feedback will guide v1.3 instead of adding more speculative features now.",
-];
-
 export default function UpdatesPage() {
+    const language = useStoredLanguage();
+    const currentCopy = copy[language];
+
     return (
         <main className="min-h-screen bg-slate-950 text-white">
             <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
@@ -140,17 +148,15 @@ export default function UpdatesPage() {
 
                 <section className="py-12 sm:py-16">
                     <div className="mb-6 inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
-                        Release notes
+                        {currentCopy.eyebrow}
                     </div>
 
                     <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
-                        Coursework Compass v1.2 is ready for student testing.
+                        {currentCopy.title}
                     </h1>
 
                     <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
-                        v1.2 is the Student Testing Polish release. It focuses on making
-                        Coursework Compass clearer, safer, more stable, and easier to test
-                        before real Year 12 and Year 13 feedback is collected.
+                        {currentCopy.subtitle}
                     </p>
 
                     <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -158,201 +164,113 @@ export default function UpdatesPage() {
                             href="/test"
                             className="rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
                         >
-                            Join student test
+                            {currentCopy.joinTest}
                         </Link>
 
                         <Link
                             href="/projects/new"
                             className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
                         >
-                            Create a project
+                            {currentCopy.createProject}
                         </Link>
 
                         <Link
                             href="/"
                             className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
                         >
-                            Back to home
+                            {currentCopy.backHome}
                         </Link>
                     </div>
                 </section>
 
                 <section className="rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-8">
                     <p className="mb-2 text-sm font-bold text-cyan-300">
-                        Current version
+                        {currentCopy.currentVersion}
                     </p>
                     <h2 className="text-3xl font-black sm:text-4xl">
-                        v1.2: Student Testing Polish
+                        {currentCopy.currentTitle}
                     </h2>
                     <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
-                        The main goal of v1.2 is to make Coursework Compass ready for
-                        student testing. This version improves onboarding, empty states,
-                        local storage communication, save feedback, mobile layout,
-                        estimated time handling, deadline visibility, and inline error
-                        messages.
+                        {currentCopy.currentDescription}
                     </p>
                 </section>
 
                 <section className="mt-10 rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-8">
-                    <p className="mb-2 text-sm font-bold text-emerald-300">
-                        Guided tutorial sandbox
-                    </p>
                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                        The test flow is separate from the real app.
+                        {currentCopy.highlightsTitle}
                     </h2>
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        The /test page uses simulated data only. It does not open Dashboard,
-                        Projects, or Today, and it does not write real project data. This
-                        makes the testing route safer and clearer for students.
-                    </p>
 
-                    <div className="mt-6">
-                        <Link
-                            href="/test"
-                            className="inline-block rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
-                        >
-                            Open guided tutorial
-                        </Link>
+                    <div className="mt-6 grid gap-4 md:grid-cols-2">
+                        {currentCopy.highlights.map((item) => (
+                            <div
+                                key={item}
+                                className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4"
+                            >
+                                <p className="text-sm font-bold leading-6 text-slate-200">
+                                    {item}
+                                </p>
+                            </div>
+                        ))}
                     </div>
                 </section>
 
                 <section className="mt-10 rounded-[2rem] border border-amber-400/30 bg-amber-400/10 p-5 sm:p-8">
-                    <p className="mb-2 text-sm font-bold text-amber-300">
-                        Data and privacy boundary
-                    </p>
                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                        v1.2 stores projects locally in the browser.
+                        {currentCopy.testingTitle}
                     </h2>
                     <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        Coursework Compass v1.2 does not use accounts or cloud sync yet.
-                        Saved projects are stored in this browser only. Students should
-                        avoid sensitive personal information during testing and use sample
-                        project details when possible.
+                        {currentCopy.testingDescription}
                     </p>
                 </section>
 
-                <section className="mt-10 rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-8">
-                    <p className="mb-2 text-sm font-bold text-cyan-300">
-                        Better empty states and errors
-                    </p>
-                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                        Empty pages and mistakes now guide the next action.
-                    </h2>
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        Dashboard, Projects, Today, and Project Details now give clearer
-                        guidance when data is missing. Form mistakes such as blank task
-                        titles now use unified inline error messages instead of inconsistent
-                        temporary warnings.
-                    </p>
-                </section>
-
-                <section className="mt-10 rounded-[2rem] border border-fuchsia-400/30 bg-fuchsia-400/10 p-5 sm:p-8">
-                    <p className="mb-2 text-sm font-bold text-fuchsia-300">
-                        Mobile polish
-                    </p>
-                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                        v1.2 improves the mobile foundation.
-                    </h2>
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        The navigation bar, onboarding popup, empty states, save success
-                        toast, and clock widget have been adjusted to work more comfortably
-                        on smaller screens.
-                    </p>
-                </section>
-
-                <section className="mt-10 rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-8">
-                    <p className="mb-2 text-sm font-bold text-emerald-300">
-                        What to test
-                    </p>
-                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                        Suggested testing flow for v1.2.
-                    </h2>
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        Students can test the guided tutorial safely first, then explore the
-                        real planning tools afterwards if they want to create a real
-                        browser-saved project.
-                    </p>
-
-                    <div className="mt-6 grid gap-4 md:grid-cols-2">
-                        {whatToTest.map((item, index) => (
-                            <div
-                                key={item}
-                                className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4"
-                            >
-                                <p className="mb-1 text-sm font-black text-emerald-300">
-                                    {String(index + 1).padStart(2, "0")}
-                                </p>
-                                <p className="text-sm font-bold leading-6 text-slate-200">
-                                    {item}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                <section className="mt-10 rounded-[2rem] border border-fuchsia-400/30 bg-fuchsia-400/10 p-5 sm:p-8">
-                    <p className="mb-2 text-sm font-bold text-fuchsia-300">
-                        Mobile testing checklist
-                    </p>
-                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                        Please check the phone experience too.
-                    </h2>
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        Many students may open Coursework Compass on a phone. If something
-                        feels cramped, blocked, or difficult to tap, that feedback is very
-                        valuable.
-                    </p>
-
-                    <div className="mt-6 grid gap-4 md:grid-cols-2">
-                        {mobileChecklist.map((item) => (
-                            <div
-                                key={item}
-                                className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4"
-                            >
-                                <p className="text-sm font-bold leading-6 text-slate-200">
-                                    {item}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                <section className="mt-16">
-                    <div className="mb-6">
-                        <p className="mb-2 text-sm font-bold text-cyan-300">
-                            What works now
-                        </p>
-                        <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                            Current beta features.
+                <section className="mt-16 grid gap-6 md:grid-cols-2">
+                    <div className="rounded-[2rem] border border-amber-400/30 bg-amber-400/10 p-5 sm:p-6">
+                        <h2 className="text-2xl font-black sm:text-3xl">
+                            {currentCopy.limitationsTitle}
                         </h2>
+
+                        <div className="mt-5 space-y-3">
+                            {currentCopy.limitations.map((item) => (
+                                <div
+                                    key={item}
+                                    className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4"
+                                >
+                                    <p className="text-sm leading-6 text-slate-300">{item}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                        {currentFeatures.map((feature) => (
-                            <div
-                                key={feature}
-                                className="rounded-3xl border border-slate-800 bg-slate-900 p-5"
-                            >
-                                <p className="text-sm font-bold leading-6 text-slate-200">
-                                    {feature}
-                                </p>
-                            </div>
-                        ))}
+                    <div className="rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
+                        <h2 className="text-2xl font-black sm:text-3xl">
+                            {currentCopy.nextTitle}
+                        </h2>
+
+                        <div className="mt-5 space-y-3">
+                            {currentCopy.next.map((item) => (
+                                <div
+                                    key={item}
+                                    className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4"
+                                >
+                                    <p className="text-sm leading-6 text-slate-300">{item}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </section>
 
                 <section className="mt-16">
                     <div className="mb-6">
                         <p className="mb-2 text-sm font-bold text-cyan-300">
-                            Version history
+                            {currentCopy.historyTitle}
                         </p>
                         <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                            How the product has evolved.
+                            {currentCopy.historySubtitle}
                         </h2>
                     </div>
 
                     <div className="space-y-5">
-                        {recentUpdates.map((update) => (
+                        {releaseHistory.map((update) => (
                             <div
                                 key={update.version}
                                 className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6"
@@ -366,81 +284,12 @@ export default function UpdatesPage() {
                                     </div>
 
                                     <span className="w-fit rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
-                    Released
-                  </span>
+                                        {currentCopy.released}
+                                    </span>
                                 </div>
 
                                 <p className="max-w-4xl text-sm leading-6 text-slate-300">
                                     {update.description}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                <section className="mt-16 grid gap-6 md:grid-cols-2">
-                    <div className="rounded-[2rem] border border-amber-400/30 bg-amber-400/10 p-5 sm:p-6">
-                        <p className="mb-2 text-sm font-bold text-amber-300">
-                            Current limitations
-                        </p>
-                        <h2 className="text-2xl font-black sm:text-3xl">
-                            What this beta does not do yet.
-                        </h2>
-
-                        <div className="mt-5 space-y-3">
-                            {currentLimitations.map((item) => (
-                                <div
-                                    key={item}
-                                    className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4"
-                                >
-                                    <p className="text-sm leading-6 text-slate-300">{item}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
-                        <p className="mb-2 text-sm font-bold text-emerald-300">
-                            Coming next
-                        </p>
-                        <h2 className="text-2xl font-black sm:text-3xl">
-                            What will be improved after testing.
-                        </h2>
-
-                        <div className="mt-5 space-y-3">
-                            {nextSteps.map((item) => (
-                                <div
-                                    key={item}
-                                    className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4"
-                                >
-                                    <p className="text-sm leading-6 text-slate-300">{item}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                <section className="mt-16 rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-8">
-                    <p className="mb-2 text-sm font-bold text-cyan-300">
-                        Stabilisation notes
-                    </p>
-                    <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
-                        v1.2 is now frozen for testing.
-                    </h2>
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-                        After this release, the product should avoid major feature changes
-                        before the student testing session. The next meaningful product
-                        direction should come from real student feedback.
-                    </p>
-
-                    <div className="mt-6 grid gap-4 md:grid-cols-2">
-                        {stabilityNotes.map((note) => (
-                            <div
-                                key={note}
-                                className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4"
-                            >
-                                <p className="text-sm font-bold leading-6 text-slate-200">
-                                    {note}
                                 </p>
                             </div>
                         ))}
