@@ -71,7 +71,7 @@ export default function AppNav() {
     }
 
     return (
-        <header className="cc-panel cc-motion-fade-up mb-6 rounded-[1.5rem] p-3 sm:mb-8 sm:rounded-[2rem] sm:p-5">
+        <header className="cc-panel cc-motion-fade-up relative z-[70] mb-6 overflow-visible rounded-[1.5rem] p-3 sm:mb-8 sm:rounded-[2rem] sm:p-5">
             <div className="grid gap-4 xl:grid-cols-[minmax(15rem,22rem)_1fr] xl:items-start">
                 <div className="flex items-start justify-between gap-3 xl:block">
                     <Link href="/" className="group cc-focus-ring min-w-0 rounded-2xl px-2 py-1">
@@ -83,12 +83,12 @@ export default function AppNav() {
                         </p>
                     </Link>
 
-                    <details className="relative xl:hidden">
+                    <details className="relative z-[80] xl:hidden">
                         <summary className="cc-button-secondary list-none rounded-2xl px-4 py-3 text-sm">
                             {t("mainMenu")}
                         </summary>
 
-                        <div className="cc-panel-strong cc-motion-scale-in absolute right-0 z-40 mt-3 w-[min(20rem,calc(100vw-2rem))] rounded-[1.5rem] p-3">
+                        <div className="cc-panel-strong cc-motion-scale-in absolute right-0 z-[90] mt-3 w-[min(20rem,calc(100vw-2rem))] rounded-[1.5rem] p-3">
                             <nav className="grid gap-2">
                                 {navItems.map((item) => {
                                     const isActive = isActivePath(pathname, item.href);
