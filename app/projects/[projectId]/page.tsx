@@ -448,14 +448,14 @@ export default function ProjectDetailPage() {
     if (!hasMounted) {
         return (
             <main className="cc-page-gradient cc-ambient-drift cc-text-main">
-                <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+                <section className="cc-page-shell">
                     <AppNav />
 
-                    <section className="cc-motion-fade-up rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-6 shadow-2xl shadow-cyan-950/20 sm:p-8">
+                    <section className="cc-page-header cc-motion-fade-up border-cyan-400/30">
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             {currentCopy.loadingEyebrow}
                         </p>
-                        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
+                        <h1 className="cc-page-title max-w-4xl">
                             {currentCopy.loadingTitle}
                         </h1>
                         <p className="cc-text-muted mt-4 max-w-3xl text-sm leading-6">
@@ -470,7 +470,7 @@ export default function ProjectDetailPage() {
     if (!projectInfo) {
         return (
             <main className="cc-page-gradient cc-ambient-drift cc-text-main">
-                <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+                <section className="cc-page-shell">
                     <AppNav />
 
                     <EmptyState
@@ -577,10 +577,10 @@ export default function ProjectDetailPage() {
 
     return (
         <main className="cc-page-gradient cc-ambient-drift cc-text-main">
-            <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+            <section className="cc-page-shell">
                 <AppNav />
 
-                <section className="cc-motion-fade-up mb-10 rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 shadow-2xl shadow-cyan-950/20 sm:p-8">
+                <section className="cc-page-header cc-motion-fade-up mb-8 border-cyan-400/30 p-5 sm:p-8">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0">
                             <p className="mb-2 text-sm font-bold text-cyan-300">
@@ -642,7 +642,7 @@ export default function ProjectDetailPage() {
                                 </div>
                             ) : (
                                 <>
-                                    <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
+                                    <h1 className="cc-page-title max-w-5xl text-4xl sm:text-5xl">
                                         {projectPlan.project.title}
                                     </h1>
 
@@ -744,7 +744,7 @@ export default function ProjectDetailPage() {
                                 <button
                                     type="button"
                                     onClick={handleArchiveCompletedTasks}
-                                    className="cc-interactive-button rounded-2xl bg-emerald-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
+                                    className="cc-button-success rounded-2xl px-5 py-3 text-sm"
                                 >
                                     {currentCopy.archiveCompletedTasks}
                                 </button>
@@ -753,7 +753,7 @@ export default function ProjectDetailPage() {
                     ) : null}
                 </section>
 
-                <section className="cc-card cc-motion-fade-up mb-10 rounded-[2rem] p-5 sm:p-6">
+                <section className="cc-section cc-motion-fade-up mb-8 rounded-[2rem] p-5 sm:p-6">
                     <p className="mb-2 text-sm font-bold text-emerald-300">
                         {currentCopy.addCustomTask}
                     </p>
@@ -831,7 +831,7 @@ export default function ProjectDetailPage() {
                     <button
                         type="button"
                         onClick={handleAddCustomTask}
-                        className="cc-interactive-button mt-5 rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
+                        className="cc-button-success mt-5 rounded-2xl px-6 py-4"
                     >
                         {currentCopy.addTask}
                     </button>

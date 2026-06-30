@@ -1132,17 +1132,14 @@ export default function NewProjectForm() {
 
     return (
         <section className="space-y-6">
-            <header className="cc-card cc-motion-fade-up relative overflow-hidden rounded-[2.5rem] p-6 sm:p-8 lg:p-10">
-                <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" />
-                <div className="pointer-events-none absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-emerald-400/10 blur-3xl" />
-
+            <header className="cc-page-header cc-motion-fade-up relative overflow-hidden rounded-[2rem] p-6 sm:p-8 lg:p-10">
                 <div className="relative z-10 grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)] lg:items-end">
                     <div>
-                        <p className="mb-4 text-sm font-black uppercase tracking-[0.2em] text-cyan-300">
+                        <p className="cc-kicker mb-4">
                             {currentCopy.pageEyebrow}
                         </p>
 
-                        <h1 className="cc-text-main max-w-5xl text-4xl font-black tracking-tight sm:text-6xl">
+                        <h1 className="cc-page-title max-w-5xl">
                             {currentCopy.pageTitle}
                         </h1>
 
@@ -1170,13 +1167,13 @@ export default function NewProjectForm() {
 
             <div className="grid gap-6 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
                 <div className="space-y-6">
-                    <section className="cc-card cc-motion-fade-up rounded-[2rem] p-5 sm:p-6">
+                    <section className="cc-section cc-motion-fade-up rounded-[2rem] p-5 sm:p-6">
                         <div className="mb-6">
-                            <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
+                            <p className="cc-kicker mb-2">
                                 {currentCopy.templateStep}
                             </p>
 
-                            <h2 className="cc-text-main text-2xl font-black">
+                            <h2 className="cc-section-title text-2xl">
                                 {currentCopy.templateLabel}
                             </h2>
                         </div>
@@ -1193,9 +1190,9 @@ export default function NewProjectForm() {
                                             setSelectedTemplateId(template.id);
                                             clearGeneratedState();
                                         }}
-                                        className={`cc-interactive-card group relative min-h-48 overflow-hidden rounded-[1.75rem] border p-5 text-left transition ${
+                                        className={`cc-interactive-card group relative min-h-48 overflow-hidden rounded-[1.5rem] border p-5 text-left transition ${
                                             isActive
-                                                ? "border-cyan-400 bg-cyan-400/10 shadow-xl shadow-cyan-950/30"
+                                                ? "border-cyan-400 bg-cyan-400/10 shadow-[0_0_0_1px_rgba(34,211,238,0.22),var(--cc-shadow-soft)]"
                                                 : "cc-surface-inset hover:border-cyan-400/50"
                                         }`}
                                     >
@@ -1211,12 +1208,12 @@ export default function NewProjectForm() {
 
                                         <div className="relative z-10 flex h-full flex-col">
                                             <div className="mb-5 flex items-center justify-between gap-3">
-                                                <div className="cc-surface-inset flex h-14 w-14 items-center justify-center rounded-2xl text-2xl">
+                                                <div className="cc-icon-tile flex h-14 w-14 rounded-2xl text-2xl">
                                                     {template.icon}
                                                 </div>
 
                                                 {isActive ? (
-                                                    <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-black text-cyan-300">
+                                                    <span className="cc-badge-accent">
                             {currentCopy.selected}
                           </span>
                                                 ) : null}
@@ -1236,13 +1233,13 @@ export default function NewProjectForm() {
                         </div>
                     </section>
 
-                    <section className="cc-card cc-motion-fade-up rounded-[2rem] p-5 sm:p-6">
+                    <section className="cc-section cc-motion-fade-up rounded-[2rem] p-5 sm:p-6">
                         <div className="mb-6">
-                            <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
+                            <p className="cc-kicker mb-2">
                                 {currentCopy.setupStep}
                             </p>
 
-                            <h2 className="cc-text-main text-2xl font-black">
+                            <h2 className="cc-section-title text-2xl">
                                 {currentCopy.setupTitle}
                             </h2>
 
@@ -1298,7 +1295,7 @@ export default function NewProjectForm() {
                                                 }}
                                                 className={`cc-interactive-card rounded-2xl border p-4 text-left transition ${
                                                     isActive
-                                                        ? "border-emerald-400 bg-emerald-400/10"
+                                                        ? "border-emerald-400 bg-emerald-400/10 shadow-[0_0_0_1px_rgba(52,211,153,0.18)]"
                                                         : "cc-surface-inset hover:border-emerald-400/50"
                                                 }`}
                                             >
@@ -1342,7 +1339,7 @@ export default function NewProjectForm() {
                                     disabled={!generatedPlan}
                                     className={`cc-interactive-button rounded-2xl px-5 py-4 text-sm font-black transition ${
                                         generatedPlan
-                                            ? "bg-emerald-400 text-slate-950 hover:bg-emerald-300"
+                                            ? "cc-button-success"
                                             : "cc-button-secondary cursor-not-allowed opacity-60"
                                     }`}
                                 >
@@ -1362,7 +1359,7 @@ export default function NewProjectForm() {
 
                                     <Link
                                         href={`/projects/${savedRouteId}`}
-                                        className="cc-interactive-button mt-4 inline-block rounded-2xl bg-emerald-400 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-emerald-300"
+                                        className="cc-button-success mt-4 rounded-2xl px-5 py-3 text-sm"
                                     >
                                         {currentCopy.openProject}
                                     </Link>
@@ -1375,11 +1372,11 @@ export default function NewProjectForm() {
                 <aside className="xl:sticky xl:top-6 xl:self-start">
                     <section className="cc-card cc-motion-fade-up overflow-hidden rounded-[2rem]">
                         <div className="cc-surface-inset border-b p-5 sm:p-6">
-                            <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
+                            <p className="cc-kicker mb-2">
                                 {currentCopy.previewStep}
                             </p>
 
-                            <h2 className="cc-text-main text-2xl font-black">
+                            <h2 className="cc-section-title text-2xl">
                                 {currentCopy.previewTitle}
                             </h2>
 
@@ -1452,7 +1449,7 @@ export default function NewProjectForm() {
                                                 key={item.id || `${item.title}-${index}`}
                                                 className="cc-surface-inset cc-motion-fade-up relative grid gap-4 rounded-[1.5rem] p-4 sm:grid-cols-[2.75rem_minmax(0,1fr)]"
                                             >
-                                                <div className="relative z-10 flex h-11 w-11 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 text-sm font-black text-cyan-300">
+                                                <div className="cc-icon-tile relative z-10 flex h-11 w-11 rounded-2xl text-sm font-black">
                                                     {index + 1}
                                                 </div>
 
@@ -1511,7 +1508,7 @@ export default function NewProjectForm() {
                             ) : (
                                 <div className="cc-surface-inset flex min-h-[26rem] items-center justify-center rounded-[1.5rem] border-dashed p-6 text-center">
                                     <div>
-                                        <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border border-cyan-400/30 bg-cyan-400/10 text-4xl">
+                                        <div className="cc-icon-tile mx-auto mb-5 flex h-20 w-20 rounded-[1.75rem] text-4xl">
                                             🧩
                                         </div>
 

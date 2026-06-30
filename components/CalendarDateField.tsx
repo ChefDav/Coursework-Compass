@@ -85,7 +85,7 @@ export default function CalendarDateField({
                         openDatePicker();
                     }
                 }}
-                className={`group cc-input relative flex min-h-16 cursor-pointer items-center rounded-2xl transition ${
+                className={`group cc-input cc-focus-ring relative flex min-h-16 cursor-pointer items-center rounded-2xl transition ${
                     disabled
                         ? "cursor-not-allowed opacity-60"
                         : "hover:border-cyan-400/70 focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-400/10"
@@ -114,7 +114,7 @@ export default function CalendarDateField({
                         openDatePicker();
                     }}
                     disabled={disabled}
-                    className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 text-cyan-200 shadow-lg shadow-cyan-950/20 transition group-hover:border-cyan-300/60 group-hover:bg-cyan-400/20 group-hover:text-white disabled:cursor-not-allowed"
+                    className="cc-icon-tile absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 rounded-2xl transition group-hover:border-cyan-300/60 group-hover:bg-cyan-400/20 disabled:cursor-not-allowed"
                 >
                     <svg
                         aria-hidden="true"

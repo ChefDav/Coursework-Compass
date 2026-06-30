@@ -12,22 +12,22 @@ export default function ProjectCard({ project, detailsHref }: ProjectCardProps) 
     const isCompleted = project.status === "Completed";
 
     return (
-        <div className="cc-interactive-card cc-motion-fade-up rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
+        <div className="cc-card cc-interactive-card cc-motion-fade-up rounded-[1.5rem] p-5 sm:p-6">
             <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                     <div className="mb-2 flex flex-wrap items-center gap-3">
-                        <h2 className="break-words text-2xl font-bold leading-tight">
+                        <h2 className="cc-card-title break-words">
                             {project.title}
                         </h2>
 
                         {isCompleted ? (
-                            <span className="rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-bold text-emerald-300">
+                            <span className="cc-badge-success">
                 Completed
               </span>
                         ) : null}
                     </div>
 
-                    <p className="break-words text-sm text-slate-400">{project.type}</p>
+                    <p className="cc-helper-text break-words">{project.type}</p>
                 </div>
 
                 <div className="shrink-0">
@@ -35,7 +35,7 @@ export default function ProjectCard({ project, detailsHref }: ProjectCardProps) 
                 </div>
             </div>
 
-            <div className="mb-3 flex flex-col gap-1 text-sm text-slate-300 sm:flex-row sm:justify-between">
+            <div className="cc-text-muted mb-3 flex flex-col gap-1 text-sm sm:flex-row sm:justify-between">
                 <span>{project.progress}% complete</span>
                 <span>{project.daysLeft} days left</span>
             </div>
@@ -46,7 +46,7 @@ export default function ProjectCard({ project, detailsHref }: ProjectCardProps) 
                 <div className="mt-5">
                     <Link
                         href={detailsHref}
-                        className="cc-interactive-button block rounded-xl border border-slate-700 px-4 py-3 text-center text-sm font-bold transition hover:border-cyan-400 hover:text-cyan-300 sm:inline-block"
+                        className="cc-button-secondary rounded-2xl px-4 py-3 text-center text-sm sm:inline-flex"
                     >
                         View details
                     </Link>

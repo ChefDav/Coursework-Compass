@@ -335,9 +335,9 @@ export default function TaskCard({
 
     return (
         <article
-            className={`cc-interactive-card cc-motion-fade-up rounded-[2rem] border p-5 transition sm:p-6 ${
+            className={`cc-interactive-card cc-motion-fade-up rounded-[1.5rem] border p-5 transition sm:p-6 ${
                 isDone
-                    ? "border-emerald-400/30 bg-emerald-400/10"
+                    ? "cc-card border-emerald-400/40 bg-emerald-400/10"
                     : "cc-card"
             }`}
         >
@@ -347,7 +347,7 @@ export default function TaskCard({
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             {currentCopy.editTask}
                         </p>
-                        <h3 className="cc-text-main text-2xl font-black">
+                        <h3 className="cc-card-title text-xl sm:text-2xl">
                             {currentCopy.updateTask}
                         </h3>
                     </div>
@@ -415,7 +415,7 @@ export default function TaskCard({
                         <button
                             type="button"
                             onClick={handleSaveEdit}
-                            className="cc-button-primary rounded-2xl px-5 py-3 text-sm"
+                            className="cc-button-primary w-full rounded-2xl px-5 py-3 text-sm sm:w-auto"
                         >
                             {currentCopy.saveChanges}
                         </button>
@@ -423,7 +423,7 @@ export default function TaskCard({
                         <button
                             type="button"
                             onClick={handleCancelEdit}
-                            className="cc-button-secondary rounded-2xl px-5 py-3 text-sm"
+                            className="cc-button-secondary w-full rounded-2xl px-5 py-3 text-sm sm:w-auto"
                         >
                             {currentCopy.cancel}
                         </button>
@@ -434,7 +434,7 @@ export default function TaskCard({
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0">
                             <h3
-                                className={`text-2xl font-black ${
+                                className={`text-xl font-black sm:text-2xl ${
                                     isDone ? "text-emerald-300 line-through" : "cc-text-main"
                                 }`}
                             >
@@ -477,7 +477,7 @@ export default function TaskCard({
                                     setIsEditing(true);
                                     setIsConfirmingDelete(false);
                                 }}
-                                className="cc-button-secondary rounded-2xl px-5 py-3 text-sm"
+                                className="cc-button-secondary w-full rounded-2xl px-5 py-3 text-sm sm:w-auto"
                             >
                                 {currentCopy.edit}
                             </button>
@@ -488,7 +488,7 @@ export default function TaskCard({
                                     setIsConfirmingDelete(true);
                                     setIsEditing(false);
                                 }}
-                                className="cc-interactive-button rounded-2xl border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                                className="cc-button-danger w-full rounded-2xl px-5 py-3 text-sm sm:w-auto"
                             >
                                 {currentCopy.delete}
                             </button>
@@ -498,8 +498,8 @@ export default function TaskCard({
                                 onClick={handleToggleStatus}
                                 className={
                                     isDone
-                                        ? "cc-interactive-button rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-5 py-3 text-sm font-bold text-emerald-200 transition hover:bg-emerald-400/20"
-                                        : "cc-button-primary rounded-2xl px-5 py-3 text-sm"
+                                        ? "cc-button-secondary w-full rounded-2xl px-5 py-3 text-sm hover:border-emerald-400 hover:text-emerald-300 sm:w-auto"
+                                        : "cc-button-success w-full rounded-2xl px-5 py-3 text-sm sm:w-auto"
                                 }
                             >
                                 {isDone ? currentCopy.markAsTodo : currentCopy.markDone}
@@ -517,7 +517,7 @@ export default function TaskCard({
                                 <button
                                     type="button"
                                     onClick={handleConfirmDelete}
-                                    className="cc-interactive-button rounded-2xl bg-red-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-red-300"
+                                    className="cc-button-danger rounded-2xl px-5 py-3 text-sm"
                                 >
                                     {currentCopy.confirmDelete}
                                 </button>

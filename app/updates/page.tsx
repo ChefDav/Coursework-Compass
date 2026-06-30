@@ -189,15 +189,15 @@ export default function UpdatesPage() {
 
     return (
         <main className="cc-page-gradient cc-ambient-drift cc-text-main">
-            <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+            <section className="cc-page-shell">
                 <AppNav />
 
-                <section className="cc-motion-fade-up py-12 sm:py-16">
-                    <div className="mb-6 inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
+                <section className="cc-page-header cc-motion-fade-up mb-8">
+                    <div className="cc-badge-accent mb-6">
                         {currentCopy.eyebrow}
                     </div>
 
-                    <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
+                    <h1 className="cc-page-title max-w-4xl">
                         {currentCopy.title}
                     </h1>
 
@@ -208,7 +208,7 @@ export default function UpdatesPage() {
                     <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                         <Link
                             href="/test"
-                            className="cc-interactive-button rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
+                            className="cc-button-success rounded-2xl px-6 py-4 text-center"
                         >
                             {currentCopy.joinTest}
                         </Link>
@@ -229,7 +229,7 @@ export default function UpdatesPage() {
                     </div>
                 </section>
 
-                <section className="cc-motion-fade-up rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-8">
+                <section className="cc-section cc-motion-fade-up rounded-[2rem] border-cyan-400/30 p-5 sm:p-8">
                     <p className="mb-2 text-sm font-bold text-cyan-300">
                         {currentCopy.currentVersion}
                     </p>
@@ -241,7 +241,7 @@ export default function UpdatesPage() {
                     </p>
                 </section>
 
-                <section className="cc-motion-fade-up mt-10 rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-8">
+                <section className="cc-section cc-motion-fade-up mt-8 rounded-[2rem] border-emerald-400/30 p-5 sm:p-8">
                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                         {currentCopy.highlightsTitle}
                     </h2>
@@ -260,7 +260,7 @@ export default function UpdatesPage() {
                     </div>
                 </section>
 
-                <section className="cc-motion-fade-up mt-10 rounded-[2rem] border border-amber-400/30 bg-amber-400/10 p-5 sm:p-8">
+                <section className="cc-section cc-motion-fade-up mt-8 rounded-[2rem] border-amber-400/30 p-5 sm:p-8">
                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                         {currentCopy.testingTitle}
                     </h2>
@@ -270,7 +270,7 @@ export default function UpdatesPage() {
                 </section>
 
                 <section className="mt-16 grid gap-6 md:grid-cols-2">
-                    <div className="cc-motion-fade-up rounded-[2rem] border border-amber-400/30 bg-amber-400/10 p-5 sm:p-6">
+                    <div className="cc-section cc-motion-fade-up rounded-[2rem] border-amber-400/30 p-5 sm:p-6">
                         <h2 className="text-2xl font-black sm:text-3xl">
                             {currentCopy.limitationsTitle}
                         </h2>
@@ -287,7 +287,7 @@ export default function UpdatesPage() {
                         </div>
                     </div>
 
-                    <div className="cc-motion-fade-up rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
+                    <div className="cc-section cc-motion-fade-up rounded-[2rem] border-emerald-400/30 p-5 sm:p-6">
                         <h2 className="text-2xl font-black sm:text-3xl">
                             {currentCopy.nextTitle}
                         </h2>

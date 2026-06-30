@@ -587,13 +587,13 @@ export default function StudentTestingPage() {
 
     return (
         <main className="cc-page-gradient cc-ambient-drift cc-text-main overflow-hidden">
-            <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-                <header className="cc-card cc-motion-fade-up mb-10 flex flex-col gap-5 rounded-[2rem] p-5 sm:p-6 md:flex-row md:items-center md:justify-between">
+            <section className="cc-page-shell">
+                <header className="cc-page-header cc-motion-fade-up mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <p className="mb-2 text-sm font-bold text-cyan-300">
+                        <p className="cc-kicker mb-2">
                             {currentCopy.headerEyebrow}
                         </p>
-                        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
+                        <h1 className="cc-section-title">
                             {currentCopy.headerTitle}
                         </h1>
                         <p className="cc-text-muted mt-2 max-w-2xl text-sm leading-6">
@@ -609,10 +609,10 @@ export default function StudentTestingPage() {
                     </Link>
                 </header>
 
-                <section className="cc-motion-fade-up mb-8 rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-6">
+                <section className="cc-section cc-motion-fade-up mb-8 rounded-[2rem] border-cyan-400/30 p-5 sm:p-6">
                     <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div>
-                            <p className="mb-2 text-sm font-bold text-cyan-300">
+                            <p className="cc-kicker mb-2">
                                 {currentCopy.progress}
                             </p>
                             <h2 className="text-2xl font-black sm:text-3xl">
@@ -620,7 +620,7 @@ export default function StudentTestingPage() {
                             </h2>
                         </div>
 
-                        <div className="rounded-full border border-cyan-400/30 bg-slate-950/70 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
+                        <div className="cc-badge-accent">
                             {currentCopy.version}
                         </div>
                     </div>
@@ -635,10 +635,10 @@ export default function StudentTestingPage() {
                                     key={label}
                                     className={`rounded-2xl border p-4 ${
                                         isActive
-                                            ? "border-cyan-300 bg-cyan-400 text-slate-950"
+                                                ? "border-cyan-300 bg-cyan-400 text-slate-950 shadow-[var(--cc-shadow-soft)]"
                                             : isComplete
                                                 ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                                                : "border-slate-800 bg-slate-950/70 text-slate-400"
+                                                : "cc-surface-muted"
                                     }`}
                                 >
                                     <p className="mb-1 text-xs font-black uppercase tracking-[0.2em]">
@@ -652,7 +652,7 @@ export default function StudentTestingPage() {
                 </section>
 
                 {step === 0 ? (
-                    <section className="cc-card cc-motion-fade-up rounded-[2rem] p-5 sm:p-8">
+                    <section className="cc-section cc-motion-fade-up rounded-[2rem] p-5 sm:p-8">
                         <p className="mb-2 text-sm font-bold text-emerald-300">
                             {currentCopy.sampleStep}
                         </p>
@@ -674,8 +674,8 @@ export default function StudentTestingPage() {
                                         onClick={() => setSelectedProjectId(project.id)}
                                         className={`cc-interactive-card rounded-[2rem] border p-5 text-left transition ${
                                             isSelected
-                                                ? "border-emerald-300 bg-emerald-400 text-slate-950"
-                                                : "border-slate-800 bg-slate-950/70 text-slate-300 hover:border-emerald-400 hover:text-emerald-300"
+                                                ? "border-emerald-300 bg-emerald-400 text-slate-950 shadow-[var(--cc-shadow-soft)]"
+                                                : "cc-surface-inset hover:border-emerald-400 hover:text-emerald-300"
                                         }`}
                                     >
                                         <h3 className="text-xl font-black">
@@ -713,7 +713,7 @@ export default function StudentTestingPage() {
                             <button
                                 type="button"
                                 onClick={() => setStep(1)}
-                                className="cc-interactive-button rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
+                                className="cc-button-success rounded-2xl px-6 py-4"
                             >
                                 {currentCopy.continuePlanner}
                             </button>
@@ -731,28 +731,28 @@ export default function StudentTestingPage() {
 
                 {step === 1 ? (
                     <section className="cc-motion-fade-up grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-                        <div className="cc-card rounded-[2rem] p-5 sm:p-6">
-                            <p className="mb-2 text-sm font-bold text-cyan-300">
+                        <div className="cc-section rounded-[2rem] p-5 sm:p-6">
+                            <p className="cc-kicker mb-2">
                                 {currentCopy.plannerStep}
                             </p>
                             <h2 className="text-3xl font-black tracking-tight">
                                 {currentCopy.plannerTitle}
                             </h2>
-                            <p className="mt-3 text-sm leading-6 text-slate-300">
+                            <p className="cc-text-muted mt-3 text-sm leading-6">
                                 {currentCopy.plannerDescription}
                             </p>
 
-                            <div className="mt-6 rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-4">
+                            <div className="cc-surface-inset mt-6 rounded-[1.5rem] border-cyan-400/30 p-4">
                                 <div className="mb-3 flex items-center justify-between gap-3">
-                                    <p className="font-bold text-white">
+                                    <p className="cc-text-main font-bold">
                                         {localText(selectedProject.name, language)}
                                     </p>
-                                    <span className="rounded-full border border-cyan-400/30 bg-slate-950/70 px-3 py-1 text-xs font-bold text-cyan-300">
+                                    <span className="cc-badge-accent">
                                         {currentCopy.tutorialProject}
                                     </span>
                                 </div>
 
-                                <div className="cc-progress-track h-3 overflow-hidden rounded-full bg-slate-800">
+                                <div className="cc-progress-track h-3 overflow-hidden rounded-full">
                                     <div
                                         className="cc-progress-fill h-full rounded-full bg-cyan-400 transition-all"
                                         style={{ width: `${tutorialProgress}%` }}
@@ -776,7 +776,7 @@ export default function StudentTestingPage() {
                                             className={`cc-motion-fade-up rounded-[1.5rem] border p-4 ${
                                                 isDone
                                                     ? "border-emerald-400/30 bg-emerald-400/10"
-                                                    : "border-slate-800 bg-slate-950/70"
+                                                    : "cc-surface-inset"
                                             }`}
                                         >
                                             {isEditing ? (
@@ -787,7 +787,7 @@ export default function StudentTestingPage() {
                                                             setEditTitle(event.target.value);
                                                             setEditError("");
                                                         }}
-                                                        className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
+                                                        className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition"
                                                     />
 
                                                     <div className="grid gap-3 sm:grid-cols-2">
@@ -798,7 +798,7 @@ export default function StudentTestingPage() {
                                                                     setEditPriority(event.target.value);
                                                                 }
                                                             }}
-                                                            className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
+                                                            className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition"
                                                         >
                                                             {priorityOptions.map((priority) => (
                                                                 <option key={priority} value={priority}>
@@ -812,7 +812,7 @@ export default function StudentTestingPage() {
                                                             onChange={(event) =>
                                                                 setEditTime(event.target.value)
                                                             }
-                                                            className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
+                                                            className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition"
                                                         />
                                                     </div>
 
@@ -826,14 +826,14 @@ export default function StudentTestingPage() {
                                                         <button
                                                             type="button"
                                                             onClick={() => handleSaveEdit(task.id)}
-                                                            className="cc-interactive-button rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                                                            className="cc-button-primary rounded-2xl px-5 py-3 text-sm"
                                                         >
                                                             {currentCopy.save}
                                                         </button>
                                                         <button
                                                             type="button"
                                                             onClick={handleCancelEdit}
-                                                            className="cc-interactive-button rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
+                                                            className="cc-button-secondary rounded-2xl px-5 py-3 text-sm"
                                                         >
                                                             {currentCopy.cancel}
                                                         </button>
@@ -847,7 +847,7 @@ export default function StudentTestingPage() {
                                                                 className={`text-lg font-black ${
                                                                     isDone
                                                                         ? "text-emerald-200 line-through"
-                                                                        : "text-white"
+                                                                        : "cc-text-main"
                                                                 }`}
                                                             >
                                                                 {localText(task.title, language)}
@@ -860,10 +860,10 @@ export default function StudentTestingPage() {
                                                                 >
                                                                     {getPriorityLabel(task.priority, language)}
                                                                 </span>
-                                                                <span className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-slate-300">
+                                                                <span className="cc-pill-muted rounded-full px-3 py-1">
                                                                     {task.time}
                                                                 </span>
-                                                                <span className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-slate-300">
+                                                                <span className="cc-pill-muted rounded-full px-3 py-1">
                                                                     {isDone ? currentCopy.done : currentCopy.todo}
                                                                 </span>
                                                             </div>
@@ -873,7 +873,7 @@ export default function StudentTestingPage() {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => handleToggleTaskStatus(task.id)}
-                                                                className="cc-interactive-button rounded-2xl bg-emerald-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
+                                                                className="cc-button-success rounded-2xl px-4 py-3 text-sm"
                                                             >
                                                                 {isDone
                                                                     ? currentCopy.markTodo
@@ -882,7 +882,7 @@ export default function StudentTestingPage() {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => handleStartEdit(task)}
-                                                                className="cc-interactive-button rounded-2xl border border-slate-700 px-4 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                                                                className="cc-button-secondary rounded-2xl px-4 py-3 text-sm"
                                                             >
                                                                 {currentCopy.edit}
                                                             </button>
@@ -892,7 +892,7 @@ export default function StudentTestingPage() {
                                                                     setDeleteCandidateId(task.id);
                                                                     setEditingTaskId("");
                                                                 }}
-                                                                className="cc-interactive-button rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                                                                className="cc-button-danger rounded-2xl px-4 py-3 text-sm"
                                                             >
                                                                 {currentCopy.delete}
                                                             </button>
@@ -916,14 +916,14 @@ export default function StudentTestingPage() {
                                                                         setDeleteCandidateId("");
                                                                         setHasDeletedTask(true);
                                                                     }}
-                                                                    className="cc-interactive-button rounded-2xl bg-red-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-red-300"
+                                                                    className="cc-button-danger rounded-2xl px-5 py-3 text-sm"
                                                                 >
                                                                     {currentCopy.confirmDelete}
                                                                 </button>
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => setDeleteCandidateId("")}
-                                                                    className="cc-interactive-button rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
+                                                                    className="cc-button-secondary rounded-2xl px-5 py-3 text-sm"
                                                                 >
                                                                     {currentCopy.cancel}
                                                                 </button>
@@ -939,7 +939,7 @@ export default function StudentTestingPage() {
                         </div>
 
                         <aside className="space-y-5">
-                            <div className="cc-motion-fade-up rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-5 sm:p-6">
+                            <div className="cc-section cc-motion-fade-up rounded-[2rem] border-emerald-400/30 p-5 sm:p-6">
                                 <p className="mb-2 text-sm font-bold text-emerald-300">
                                     {currentCopy.addTask}
                                 </p>
@@ -951,7 +951,7 @@ export default function StudentTestingPage() {
                                             setNewTaskError("");
                                         }}
                                         placeholder={currentCopy.newTaskPlaceholder}
-                                        className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-300"
+                                        className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition"
                                     />
 
                                     <div className="grid gap-3 sm:grid-cols-2">
@@ -962,7 +962,7 @@ export default function StudentTestingPage() {
                                                     setNewTaskPriority(event.target.value);
                                                 }
                                             }}
-                                            className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-emerald-300"
+                                            className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition"
                                         >
                                             {priorityOptions.map((priority) => (
                                                 <option key={priority} value={priority}>
@@ -976,7 +976,7 @@ export default function StudentTestingPage() {
                                             onChange={(event) =>
                                                 setNewTaskTime(event.target.value)
                                             }
-                                            className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-emerald-300"
+                                            className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition"
                                         />
                                     </div>
 
@@ -989,15 +989,15 @@ export default function StudentTestingPage() {
                                     <button
                                         type="button"
                                         onClick={handleAddTask}
-                                        className="cc-interactive-button rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
+                                        className="cc-button-success rounded-2xl px-6 py-4"
                                     >
                                         {currentCopy.addTask}
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="cc-motion-fade-up rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-6">
-                                <p className="mb-2 text-sm font-bold text-cyan-300">
+                            <div className="cc-section cc-motion-fade-up rounded-[2rem] border-cyan-400/30 p-5 sm:p-6">
+                                <p className="cc-kicker mb-2">
                                     {currentCopy.progress}
                                 </p>
                                 <h2 className="text-2xl font-black">
@@ -1019,7 +1019,7 @@ export default function StudentTestingPage() {
                                                 className={`rounded-2xl border p-3 ${
                                                     isComplete
                                                         ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                                                        : "border-slate-800 bg-slate-950/70 text-slate-400"
+                                                        : "cc-surface-muted cc-text-subtle"
                                                 }`}
                                             >
                                                 {isComplete ? "✓ " : ""}
@@ -1035,14 +1035,14 @@ export default function StudentTestingPage() {
                                     disabled={completedActions < 4}
                                     className={`mt-6 w-full rounded-2xl px-6 py-4 font-bold transition ${
                                         completedActions >= 4
-                                            ? "bg-cyan-400 text-slate-950 hover:bg-cyan-300"
-                                            : "cursor-not-allowed bg-slate-800 text-slate-500"
+                                            ? "cc-button-primary"
+                                            : "cc-button-secondary cursor-not-allowed opacity-60"
                                     }`}
                                 >
                                     {currentCopy.continueReview}
                                 </button>
 
-                                <p className="mt-3 text-xs leading-5 text-slate-400">
+                                <p className="cc-helper-text mt-3">
                                     {currentCopy.unlockNote}
                                 </p>
                             </div>
@@ -1051,34 +1051,34 @@ export default function StudentTestingPage() {
                 ) : null}
 
                 {step === 2 ? (
-                    <section className="cc-motion-fade-up rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-8">
+                    <section className="cc-section cc-motion-fade-up rounded-[2rem] p-5 sm:p-8">
                         <p className="mb-2 text-sm font-bold text-fuchsia-300">
                             {currentCopy.reviewStep}
                         </p>
                         <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                             {currentCopy.reviewTitle}
                         </h2>
-                        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                        <p className="cc-text-muted mt-3 max-w-3xl text-sm leading-6">
                             {currentCopy.reviewDescription}
                         </p>
 
                         <div className="mt-6 grid gap-4 md:grid-cols-2">
-                            <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-5">
+                            <div className="cc-surface-inset rounded-[1.5rem] p-5">
                                 <p className="mb-2 text-sm font-bold text-emerald-300">
                                     {currentCopy.completedActions}
                                 </p>
-                                <div className="space-y-2 text-sm leading-6 text-slate-300">
+                                <div className="cc-text-muted space-y-2 text-sm leading-6">
                                     {currentCopy.checklistItems.map((item) => (
                                         <p key={item}>- {item}</p>
                                     ))}
                                 </div>
                             </div>
 
-                            <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-5">
+                            <div className="cc-surface-inset rounded-[1.5rem] p-5">
                                 <p className="mb-2 text-sm font-bold text-fuchsia-300">
                                     {currentCopy.feedbackIdeas}
                                 </p>
-                                <div className="space-y-2 text-sm leading-6 text-slate-300">
+                                <div className="cc-text-muted space-y-2 text-sm leading-6">
                                     {currentCopy.feedbackPrompts.map((item) => (
                                         <p key={item}>- {item}</p>
                                     ))}
@@ -1090,7 +1090,7 @@ export default function StudentTestingPage() {
                             <button
                                 type="button"
                                 onClick={handleStartFeedbackStep}
-                                className="cc-interactive-button rounded-2xl bg-fuchsia-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-fuchsia-300"
+                                className="cc-interactive-button rounded-2xl border border-fuchsia-400/40 bg-fuchsia-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-fuchsia-300"
                             >
                                 {currentCopy.prepareFeedback}
                             </button>
@@ -1098,7 +1098,7 @@ export default function StudentTestingPage() {
                             <button
                                 type="button"
                                 onClick={() => setStep(1)}
-                                className="cc-interactive-button rounded-2xl border border-slate-700 px-6 py-4 font-bold text-white transition hover:border-slate-400"
+                                className="cc-button-secondary rounded-2xl px-6 py-4"
                             >
                                 {currentCopy.backPlanner}
                             </button>
@@ -1107,7 +1107,7 @@ export default function StudentTestingPage() {
                 ) : null}
 
                 {step === 3 ? (
-                    <section className="cc-motion-fade-up rounded-[2rem] border border-fuchsia-400/30 bg-fuchsia-400/10 p-5 sm:p-8">
+                    <section className="cc-section cc-motion-fade-up rounded-[2rem] border-fuchsia-400/30 p-5 sm:p-8">
                         {!showFeedback ? (
                             <div>
                                 <p className="mb-2 text-sm font-bold text-fuchsia-300">
@@ -1116,13 +1116,13 @@ export default function StudentTestingPage() {
                                 <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                                     {currentCopy.feedbackTitle}
                                 </h2>
-                                <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                                <p className="cc-text-muted mt-3 max-w-3xl text-sm leading-6">
                                     {currentCopy.loadingMessages[loadingMessageIndex]}
                                 </p>
 
                                 <div className="mt-8">
                                     <div className="mb-3 flex items-center justify-between">
-                                        <p className="text-sm font-bold text-slate-300">
+                                        <p className="cc-text-muted text-sm font-bold">
                                             {currentCopy.loadingProgress}
                                         </p>
                                         <p className="text-sm font-black text-fuchsia-300">
@@ -1130,7 +1130,7 @@ export default function StudentTestingPage() {
                                         </p>
                                     </div>
 
-                                    <div className="cc-progress-track h-4 overflow-hidden rounded-full bg-slate-900">
+                                    <div className="cc-progress-track h-4 overflow-hidden rounded-full">
                                         <div
                                             className="cc-progress-fill h-full rounded-full bg-fuchsia-400 transition-all duration-100"
                                             style={{ width: `${loadingProgress}%` }}
@@ -1147,7 +1147,7 @@ export default function StudentTestingPage() {
                                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                                         {currentCopy.sendFeedback}
                                     </h2>
-                                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                                    <p className="cc-text-muted mt-3 max-w-3xl text-sm leading-6">
                                         {currentCopy.sendFeedbackDescription}
                                     </p>
                                 </div>
@@ -1158,7 +1158,7 @@ export default function StudentTestingPage() {
                                     <button
                                         type="button"
                                         onClick={() => setStep(4)}
-                                        className="cc-interactive-button rounded-2xl bg-emerald-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-emerald-300"
+                                        className="cc-button-success rounded-2xl px-6 py-4"
                                     >
                                         {currentCopy.finished}
                                     </button>
@@ -1166,7 +1166,7 @@ export default function StudentTestingPage() {
                                     <button
                                         type="button"
                                         onClick={handleResetTutorial}
-                                        className="cc-interactive-button rounded-2xl border border-slate-700 px-6 py-4 font-bold text-white transition hover:border-slate-400"
+                                        className="cc-button-secondary rounded-2xl px-6 py-4"
                                     >
                                         {currentCopy.reset}
                                     </button>
@@ -1177,20 +1177,17 @@ export default function StudentTestingPage() {
                 ) : null}
 
                 {step === 4 ? (
-                    <section className="cc-modal-motion relative overflow-hidden rounded-[2rem] border border-emerald-400/30 bg-emerald-400/10 p-6 shadow-2xl shadow-emerald-950/30 sm:p-10">
-                        <div className="absolute -left-16 -top-16 h-40 w-40 rounded-full bg-cyan-400/20 blur-3xl" />
-                        <div className="absolute -bottom-16 -right-16 h-48 w-48 rounded-full bg-fuchsia-400/20 blur-3xl" />
-
+                    <section className="cc-section cc-modal-motion relative overflow-hidden rounded-[2rem] border-emerald-400/30 p-6 sm:p-10">
                         <div className="relative z-10">
-                            <div className="mb-6 inline-flex rounded-full border border-emerald-400/30 bg-slate-950/70 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
+                            <div className="cc-badge-success mb-6">
                                 {currentCopy.completeBadge}
                             </div>
 
-                            <h2 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
+                            <h2 className="cc-page-title max-w-4xl">
                                 {currentCopy.completeTitle}
                             </h2>
 
-                            <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
+                            <p className="cc-text-muted mt-6 max-w-3xl text-base leading-8 sm:text-lg">
                                 {currentCopy.completeDescription}
                             </p>
 
@@ -1198,13 +1195,13 @@ export default function StudentTestingPage() {
                                 {currentCopy.completeCards.map((card, index) => (
                                     <div
                                         key={card.title}
-                                        className="rounded-3xl border border-slate-800 bg-slate-950/70 p-5"
+                                        className="cc-surface-inset rounded-[1.5rem] p-5"
                                     >
                                         <p className="mb-2 text-sm font-black text-emerald-300">
                                             {String(index + 1).padStart(2, "0")}
                                         </p>
-                                        <h3 className="font-bold text-white">{card.title}</h3>
-                                        <p className="mt-2 text-sm leading-6 text-slate-400">
+                                        <h3 className="cc-text-main font-bold">{card.title}</h3>
+                                        <p className="cc-text-subtle mt-2 text-sm leading-6">
                                             {card.description}
                                         </p>
                                     </div>
@@ -1214,14 +1211,14 @@ export default function StudentTestingPage() {
                             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                                 <Link
                                     href="/"
-                                    className="cc-interactive-button rounded-[1.75rem] bg-emerald-400 px-8 py-5 text-center text-lg font-black text-slate-950 shadow-2xl shadow-emerald-950/40 transition hover:bg-emerald-300"
+                                    className="cc-button-success rounded-[1.75rem] px-8 py-5 text-center text-base"
                                 >
                                     {currentCopy.returnHome}
                                 </Link>
 
                                 <Link
                                     href="/projects/new"
-                                    className="cc-interactive-button rounded-[1.75rem] border border-slate-700 px-8 py-5 text-center text-lg font-black text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                                    className="cc-button-primary rounded-[1.75rem] px-8 py-5 text-center text-base"
                                 >
                                     {currentCopy.startReal}
                                 </Link>
@@ -1229,7 +1226,7 @@ export default function StudentTestingPage() {
                                 <button
                                     type="button"
                                     onClick={handleResetTutorial}
-                                    className="cc-interactive-button rounded-[1.75rem] border border-slate-700 px-8 py-5 text-center text-lg font-black text-white transition hover:border-slate-400"
+                                    className="cc-button-secondary rounded-[1.75rem] px-8 py-5 text-center text-base"
                                 >
                                     {currentCopy.tryAgain}
                                 </button>

@@ -10,8 +10,8 @@ export default function ExamCountdownCard() {
 
     if (!countdown) {
         return (
-            <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
-                <p className="text-sm text-slate-400">Loading exam countdown...</p>
+            <div className="cc-card rounded-[1.5rem] p-5 sm:p-6">
+                <p className="cc-text-subtle text-sm">Loading exam countdown...</p>
             </div>
         );
     }
@@ -20,7 +20,7 @@ export default function ExamCountdownCard() {
     const isToday = countdown.status === "today";
 
     return (
-        <div className="rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-6">
+        <div className="cc-card rounded-[1.5rem] border-cyan-400/30 p-5 sm:p-6">
             <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
                 <div>
                     <p className="mb-2 text-sm font-bold text-cyan-300">
@@ -29,13 +29,13 @@ export default function ExamCountdownCard() {
                     <h2 className="text-2xl font-black sm:text-3xl">
                         {countdown.label}
                     </h2>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">
+                    <p className="cc-text-muted mt-2 text-sm leading-6">
                         Target date: {countdown.targetDateLabel}. Keep coursework pressure
                         under control before revision season becomes a meteor shower.
                     </p>
                 </div>
 
-                <div className="rounded-3xl border border-slate-800 bg-slate-950 p-5 text-center md:min-w-48">
+                <div className="cc-surface-inset rounded-[1.5rem] p-5 text-center md:min-w-48">
                     <p
                         className={`text-5xl font-black ${
                             isToday || isStarted ? "text-amber-300" : "text-cyan-300"
@@ -43,7 +43,7 @@ export default function ExamCountdownCard() {
                     >
                         {countdown.daysLeft}
                     </p>
-                    <p className="mt-2 text-sm font-bold text-slate-300">
+                    <p className="cc-text-muted mt-2 text-sm font-bold">
                         {countdown.message}
                     </p>
                 </div>

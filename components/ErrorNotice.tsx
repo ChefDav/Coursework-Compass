@@ -52,7 +52,7 @@ export default function ErrorNotice({
 
                 <div className="min-w-0">
                     <p className="text-sm font-black">{displayTitle}</p>
-                    <p className="cc-text-muted mt-1 text-sm leading-6">
+                    <p className="mt-1 text-sm leading-6">
                         {displayMessage}
                     </p>
                 </div>

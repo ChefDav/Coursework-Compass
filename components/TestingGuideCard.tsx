@@ -95,9 +95,6 @@ export default function TestingGuideCard() {
 
     return (
         <section className="cc-panel-strong cc-motion-fade-up relative overflow-hidden rounded-[2rem] p-5 sm:p-6 lg:p-8">
-            <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-28 -left-28 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-
             <div className="relative z-10">
                 <div className="mb-7">
                     <div className="mb-4 inline-flex rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-300">

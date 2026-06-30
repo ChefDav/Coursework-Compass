@@ -279,16 +279,16 @@ export default function DashboardPage() {
     }, [plans]);
 
     return (
-        <main className="cc-page-gradient cc-ambient-drift cc-text-main px-4 py-6 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-7xl">
+        <main className="cc-page-gradient cc-ambient-drift cc-text-main">
+            <div className="cc-page-shell">
                 <AppNav />
 
-                <header className="cc-card cc-motion-fade-up mb-8 rounded-[2rem] p-6 sm:p-8">
-                    <p className="mb-3 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
+                <header className="cc-page-header cc-motion-fade-up mb-8">
+                    <p className="cc-kicker mb-3">
                         {currentCopy.eyebrow}
                     </p>
 
-                    <h1 className="cc-text-main max-w-5xl text-4xl font-black tracking-tight sm:text-6xl">
+                    <h1 className="cc-page-title max-w-5xl">
                         {currentCopy.title}
                     </h1>
 
@@ -297,7 +297,7 @@ export default function DashboardPage() {
                     </p>
                 </header>
 
-                <section className="cc-card cc-motion-fade-up mb-8 rounded-[2rem] p-5 sm:p-6">
+                <section className="cc-section cc-motion-fade-up mb-8 rounded-[2rem] p-5 sm:p-6">
                     <div className="mb-5">
                         <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                             {currentCopy.personaliseWorkspace}
@@ -376,10 +376,10 @@ export default function DashboardPage() {
                             </article>
                         </section>
 
-                        <section className="cc-card cc-motion-fade-up rounded-[2rem] p-5 sm:p-6">
+                        <section className="cc-section cc-motion-fade-up rounded-[2rem] p-5 sm:p-6">
                             <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                 <div>
-                                    <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
+                                    <p className="cc-kicker mb-2">
                                         {currentCopy.projectOverview}
                                     </p>
 

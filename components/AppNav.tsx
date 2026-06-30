@@ -71,20 +71,20 @@ export default function AppNav() {
     }
 
     return (
-        <header className="cc-panel cc-motion-fade-up mb-6 rounded-[1.5rem] p-3 backdrop-blur-md sm:mb-8 sm:rounded-[2rem] sm:p-5">
-            <div className="grid gap-5 xl:grid-cols-[minmax(15rem,22rem)_1fr] xl:items-start">
+        <header className="cc-panel cc-motion-fade-up mb-6 rounded-[1.5rem] p-3 sm:mb-8 sm:rounded-[2rem] sm:p-5">
+            <div className="grid gap-4 xl:grid-cols-[minmax(15rem,22rem)_1fr] xl:items-start">
                 <div className="flex items-start justify-between gap-3 xl:block">
-                    <Link href="/" className="group min-w-0">
-                        <p className="cc-text-main max-w-[18rem] truncate text-lg font-black tracking-tight transition group-hover:text-cyan-300 sm:max-w-none sm:text-xl xl:whitespace-normal">
+                    <Link href="/" className="group cc-focus-ring min-w-0 rounded-2xl px-2 py-1">
+                        <p className="cc-text-main max-w-[18rem] truncate text-lg font-black leading-tight tracking-tight transition group-hover:text-cyan-300 sm:max-w-none sm:text-xl xl:whitespace-normal">
                             {t("appName")}
                         </p>
-                        <p className="cc-text-subtle mt-1 max-w-[12rem] text-[0.65rem] font-black uppercase tracking-[0.18em] transition group-hover:text-cyan-400 sm:max-w-none sm:text-xs sm:tracking-[0.2em] xl:leading-5">
+                        <p className="cc-text-subtle mt-1 max-w-[12rem] text-[0.65rem] font-black uppercase tracking-[0.14em] transition group-hover:text-cyan-400 sm:max-w-none sm:text-xs xl:leading-5">
                             {t("versionLabel")}
                         </p>
                     </Link>
 
                     <details className="relative xl:hidden">
-                        <summary className="cc-interactive-button list-none rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm font-black text-cyan-300">
+                        <summary className="cc-button-secondary list-none rounded-2xl px-4 py-3 text-sm">
                             {t("mainMenu")}
                         </summary>
 
@@ -101,7 +101,7 @@ export default function AppNav() {
                                                 isActive
                                                     ? "cc-button-primary"
                                                     : item.href === "/"
-                                                        ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+                                                        ? "cc-button-secondary hover:border-emerald-400 hover:text-emerald-300"
                                                         : "cc-button-secondary"
                                             }`}
                                         >
@@ -116,7 +116,7 @@ export default function AppNav() {
                                 <button
                                     type="button"
                                     onClick={handleResetData}
-                                    className="cc-interactive-button rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-left text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                                    className="cc-button-danger rounded-2xl px-4 py-3 text-sm"
                                 >
                                     {t("resetData")}
                                 </button>
@@ -134,11 +134,11 @@ export default function AppNav() {
                                 <Link
                                     key={item.href}
                                     href={item.href}
-                                    className={`cc-interactive-button min-w-[6.75rem] whitespace-nowrap rounded-2xl px-3 py-3 text-center text-sm font-bold transition ${
+                                    className={`cc-interactive-button min-w-[6.5rem] whitespace-nowrap rounded-2xl px-3 py-3 text-center text-sm font-bold transition ${
                                             isActive
                                             ? "cc-button-primary"
                                             : item.href === "/"
-                                                ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20"
+                                                ? "cc-button-secondary hover:border-emerald-400 hover:text-emerald-300"
                                                 : "cc-button-secondary"
                                     }`}
                                 >
@@ -155,7 +155,7 @@ export default function AppNav() {
                         <button
                             type="button"
                             onClick={handleResetData}
-                            className="cc-interactive-button whitespace-nowrap rounded-2xl border border-red-400/30 bg-red-400/10 px-5 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                            className="cc-button-danger whitespace-nowrap rounded-2xl px-5 py-3 text-sm"
                         >
                             {t("resetData")}
                         </button>
@@ -173,7 +173,7 @@ export default function AppNav() {
                 </p>
             </details>
 
-            <div className="mt-5 hidden rounded-3xl border border-amber-400/30 bg-amber-400/10 p-4 xl:block">
+            <div className="mt-5 hidden rounded-[1.5rem] border border-amber-400/30 bg-amber-400/10 p-4 xl:block">
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                     <div>
                         <p className="mb-1 text-sm font-black text-amber-300">

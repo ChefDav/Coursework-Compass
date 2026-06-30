@@ -320,11 +320,8 @@ export default function EmptyState({
     return (
         <section className="cc-card cc-motion-fade-up overflow-hidden rounded-[2rem] p-5 sm:p-8">
             <div className="relative">
-                <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-400/10 blur-3xl" />
-                <div className="absolute -bottom-28 -left-28 h-56 w-56 rounded-full bg-emerald-400/10 blur-3xl" />
-
                 <div className="relative z-10">
-                    <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-[1.5rem] border border-cyan-400/30 bg-cyan-400/10 text-3xl">
+                    <div className="cc-icon-tile mb-5 flex h-16 w-16 rounded-[1.5rem] text-3xl">
                         {icon}
                     </div>
 

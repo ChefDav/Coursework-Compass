@@ -197,16 +197,16 @@ export default function HomePage() {
 
     return (
         <main className="cc-page-gradient cc-ambient-drift cc-text-main">
-            <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+            <section className="cc-page-shell">
                 <AppNav />
 
-                <section className="cc-motion-fade-up grid gap-10 py-12 md:grid-cols-[1.2fr_0.8fr] md:items-center md:py-20">
+                <section className="cc-motion-fade-up grid gap-10 py-10 md:grid-cols-[1.2fr_0.8fr] md:items-center md:py-16">
                     <div>
                         <div className="mb-5 inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
                             {currentCopy.badge}
                         </div>
 
-                        <h1 className="text-5xl font-black tracking-tight sm:text-6xl md:text-7xl">
+                        <h1 className="cc-page-title max-w-5xl">
                             {currentCopy.title}
                         </h1>
 
@@ -321,10 +321,7 @@ export default function HomePage() {
                         </div>
 
                         <div className="flex flex-col gap-4">
-                            <Link
-                                href="/test"
-                                className="cc-interactive-button rounded-[1.75rem] bg-emerald-400 px-8 py-6 text-center text-lg font-black text-slate-950 shadow-2xl shadow-emerald-950/40 transition hover:bg-emerald-300"
-                            >
+                            <Link href="/test" className="cc-button-success rounded-[1.75rem] px-8 py-5 text-center text-base">
                                 {currentCopy.joinTest}
                             </Link>
 
@@ -467,10 +464,7 @@ export default function HomePage() {
                         </div>
 
                         <div className="flex flex-col gap-4">
-                            <Link
-                                href="/projects/new"
-                                className="cc-interactive-button rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
-                            >
+                            <Link href="/projects/new" className="cc-button-success rounded-2xl px-6 py-4 text-center">
                                 {currentCopy.createProject}
                             </Link>
 

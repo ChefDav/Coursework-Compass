@@ -198,11 +198,11 @@ export default function EstimatedTimeField({
 
     return (
         <div>
-            <label className="cc-text-muted mb-2 block text-xs font-bold">
+            <label className="cc-text-muted mb-2 block text-xs font-black">
                 {label}
             </label>
 
-            <div className="grid grid-cols-[1fr_8.5rem] gap-3">
+            <div className="grid gap-3 sm:grid-cols-[1fr_8.5rem]">
                 <input
                     type="text"
                     value={amount}

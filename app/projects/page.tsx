@@ -172,16 +172,16 @@ export default function ProjectsPage() {
     }
 
     return (
-        <main className="cc-page-gradient cc-ambient-drift cc-text-main px-4 py-6 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-7xl">
+        <main className="cc-page-gradient cc-ambient-drift cc-text-main">
+            <div className="cc-page-shell">
                 <AppNav />
 
-                <header className="cc-card cc-motion-fade-up mb-8 rounded-[2rem] p-6 sm:p-8">
-                    <p className="mb-3 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
+                <header className="cc-page-header cc-motion-fade-up mb-8">
+                    <p className="cc-kicker mb-3">
                         {currentCopy.eyebrow}
                     </p>
 
-                    <h1 className="cc-text-main max-w-5xl text-4xl font-black tracking-tight sm:text-6xl">
+                    <h1 className="cc-page-title max-w-5xl">
                         {currentCopy.title}
                     </h1>
 
@@ -232,10 +232,10 @@ export default function ProjectsPage() {
                         tips={[...currentCopy.tips]}
                     />
                 ) : (
-                    <section className="cc-card cc-motion-fade-up rounded-[2rem] p-5 sm:p-6">
+                    <section className="cc-section cc-motion-fade-up rounded-[2rem] p-5 sm:p-6">
                         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                             <div>
-                                <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
+                                <p className="cc-kicker mb-2">
                                     {currentCopy.savedProjects}
                                 </p>
 
@@ -280,7 +280,7 @@ export default function ProjectsPage() {
                                             <button
                                                 type="button"
                                                 onClick={() => handleDeleteProject(plan)}
-                                                className="cc-interactive-button w-fit rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm font-bold text-red-300 transition hover:bg-red-400/20"
+                                                className="cc-button-danger w-fit rounded-2xl px-4 py-3 text-sm"
                                             >
                                                 {currentCopy.deleteProject}
                                             </button>
