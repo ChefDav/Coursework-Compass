@@ -10,10 +10,10 @@ const ONBOARDING_STORAGE_KEY =
 
 const copy = {
     en: {
-        badge: "v1.3 Multilingual Foundation",
+        badge: "v1.4 Personalisation Version",
         title: "Welcome to Coursework Compass.",
         description:
-            "Coursework Compass helps IB and A-Level students turn large coursework projects into clearer tasks, deadlines, and daily actions. This version adds the English / Simplified Chinese foundation for student testing.",
+            "Coursework Compass helps IB and A-Level students turn large coursework projects into clearer tasks, deadlines, and daily actions. This version adds dark/light themes, saved preferences, background presets, and personalisation polish.",
         close: "Close",
         cards: [
             {
@@ -26,7 +26,7 @@ const copy = {
                 number: "02",
                 title: "Switch language",
                 description:
-                    "Use English or Simplified Chinese while the v1.3 bilingual foundation expands.",
+                    "Use English or Simplified Chinese while the v1.4 personal workspace polish continues.",
             },
             {
                 number: "03",
@@ -46,10 +46,10 @@ const copy = {
         explore: "Explore first",
     },
     zh: {
-        badge: "v1.3 多语言基础版本",
+        badge: "v1.4 个性化版本",
         title: "欢迎使用 Coursework Compass。",
         description:
-            "Coursework Compass 帮助 IB 和 A-Level 学生把大型 coursework 项目拆成更清晰的任务、截止日期和每日行动。这个版本加入英文 / 简体中文基础，方便学生测试。",
+            "Coursework Compass 帮助 IB 和 A-Level 学生把大型 coursework 项目拆成更清晰的任务、截止日期和每日行动。这个版本加入深色/浅色主题、保存的偏好、背景预设和个性化打磨。",
         close: "关闭",
         cards: [
             {
@@ -62,7 +62,7 @@ const copy = {
                 number: "02",
                 title: "切换语言",
                 description:
-                    "可以使用英文或简体中文；v1.3 会继续扩展双语基础。",
+                    "可以使用英文或简体中文；v1.4 会继续打磨更个人化的学习空间。",
             },
             {
                 number: "03",

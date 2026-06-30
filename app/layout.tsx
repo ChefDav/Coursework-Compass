@@ -10,7 +10,7 @@ import BackgroundBootstrap from "@/components/BackgroundBootstrap";
 export const metadata: Metadata = {
     title: "Coursework Compass",
     description:
-        "A coursework planning tool for IB, A-Level, and international school students.",
+        "Coursework Compass is a local-first coursework planning workspace for international school students with bilingual UI, saved preferences, and personalisation features.",
 };
 
 const themeBootstrapScript = `

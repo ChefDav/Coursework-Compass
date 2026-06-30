@@ -27,8 +27,8 @@ const feedbackTypes: FeedbackType[] = [
 
 const copy = {
     en: {
-        eyebrow: "v1.3 student testing feedback",
-        title: "Help shape the multilingual foundation.",
+        eyebrow: "v1.4 student testing feedback",
+        title: "Help shape the personalisation version.",
         description:
             "Coursework Compass is being improved through real student testing. Useful feedback can be short, honest, and specific. Even one confusing button is worth reporting.",
         note:
@@ -47,11 +47,11 @@ const copy = {
         helper:
             "This opens your email app with a ready-made feedback template. You can edit it before sending.",
         bodyIntro:
-            "I tested Coursework Compass v1.3 Multilingual Foundation and would like to share some feedback.",
+            "I tested Coursework Compass v1.4 Personalisation Version and would like to share some feedback.",
     },
     zh: {
-        eyebrow: "v1.3 学生测试反馈",
-        title: "帮助完善多语言基础版本。",
+        eyebrow: "v1.4 学生测试反馈",
+        title: "帮助完善个性化版本。",
         description:
             "Coursework Compass 正在通过真实学生测试继续改进。反馈可以很短、真实、具体。哪怕只是一个让你困惑的按钮，也值得告诉我。",
         note:
@@ -70,7 +70,7 @@ const copy = {
         helper:
             "这会打开你的邮件应用，并预填一个反馈模板。发送前你可以继续编辑。",
         bodyIntro:
-            "我测试了 Coursework Compass v1.3 多语言基础版本，想分享一些反馈。",
+            "我测试了 Coursework Compass v1.4 个性化版本，想分享一些反馈。",
     },
 } as const;
 
@@ -121,7 +121,7 @@ export default function FeedbackPanel() {
 
     const feedbackMailto = useMemo(() => {
         const subject = encodeURIComponent(
-            `Coursework Compass v1.3 Student Testing Feedback - ${selectedType}`,
+            `Coursework Compass v1.4 Student Testing Feedback - ${selectedType}`,
         );
 
         const body = encodeURIComponent(

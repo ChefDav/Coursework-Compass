@@ -12,7 +12,7 @@ import { useStoredLanguage } from "@/lib/clientStores";
 
 const copy = {
     en: {
-        badge: "Coursework Compass v1.3 Multilingual Foundation",
+        badge: "Coursework Compass v1.4 Personalisation Version",
         title: "Turn coursework chaos into a clear daily plan.",
         subtitle:
             "Coursework Compass helps IB and A-Level students break major projects into manageable tasks, deadlines, progress, and daily execution. Create a plan, edit it, and keep moving in English or Simplified Chinese.",
@@ -44,12 +44,12 @@ const copy = {
             "Coursework Compass includes countdown-oriented planning so major projects feel less invisible.",
         howEyebrow: "How it works",
         howTitle: "From vague coursework to visible progress.",
-        featuresEyebrow: "v1.3 features",
+        featuresEyebrow: "v1.4 features",
         featuresTitle: "Built for real student workflows.",
         templatesEyebrow: "Supported templates",
         templatesTitle: "Start with a subject-specific structure.",
         templatesText:
-            "The v1.3 template library covers common IB, A-Level, EPQ, and university application work.",
+            "The v1.4 template library covers common IB, A-Level, EPQ, and university application work while the workspace adds saved personalisation.",
         readyEyebrow: "Ready to plan?",
         readyTitle: "Create your first coursework plan.",
         readyText:
@@ -77,9 +77,9 @@ const copy = {
         ],
         featureCards: [
             {
-                title: "Bilingual foundation",
+                title: "Personal workspace",
                 description:
-                    "Switch between English and Simplified Chinese across the main planning and testing surfaces.",
+                    "Use dark or light themes, saved preferences, and background presets to make the planner feel more like your own study space.",
             },
             {
                 title: "Editable task workspace",
@@ -94,7 +94,7 @@ const copy = {
         ],
     },
     zh: {
-        badge: "Coursework Compass v1.3 多语言基础版本",
+        badge: "Coursework Compass v1.4 个性化版本",
         title: "把混乱的 coursework 变成清晰的每日计划。",
         subtitle:
             "Coursework Compass 帮助 IB 和 A-Level 学生把大型项目拆成可执行的任务、截止日期、进度和每日行动。你可以用英文或简体中文创建计划、编辑任务并持续推进。",
@@ -126,12 +126,12 @@ const copy = {
             "Coursework Compass 包含倒计时式规划，让大型项目不再像一团看不见的压力。",
         howEyebrow: "使用方式",
         howTitle: "从模糊 coursework 到可见进度。",
-        featuresEyebrow: "v1.3 功能",
+        featuresEyebrow: "v1.4 功能",
         featuresTitle: "为真实学生工作流设计。",
         templatesEyebrow: "支持的模板",
         templatesTitle: "从学科结构开始。",
         templatesText:
-            "v1.3 模板库覆盖常见 IB、A-Level、EPQ 和大学申请相关工作。",
+            "v1.4 模板库覆盖常见 IB、A-Level、EPQ 和大学申请相关工作，并加入保存的个性化学习空间设置。",
         readyEyebrow: "准备开始？",
         readyTitle: "创建你的第一个 coursework 计划。",
         readyText:
@@ -159,9 +159,9 @@ const copy = {
         ],
         featureCards: [
             {
-                title: "双语基础",
+                title: "个性化学习空间",
                 description:
-                    "在主要规划和测试界面中切换英文与简体中文。",
+                    "使用深色/浅色主题、保存的偏好和背景预设，让 planner 更像自己的学习空间。",
             },
             {
                 title: "可编辑任务工作区",

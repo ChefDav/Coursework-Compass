@@ -25,7 +25,7 @@ export const languages: {
 export const translations = {
     en: {
         appName: "Coursework Compass",
-        versionLabel: "v1.3 Multilingual Foundation",
+        versionLabel: "v1.4 Personalisation Version",
 
         language: "Language",
         english: "English",
@@ -49,11 +49,11 @@ export const translations = {
         openDashboard: "Open dashboard",
         openToday: "Open Today",
 
-        betaNoticeEyebrow: "Coursework Compass v1.3 Multilingual Foundation",
-        betaNoticeTitle: "A clearer bilingual testing version is now in progress.",
+        betaNoticeEyebrow: "Coursework Compass v1.4 Personalisation Version",
+        betaNoticeTitle: "A more personal study workspace is now in progress.",
         betaNoticeDescription:
-            "This version begins turning Coursework Compass into an English and Simplified Chinese coursework planner. The current foundation focuses on language switching, clearer global notices, and preparing the product for Chinese-speaking international school students.",
-        betaNoticeBadge: "v1.3 beta",
+            "This version adds dark and light themes, saved workspace preferences, background presets, smoother motion, and clearer completion feedback while keeping the browser-only beta simple.",
+        betaNoticeBadge: "v1.4 beta",
         betaCardOneNumber: "01",
         betaCardOneTitle: "Plan coursework",
         betaCardOneDescription:
@@ -65,10 +65,10 @@ export const translations = {
         betaCardThreeNumber: "03",
         betaCardThreeTitle: "Test bilingually",
         betaCardThreeDescription:
-            "Use the English interface or switch to Simplified Chinese as v1.3 expands bilingual support across the product.",
+            "Use the English interface or switch to Simplified Chinese while the v1.4 personal workspace polish continues.",
         importantDataNoteTitle: "Important data note",
         importantDataNoteOne:
-            "Coursework Compass v1.3 still uses browser-only local storage. It does not use accounts or cloud sync yet.",
+            "Coursework Compass v1.4 still uses browser-only local storage. It does not use accounts or cloud sync yet.",
         importantDataNoteTwo:
             "This means your projects may disappear if you clear browser data, use another browser, use another device, or reset local data from the navigation bar.",
         importantDataNoteThree:
@@ -149,7 +149,7 @@ export const translations = {
 
     zh: {
         appName: "Coursework Compass",
-        versionLabel: "v1.3 多语言基础版本",
+        versionLabel: "v1.4 个性化版本",
 
         language: "语言",
         english: "English",
@@ -173,11 +173,11 @@ export const translations = {
         openDashboard: "打开仪表盘",
         openToday: "打开今日任务",
 
-        betaNoticeEyebrow: "Coursework Compass v1.3 多语言基础版本",
-        betaNoticeTitle: "更清晰的双语测试版本正在完善中。",
+        betaNoticeEyebrow: "Coursework Compass v1.4 个性化版本",
+        betaNoticeTitle: "更具个人空间感的学习工作台正在完善中。",
         betaNoticeDescription:
-            "这个版本开始把 Coursework Compass 升级为支持英文和简体中文的 coursework 规划工具。当前重点是语言切换、全局提示双语化，并为中文国际学校学生的使用场景打基础。",
-        betaNoticeBadge: "v1.3 测试版",
+            "这个版本新增深色/浅色主题、本地偏好保存、背景预设、轻量动效和更清晰的任务完成反馈，同时继续保持浏览器本地测试存储。",
+        betaNoticeBadge: "v1.4 测试版",
         betaCardOneNumber: "01",
         betaCardOneTitle: "规划 coursework",
         betaCardOneDescription:
@@ -189,10 +189,10 @@ export const translations = {
         betaCardThreeNumber: "03",
         betaCardThreeTitle: "双语测试体验",
         betaCardThreeDescription:
-            "你可以使用英文界面，也可以切换到简体中文。v1.3 会把更多页面升级为双语版本。",
+            "你可以使用英文界面，也可以切换到简体中文。v1.4 会继续打磨更个人化的学习空间。",
         importantDataNoteTitle: "重要数据说明",
         importantDataNoteOne:
-            "Coursework Compass v1.3 仍然使用浏览器本地存储，目前还没有账号系统或云端同步。",
+            "Coursework Compass v1.4 仍然使用浏览器本地存储，目前还没有账号系统或云端同步。",
         importantDataNoteTwo:
             "这意味着如果你清除浏览器数据、更换浏览器、更换设备，或在导航栏中重置本地数据，之前保存的项目可能不会显示。",
         importantDataNoteThree:

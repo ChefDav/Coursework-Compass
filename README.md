@@ -1,18 +1,22 @@
 # Coursework Compass
 
-Current version: **v1.3 Multilingual Foundation**
+Current version: **v1.4 Personalisation Version**
 
-Coursework Compass is a local-first coursework planning app for international school students. It helps students turn large coursework projects into structured task plans, track progress, and test the workflow in English or Simplified Chinese.
+Coursework Compass is a local-first coursework planning workspace for international school students. It helps students turn large projects into structured plans, track daily progress, and work in a more personal browser-based study space.
 
 ## Key Features
 
 - Local-first coursework planning
-- Dashboard, Projects, and Today views
-- Redesigned New Project Studio
+- Dashboard / Projects / Today / Project Detail
+- New Project Studio
 - 11 coursework templates
 - English / Simplified Chinese interface foundation
-- Improved date picker styling
-- Local-first browser storage beta
+- Dark / light themes
+- Saved theme and background preferences
+- Background presets
+- Personalisation Panel
+- Motion polish and task completion feedback
+- Browser localStorage beta
 
 ## Coursework Templates
 
@@ -36,11 +40,11 @@ Coursework Compass is a local-first coursework planning app for international sc
 - Tailwind CSS
 - localStorage
 
-## Beta Testing Note
+## Testing Note
 
-During beta, project data is saved only in the current browser. It does not sync across devices or browsers, and it may be lost if browser data is cleared. Testers should avoid entering sensitive personal information.
+During beta, data and preferences are saved only in the current browser. They do not sync across devices or browsers, and they may be lost if browser data is cleared.
 
-## Setup
+## Basic Setup
 
 ```bash
 npm install

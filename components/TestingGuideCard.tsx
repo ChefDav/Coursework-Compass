@@ -43,7 +43,7 @@ const copy = {
         ],
         noteTitle: "Important",
         note:
-            "Coursework Compass v1.3 is still a beta. Saved data stays in the current browser only, so students should avoid sensitive personal information during testing.",
+            "Coursework Compass v1.4 is still a beta. Saved data and preferences stay in the current browser only, so students should avoid sensitive personal information during testing.",
     },
     zh: {
         eyebrow: "测试指南",
@@ -85,7 +85,7 @@ const copy = {
         ],
         noteTitle: "重要说明",
         note:
-            "Coursework Compass v1.3 仍然是 beta 版本。保存的数据只会留在当前浏览器中，因此测试时请避免输入敏感个人信息。",
+            "Coursework Compass v1.4 仍然是 beta 版本。保存的数据和偏好只会留在当前浏览器中，因此测试时请避免输入敏感个人信息。",
     },
 } as const;
 

@@ -8,24 +8,26 @@ import { useStoredLanguage } from "@/lib/clientStores";
 const copy = {
     en: {
         eyebrow: "Release notes",
-        title: "v1.3 Multilingual Foundation",
+        title: "v1.4 Personalisation Version",
         subtitle:
-            "Coursework Compass v1.3 lays the groundwork for an English / Simplified Chinese planning experience and polishes the student testing flow.",
+            "This release turns Coursework Compass into a more personal study workspace with dark/light themes, saved workspace preferences, background presets, smoother motion, premium UI refinement, and clearer completion feedback.",
         joinTest: "Join student test",
         createProject: "Create a project",
         backHome: "Back to home",
-        currentVersion: "Current version: v1.3",
-        currentTitle: "v1.3 Multilingual Foundation",
+        currentVersion: "Current version: v1.4",
+        currentTitle: "v1.4 Personalisation Version",
         currentDescription:
-            "This release focuses on bilingual interface foundations, the redesigned New Project Studio, clearer date controls, better empty states, and safer browser-only beta messaging.",
-        highlightsTitle: "What changed in v1.3",
+            "This release turns Coursework Compass into a more personal study workspace with dark/light themes, saved workspace preferences, background presets, smoother motion, premium UI refinement, and clearer completion feedback.",
+        highlightsTitle: "What changed in v1.4",
         highlights: [
-            "English / Simplified Chinese interface foundation",
-            "Redesigned New Project Studio",
-            "Expanded coursework template library",
-            "Improved date picker styling",
-            "Bilingual empty states and testing guidance",
-            "Better student testing readiness",
+            "Dark and light theme support",
+            "Saved theme and background preferences",
+            "Background presets for workspace personalisation",
+            "Premium UI refinement across the app",
+            "Smoother motion and progress feedback",
+            "Task completion microinteractions",
+            "Personalisation Panel on Dashboard",
+            "Continued bilingual English / Simplified Chinese support",
             "Browser-only beta storage reminder",
         ],
         testingTitle: "Testing focus",
@@ -50,24 +52,26 @@ const copy = {
     },
     zh: {
         eyebrow: "更新日志",
-        title: "v1.3 多语言基础版本",
+        title: "v1.4 个性化版本",
         subtitle:
-            "Coursework Compass v1.3 为英文 / 简体中文规划体验打基础，并进一步打磨学生测试流程。",
+            "这个版本让 Coursework Compass 变成更具个人空间感的学习工作台，新增深色/浅色主题、本地偏好保存、背景预设、轻量动效、高级 UI 打磨和更清晰的任务完成反馈。",
         joinTest: "参加学生测试",
         createProject: "创建项目",
         backHome: "返回首页",
-        currentVersion: "当前版本：v1.3",
-        currentTitle: "v1.3 多语言基础版本",
+        currentVersion: "当前版本：v1.4",
+        currentTitle: "v1.4 个性化版本",
         currentDescription:
-            "这个版本重点完成双语界面基础、新版 Project Studio、更清晰的日期控件、更好的空状态，以及更安全的浏览器本地测试存储提示。",
-        highlightsTitle: "v1.3 更新内容",
+            "这个版本让 Coursework Compass 变成更具个人空间感的学习工作台，新增深色/浅色主题、本地偏好保存、背景预设、轻量动效、高级 UI 打磨和更清晰的任务完成反馈。",
+        highlightsTitle: "v1.4 更新内容",
         highlights: [
-            "英文 / 简体中文界面基础",
-            "重新设计的新建项目 Project Studio",
-            "扩展 coursework 模板库",
-            "改进日期选择器样式",
-            "双语空状态和测试指引",
-            "更适合学生测试的细节打磨",
+            "支持深色与浅色主题",
+            "主题和背景偏好会保存在当前浏览器",
+            "新增学习空间背景预设",
+            "全站高级 UI 细节打磨",
+            "更顺滑的动效和进度反馈",
+            "任务完成微交互",
+            "Dashboard 新增个性化面板",
+            "继续支持 English / 简体中文",
             "浏览器本地 beta 存储提醒",
         ],
         testingTitle: "测试重点",
@@ -93,6 +97,17 @@ const copy = {
 } as const;
 
 const releaseHistory = [
+    {
+        version: "v1.4",
+        title: {
+            en: "v1.4 Personalisation Version",
+            zh: "v1.4 个性化版本",
+        },
+        description: {
+            en: "This release turns Coursework Compass into a more personal study workspace with dark/light themes, saved workspace preferences, background presets, smoother motion, premium UI refinement, and clearer completion feedback.",
+            zh: "这个版本让 Coursework Compass 变成更具个人空间感的学习工作台，新增深色/浅色主题、本地偏好保存、背景预设、轻量动效、高级 UI 打磨和更清晰的任务完成反馈。",
+        },
+    },
     {
         version: "v1.3",
         title: {

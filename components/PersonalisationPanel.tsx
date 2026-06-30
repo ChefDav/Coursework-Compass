@@ -37,11 +37,9 @@ const copy = {
         description:
             "选择 Coursework Compass 在当前浏览器中的显示方式。主题和背景偏好会保存在本地。",
         themeTitle: "主题",
-        themeHelper:
-            "在专注的深色工作区和干净的白昼工作区之间切换。",
+        themeHelper: "在专注的深色工作区和干净的白昼工作区之间切换。",
         backgroundTitle: "背景",
-        backgroundHelper:
-            "为你的 planner 选择一个克制的背景氛围。",
+        backgroundHelper: "为你的 planner 选择一个克制的背景氛围。",
         motionTitle: "动态效果",
         motionHelper:
             "界面会使用轻量动效提供反馈和质感，并尊重系统的减少动态效果设置。",
@@ -96,9 +94,7 @@ export default function PersonalisationPanel() {
             <div className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.6fr)] xl:items-start">
                 <div>
                     <div className="mb-4 flex flex-wrap items-center gap-3">
-                        <p className="cc-kicker">
-                            {currentCopy.eyebrow}
-                        </p>
+                        <p className="cc-kicker">{currentCopy.eyebrow}</p>
 
                         <span className="cc-badge-accent">
                             {currentCopy.localBadge}

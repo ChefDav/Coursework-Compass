@@ -30,7 +30,7 @@ const copy = {
             "This tutorial is separate from the real app. It uses simulated tasks, so students can learn the workflow without changing real project data.",
         mainSite: "Main site",
         progress: "Tutorial progress",
-        version: "v1.3",
+        version: "v1.4",
         step: "Step",
         stepLabels: [
             "Choose sample",
@@ -147,7 +147,7 @@ const copy = {
             "这个教程独立于真实应用，使用模拟任务，让学生在不改变真实项目数据的情况下学习工作流。",
         mainSite: "主站",
         progress: "教程进度",
-        version: "v1.3",
+        version: "v1.4",
         step: "步骤",
         stepLabels: [
             "选择示例",
