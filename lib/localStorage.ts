@@ -1,14 +1,16 @@
-export type TaskStatus = "Todo" | "Done";
+﻿export type TaskStatus = "Todo" | "Done";
 
 export type CourseworkTask = {
     id: string;
     title: string;
+    description?: string;
     status: TaskStatus;
     priority?: string;
     dueDate?: string;
     estimatedTime?: string;
     completedAt?: string;
     archivedAt?: string;
+  archived?: boolean;
 };
 
 type LegacyTaskInput = Partial<CourseworkTask> & {
@@ -37,6 +39,8 @@ export type GeneratedProjectPlan = {
         deadline: string;
         status?: string;
         type?: string;
+        courseworkType?: string;
+        subject?: string;
     };
     tasks: CourseworkTask[];
     archivedTasks?: CourseworkTask[];
@@ -267,6 +271,7 @@ function normaliseTask(rawTask: LegacyTaskInput, index: number) {
     return {
         id: rawTask.id || createId(`task-${index}`),
         title: rawTask.title || "Untitled task",
+        description: rawTask.description,
         status:
             String(rawTask.status).toLowerCase() === "done" ? "Done" : "Todo",
         priority,
@@ -333,7 +338,13 @@ function normaliseProjectPlan(
             title: projectTitle,
             deadline: projectDeadline,
             status: rawProject.status || "Active",
-            type: rawProject.type || "",
+            type:
+                rawProject.type ||
+                rawProject.courseworkType ||
+                rawProject.subject ||
+                "",
+            courseworkType: rawProject.courseworkType,
+            subject: rawProject.subject,
         },
         tasks,
         archivedTasks,

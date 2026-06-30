@@ -1,43 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useCompletedPlanWaitingForPrompt } from "@/lib/clientStores";
 import {
     archiveCompletedProjectTasks,
-    findCompletedPlanWaitingForPrompt,
     keepCompletedProjectTasks,
-    listenForProjectPlanUpdates,
-    type GeneratedProjectPlan,
 } from "@/lib/localStorage";
 
 export default function CompletionWatcher() {
-    const [completedPlan, setCompletedPlan] =
-        useState<GeneratedProjectPlan | null>(null);
-    const [isOpen, setIsOpen] = useState(false);
-
-    function checkForCompletedProject() {
-        const plan = findCompletedPlanWaitingForPrompt();
-
-        if (!plan) {
-            setCompletedPlan(null);
-            setIsOpen(false);
-            return;
-        }
-
-        setCompletedPlan(plan);
-        setIsOpen(true);
-    }
-
-    useEffect(() => {
-        checkForCompletedProject();
-
-        const unsubscribe = listenForProjectPlanUpdates(() => {
-            checkForCompletedProject();
-        });
-
-        return () => {
-            unsubscribe();
-        };
-    }, []);
+    const completedPlan = useCompletedPlanWaitingForPrompt();
+    const [temporarilyClosedPlanId, setTemporarilyClosedPlanId] = useState("");
 
     function handleArchiveCompletedTasks() {
         if (!completedPlan) {
@@ -45,8 +17,7 @@ export default function CompletionWatcher() {
         }
 
         archiveCompletedProjectTasks(completedPlan.id);
-        setCompletedPlan(null);
-        setIsOpen(false);
+        setTemporarilyClosedPlanId("");
     }
 
     function handleKeepCompletedTasks() {
@@ -55,15 +26,14 @@ export default function CompletionWatcher() {
         }
 
         keepCompletedProjectTasks(completedPlan.id);
-        setCompletedPlan(null);
-        setIsOpen(false);
+        setTemporarilyClosedPlanId("");
     }
 
     function handleCloseTemporarily() {
-        setIsOpen(false);
+        setTemporarilyClosedPlanId(completedPlan?.id ?? "");
     }
 
-    if (!isOpen || !completedPlan) {
+    if (!completedPlan || temporarilyClosedPlanId === completedPlan.id) {
         return null;
     }
 

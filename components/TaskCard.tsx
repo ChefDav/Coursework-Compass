@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CalendarDateField from "@/components/CalendarDateField";
 import ErrorNotice from "@/components/ErrorNotice";
 import EstimatedTimeField, {
@@ -155,7 +155,15 @@ export default function TaskCard({
                                  }: TaskCardProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+    const taskEditKey = [
+        task.id,
+        task.title,
+        task.priority || "",
+        task.dueDate || "",
+        task.estimatedTime || "",
+    ].join("|");
 
+    const [lastTaskEditKey, setLastTaskEditKey] = useState(taskEditKey);
     const [editTitle, setEditTitle] = useState(task.title);
     const [editPriority, setEditPriority] = useState<TaskPriority>(
         normalisePriority(task.priority),
@@ -173,14 +181,15 @@ export default function TaskCard({
     );
     const dueDate = task.dueDate || "";
 
-    useEffect(() => {
+    if (taskEditKey !== lastTaskEditKey) {
+        setLastTaskEditKey(taskEditKey);
         setEditTitle(task.title);
         setEditPriority(normalisePriority(task.priority));
         setEditDueDate(task.dueDate || "");
         setEditEstimatedTime(
             getDisplayEstimatedTime(task.estimatedTime, task.priority),
         );
-    }, [task]);
+    }
 
     function handleSaveEdit() {
         const trimmedTitle = editTitle.trim();

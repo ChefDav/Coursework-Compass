@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useStoredLanguage } from "@/lib/clientStores";
 import {
     createTranslator,
-    getStoredLanguage,
-    listenForLanguageChange,
     type Language,
     type TranslationKey,
 } from "@/lib/i18n";
@@ -300,20 +299,7 @@ export default function EmptyState({
                                        descriptionKey,
                                        tipKeys,
                                    }: EmptyStateProps) {
-    const [language, setLanguage] = useState<Language>("en");
-
-    useEffect(() => {
-        setLanguage(getStoredLanguage());
-
-        const unsubscribe = listenForLanguageChange((nextLanguage) => {
-            setLanguage(nextLanguage);
-        });
-
-        return () => {
-            unsubscribe();
-        };
-    }, []);
-
+    const language = useStoredLanguage();
     const t = createTranslator(language);
 
     const displayEyebrow = eyebrowKey
@@ -362,13 +348,13 @@ export default function EmptyState({
                                     : localiseText(action.label, language);
 
                                 return (
-                                    <a
+                                    <Link
                                         key={`${action.href}-${action.label}`}
                                         href={action.href}
                                         className={getActionClasses(action.variant)}
                                     >
                                         {displayLabel}
-                                    </a>
+                                    </Link>
                                 );
                             })}
                         </div>

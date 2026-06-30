@@ -1,28 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-    createTranslator,
-    getStoredLanguage,
-    listenForLanguageChange,
-    type Language,
-} from "@/lib/i18n";
+import Link from "next/link";
+import { useStoredLanguage } from "@/lib/clientStores";
+import { createTranslator } from "@/lib/i18n";
 
 export default function BetaNotice() {
-    const [language, setLanguage] = useState<Language>("en");
-
-    useEffect(() => {
-        setLanguage(getStoredLanguage());
-
-        const unsubscribe = listenForLanguageChange((nextLanguage) => {
-            setLanguage(nextLanguage);
-        });
-
-        return () => {
-            unsubscribe();
-        };
-    }, []);
-
+    const language = useStoredLanguage();
     const t = createTranslator(language);
 
     return (
@@ -40,26 +23,26 @@ export default function BetaNotice() {
                     </p>
 
                     <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                        <a
+                        <Link
                             href="/updates"
                             className="rounded-2xl bg-cyan-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
                         >
                             {t("viewReleaseNotes")}
-                        </a>
+                        </Link>
 
-                        <a
+                        <Link
                             href="/test"
                             className="rounded-2xl bg-emerald-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
                         >
                             {t("joinStudentTest")}
-                        </a>
+                        </Link>
 
-                        <a
+                        <Link
                             href="/projects/new"
                             className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-slate-400"
                         >
                             {t("startPlanning")}
-                        </a>
+                        </Link>
                     </div>
                 </div>
 

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useStoredLanguage } from "@/lib/clientStores";
 import {
     createTranslator,
-    getStoredLanguage,
-    listenForLanguageChange,
     type Language,
     type TranslationKey,
 } from "@/lib/i18n";
@@ -124,21 +124,9 @@ function localiseText(value: string | undefined, language: Language) {
 }
 
 export default function SaveSuccessToast() {
-    const [language, setLanguage] = useState<Language>("en");
+    const language = useStoredLanguage();
     const [toast, setToast] = useState<SaveSuccessEventDetail | null>(null);
     const hideTimerRef = useRef<number | null>(null);
-
-    useEffect(() => {
-        setLanguage(getStoredLanguage());
-
-        const unsubscribe = listenForLanguageChange((nextLanguage) => {
-            setLanguage(nextLanguage);
-        });
-
-        return () => {
-            unsubscribe();
-        };
-    }, []);
 
     useEffect(() => {
         function handleSaveSuccess(event: Event) {
@@ -221,12 +209,12 @@ export default function SaveSuccessToast() {
                     </div>
 
                     {toast.actionHref && displayActionLabel ? (
-                        <a
+                        <Link
                             href={toast.actionHref}
                             className="mt-4 inline-block rounded-2xl bg-emerald-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
                         >
                             {displayActionLabel}
-                        </a>
+                        </Link>
                     ) : null}
 
                     <div className="mt-4 h-1 overflow-hidden rounded-full bg-slate-800">

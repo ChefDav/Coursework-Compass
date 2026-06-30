@@ -6,12 +6,8 @@ import {
     useState,
     type PointerEvent as ReactPointerEvent,
 } from "react";
-import {
-    createTranslator,
-    getStoredLanguage,
-    listenForLanguageChange,
-    type Language,
-} from "@/lib/i18n";
+import { useHasMounted, useStoredLanguage } from "@/lib/clientStores";
+import { createTranslator, type Language } from "@/lib/i18n";
 
 type ClockMode = "expanded" | "minimized" | "hidden";
 
@@ -117,13 +113,19 @@ function readSavedPosition() {
 }
 
 export default function GlobalClock() {
-    const [hasMounted, setHasMounted] = useState(false);
-    const [language, setLanguage] = useState<Language>("en");
-    const [mode, setMode] = useState<ClockMode>("minimized");
-    const [position, setPosition] = useState<ClockPosition>({
-        x: 16,
-        y: 16,
+    const hasMounted = useHasMounted();
+    const language = useStoredLanguage();
+    const [mode, setMode] = useState<ClockMode>(() => {
+        if (typeof window === "undefined") {
+            return "minimized";
+        }
+
+        const savedMode = window.localStorage.getItem(CLOCK_MODE_KEY);
+        return isClockMode(savedMode) ? savedMode : getDefaultMode();
     });
+    const [position, setPosition] = useState<ClockPosition>(() =>
+        readSavedPosition(),
+    );
     const [tick, setTick] = useState(0);
 
     const dragStartRef = useRef<{
@@ -136,17 +138,6 @@ export default function GlobalClock() {
     const t = createTranslator(language);
 
     useEffect(() => {
-        const savedMode = window.localStorage.getItem(CLOCK_MODE_KEY);
-
-        setLanguage(getStoredLanguage());
-        setMode(isClockMode(savedMode) ? savedMode : getDefaultMode());
-        setPosition(readSavedPosition());
-        setHasMounted(true);
-
-        const unsubscribeLanguage = listenForLanguageChange((nextLanguage) => {
-            setLanguage(nextLanguage);
-        });
-
         const timer = window.setInterval(() => {
             setTick((currentTick) => currentTick + 1);
         }, 1000);
@@ -167,7 +158,6 @@ export default function GlobalClock() {
         window.addEventListener("resize", handleResize);
 
         return () => {
-            unsubscribeLanguage();
             window.clearInterval(timer);
             window.removeEventListener("resize", handleResize);
         };

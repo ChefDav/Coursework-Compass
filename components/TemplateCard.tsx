@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ProjectTemplate } from "@/types/coursework";
 
 type TemplateCardProps = {
@@ -17,12 +18,12 @@ export default function TemplateCard({ template }: TemplateCardProps) {
                 {template.description}
             </p>
 
-            <a
+            <Link
                 href={`/projects/new?template=${template.id}`}
                 className="block rounded-xl border border-slate-700 px-4 py-3 text-center text-sm font-bold transition hover:border-cyan-400 hover:text-cyan-300 sm:inline-block"
             >
                 Use template
-            </a>
+            </Link>
         </div>
     );
 }

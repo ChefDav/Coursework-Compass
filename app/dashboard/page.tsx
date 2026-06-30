@@ -1,21 +1,21 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+import Link from "next/link";
 import AppNav from "@/components/AppNav";
 import EmptyState from "@/components/EmptyState";
 import FeedbackPanel from "@/components/FeedbackPanel";
 import {
+    useHasMounted,
+    useProjectPlans,
+    useStoredLanguage,
+} from "@/lib/clientStores";
+import {
     getProjectRouteId,
-    listenForProjectPlanUpdates,
-    loadProjectPlans,
     type CourseworkTask,
     type GeneratedProjectPlan,
 } from "@/lib/localStorage";
-import {
-    getStoredLanguage,
-    listenForLanguageChange,
-    type Language,
-} from "@/lib/i18n";
+import type { Language } from "@/lib/i18n";
 
 const copy = {
     en: {
@@ -104,8 +104,17 @@ function isDone(task: CourseworkTask) {
     return String(task.status).toLowerCase() === "done";
 }
 
+function isTaskArchived(task: CourseworkTask) {
+    const archivedTask = task as CourseworkTask & {
+        archived?: boolean;
+        archivedAt?: string | null;
+    };
+
+    return Boolean(archivedTask.archived || archivedTask.archivedAt);
+}
+
 function getVisibleTasks(plan: GeneratedProjectPlan) {
-    return plan.tasks.filter((task) => !task.archived);
+    return plan.tasks.filter((task) => !isTaskArchived(task));
 }
 
 function getActiveTasks(plan: GeneratedProjectPlan) {
@@ -123,7 +132,9 @@ function getProjectProgress(plan: GeneratedProjectPlan) {
         return 0;
     }
 
-    return Math.round((getCompletedTasks(plan).length / visibleTasks.length) * 100);
+    return Math.round(
+        (getCompletedTasks(plan).length / visibleTasks.length) * 100,
+    );
 }
 
 function getDaysLeft(dateValue?: string) {
@@ -219,34 +230,11 @@ function getProjectType(plan: GeneratedProjectPlan, language: Language) {
 }
 
 export default function DashboardPage() {
-    const [language, setLanguage] = useState<Language>("en");
-    const [hasMounted, setHasMounted] = useState(false);
-    const [plans, setPlans] = useState<GeneratedProjectPlan[]>([]);
+    const language = useStoredLanguage();
+    const hasMounted = useHasMounted();
+    const plans = useProjectPlans();
 
     const currentCopy = copy[language];
-
-    function refreshPlans() {
-        setPlans(loadProjectPlans());
-    }
-
-    useEffect(() => {
-        setLanguage(getStoredLanguage());
-        refreshPlans();
-        setHasMounted(true);
-
-        const unsubscribeLanguage = listenForLanguageChange((nextLanguage) => {
-            setLanguage(nextLanguage);
-        });
-
-        const unsubscribePlans = listenForProjectPlanUpdates(() => {
-            refreshPlans();
-        });
-
-        return () => {
-            unsubscribeLanguage();
-            unsubscribePlans();
-        };
-    }, []);
 
     const stats = useMemo(() => {
         const projectCount = plans.length;
@@ -483,12 +471,12 @@ export default function DashboardPage() {
                                                     </p>
                                                 </div>
 
-                                                <a
+                                                <Link
                                                     href={`/projects/${routeId}`}
                                                     className="rounded-2xl bg-cyan-400 px-5 py-4 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
                                                 >
                                                     {currentCopy.openProject}
-                                                </a>
+                                                </Link>
                                             </div>
                                         </article>
                                     );
@@ -496,12 +484,12 @@ export default function DashboardPage() {
                             </div>
 
                             <div className="mt-6">
-                                <a
+                                <Link
                                     href="/today"
                                     className="inline-flex rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
                                 >
                                     {currentCopy.viewToday}
-                                </a>
+                                </Link>
                             </div>
                         </section>
                     </div>

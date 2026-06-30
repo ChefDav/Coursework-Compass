@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import FeedbackPanel from "@/components/FeedbackPanel";
 
 type TutorialStep = 0 | 1 | 2 | 3 | 4;
@@ -167,9 +168,6 @@ export default function StudentTestingPage() {
             return;
         }
 
-        setLoadingProgress(0);
-        setLoadingMessageIndex(0);
-
         const progressTimer = window.setInterval(() => {
             setLoadingProgress((currentProgress) => {
                 if (currentProgress >= 100) {
@@ -333,6 +331,13 @@ export default function StudentTestingPage() {
         setShowFeedback(false);
     }
 
+    function handleStartFeedbackStep() {
+        setLoadingProgress(0);
+        setLoadingMessageIndex(0);
+        setShowFeedback(false);
+        setStep(3);
+    }
+
     return (
         <main className="min-h-screen overflow-hidden bg-slate-950 text-white">
             <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
@@ -351,12 +356,12 @@ export default function StudentTestingPage() {
                         </p>
                     </div>
 
-                    <a
+                    <Link
                         href="/"
                         className="w-fit rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
                     >
                         Main site
-                    </a>
+                    </Link>
                 </header>
 
                 <section className="mb-8 rounded-[2rem] border border-cyan-400/30 bg-cyan-400/10 p-5 sm:p-6">
@@ -897,7 +902,7 @@ export default function StudentTestingPage() {
                         <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                             <button
                                 type="button"
-                                onClick={() => setStep(3)}
+                                onClick={handleStartFeedbackStep}
                                 className="rounded-2xl bg-fuchsia-400 px-6 py-4 font-bold text-slate-950 transition hover:bg-fuchsia-300"
                             >
                                 Prepare feedback form
@@ -1049,19 +1054,19 @@ export default function StudentTestingPage() {
                             </div>
 
                             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                                <a
+                                <Link
                                     href="/"
                                     className="rounded-[1.75rem] bg-emerald-400 px-8 py-5 text-center text-lg font-black text-slate-950 shadow-2xl shadow-emerald-950/40 transition hover:bg-emerald-300"
                                 >
                                     Return to main menu
-                                </a>
+                                </Link>
 
-                                <a
+                                <Link
                                     href="/projects/new"
                                     className="rounded-[1.75rem] border border-slate-700 px-8 py-5 text-center text-lg font-black text-white transition hover:border-cyan-400 hover:text-cyan-300"
                                 >
                                     Officially start the journey
-                                </a>
+                                </Link>
 
                                 <button
                                     type="button"

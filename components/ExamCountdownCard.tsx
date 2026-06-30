@@ -1,16 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getIbExamCountdown } from "@/lib/examCountdown";
 
 type Countdown = ReturnType<typeof getIbExamCountdown>;
 
 export default function ExamCountdownCard() {
-    const [countdown, setCountdown] = useState<Countdown | null>(null);
-
-    useEffect(() => {
-        setCountdown(getIbExamCountdown());
-    }, []);
+    const [countdown] = useState<Countdown>(() => getIbExamCountdown());
 
     if (!countdown) {
         return (

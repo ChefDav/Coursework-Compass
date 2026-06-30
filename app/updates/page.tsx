@@ -1,3 +1,4 @@
+import Link from "next/link";
 import AppNav from "@/components/AppNav";
 import FeedbackPanel from "@/components/FeedbackPanel";
 
@@ -153,26 +154,26 @@ export default function UpdatesPage() {
                     </p>
 
                     <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                        <a
+                        <Link
                             href="/test"
                             className="rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
                         >
                             Join student test
-                        </a>
+                        </Link>
 
-                        <a
+                        <Link
                             href="/projects/new"
                             className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
                         >
                             Create a project
-                        </a>
+                        </Link>
 
-                        <a
+                        <Link
                             href="/"
                             className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
                         >
                             Back to home
-                        </a>
+                        </Link>
                     </div>
                 </section>
 
@@ -206,12 +207,12 @@ export default function UpdatesPage() {
                     </p>
 
                     <div className="mt-6">
-                        <a
+                        <Link
                             href="/test"
                             className="inline-block rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
                         >
                             Open guided tutorial
-                        </a>
+                        </Link>
                     </div>
                 </section>
 

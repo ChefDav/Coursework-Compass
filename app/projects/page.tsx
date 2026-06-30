@@ -1,22 +1,22 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+import Link from "next/link";
 import AppNav from "@/components/AppNav";
 import EmptyState from "@/components/EmptyState";
 import FeedbackPanel from "@/components/FeedbackPanel";
 import {
+    useHasMounted,
+    useProjectPlans,
+    useStoredLanguage,
+} from "@/lib/clientStores";
+import {
     deleteProjectPlan,
     getProjectRouteId,
-    listenForProjectPlanUpdates,
-    loadProjectPlans,
     type CourseworkTask,
     type GeneratedProjectPlan,
 } from "@/lib/localStorage";
-import {
-    getStoredLanguage,
-    listenForLanguageChange,
-    type Language,
-} from "@/lib/i18n";
+import type { Language } from "@/lib/i18n";
 
 const copy = {
     en: {
@@ -24,7 +24,7 @@ const copy = {
         title: "Your saved coursework library.",
         subtitle:
             "Every saved plan lives here. Open a project, review its tasks, or delete local projects from this browser.",
-        loading: "Loading projects",
+        loading: "Loading projects...",
         createProject: "Create project",
         openTutorial: "Open tutorial",
         openProject: "Open project",
@@ -32,6 +32,7 @@ const copy = {
         progress: "Progress",
         tasks: "Tasks",
         activeTasks: "Active tasks",
+        completedTasks: "Completed tasks",
         deadline: "Deadline",
         noDeadline: "No deadline",
         localStorage: "Local browser storage",
@@ -40,6 +41,7 @@ const copy = {
         savedProjects: "Saved projects",
         savedProjectsDescription:
             "These projects are stored locally in this browser during the beta.",
+        courseworkProject: "Coursework project",
         emptyEyebrow: "Projects library is empty",
         emptyTitle: "Your coursework library is waiting for its first project.",
         emptyDescription:
@@ -56,7 +58,7 @@ const copy = {
         title: "你的 coursework 项目库。",
         subtitle:
             "所有已保存的计划都会放在这里。你可以打开项目、查看任务，或删除当前浏览器中的本地项目。",
-        loading: "正在加载项目",
+        loading: "正在加载项目...",
         createProject: "创建项目",
         openTutorial: "打开引导测试",
         openProject: "打开项目",
@@ -64,6 +66,7 @@ const copy = {
         progress: "进度",
         tasks: "任务",
         activeTasks: "活跃任务",
+        completedTasks: "已完成任务",
         deadline: "截止日期",
         noDeadline: "未设置截止日期",
         localStorage: "浏览器本地存储",
@@ -72,6 +75,7 @@ const copy = {
         savedProjects: "已保存项目",
         savedProjectsDescription:
             "测试版期间，这些项目只会保存在当前浏览器中。",
+        courseworkProject: "Coursework 项目",
         emptyEyebrow: "项目库还是空的",
         emptyTitle: "你的 coursework 项目库正在等待第一个项目。",
         emptyDescription:
@@ -89,20 +93,37 @@ function isDone(task: CourseworkTask) {
     return String(task.status).toLowerCase() === "done";
 }
 
+function isTaskArchived(task: CourseworkTask) {
+    const archivedTask = task as CourseworkTask & {
+        archived?: boolean;
+        archivedAt?: string | null;
+    };
+
+    return Boolean(archivedTask.archived || archivedTask.archivedAt);
+}
+
+function getVisibleTasks(plan: GeneratedProjectPlan) {
+    return plan.tasks.filter((task) => !isTaskArchived(task));
+}
+
+function getActiveTasks(plan: GeneratedProjectPlan) {
+    return getVisibleTasks(plan).filter((task) => !isDone(task));
+}
+
+function getCompletedTasks(plan: GeneratedProjectPlan) {
+    return getVisibleTasks(plan).filter((task) => isDone(task));
+}
+
 function getProgress(plan: GeneratedProjectPlan) {
-    const visibleTasks = plan.tasks.filter((task) => !task.archived);
+    const visibleTasks = getVisibleTasks(plan);
 
     if (visibleTasks.length === 0) {
         return 0;
     }
 
-    const completedTasks = visibleTasks.filter((task) => isDone(task)).length;
-
-    return Math.round((completedTasks / visibleTasks.length) * 100);
-}
-
-function getActiveTaskCount(plan: GeneratedProjectPlan) {
-    return plan.tasks.filter((task) => !task.archived && !isDone(task)).length;
+    return Math.round(
+        (getCompletedTasks(plan).length / visibleTasks.length) * 100,
+    );
 }
 
 function formatDate(dateValue: string | undefined, language: Language) {
@@ -123,35 +144,21 @@ function formatDate(dateValue: string | undefined, language: Language) {
     }).format(date);
 }
 
+function getProjectType(plan: GeneratedProjectPlan, language: Language) {
+    return (
+        plan.project.type ||
+        plan.project.courseworkType ||
+        plan.project.subject ||
+        copy[language].courseworkProject
+    );
+}
+
 export default function ProjectsPage() {
-    const [language, setLanguage] = useState<Language>("en");
-    const [hasMounted, setHasMounted] = useState(false);
-    const [plans, setPlans] = useState<GeneratedProjectPlan[]>([]);
+    const language = useStoredLanguage();
+    const hasMounted = useHasMounted();
+    const plans = useProjectPlans();
 
     const currentCopy = copy[language];
-
-    function refreshPlans() {
-        setPlans(loadProjectPlans());
-    }
-
-    useEffect(() => {
-        setLanguage(getStoredLanguage());
-        refreshPlans();
-        setHasMounted(true);
-
-        const unsubscribeLanguage = listenForLanguageChange((nextLanguage) => {
-            setLanguage(nextLanguage);
-        });
-
-        const unsubscribePlans = listenForProjectPlanUpdates(() => {
-            refreshPlans();
-        });
-
-        return () => {
-            unsubscribeLanguage();
-            unsubscribePlans();
-        };
-    }, []);
 
     const savedProjectCount = useMemo(() => plans.length, [plans]);
 
@@ -163,7 +170,6 @@ export default function ProjectsPage() {
         }
 
         deleteProjectPlan(plan.id);
-        refreshPlans();
     }
 
     return (
@@ -171,31 +177,33 @@ export default function ProjectsPage() {
             <div className="mx-auto max-w-7xl">
                 <AppNav />
 
-                <header className="mb-8">
+                <header className="mb-8 rounded-[2rem] border border-slate-800 bg-slate-900/70 p-6 shadow-2xl shadow-cyan-950/20 sm:p-8">
                     <p className="mb-3 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                         {currentCopy.eyebrow}
                     </p>
-                    <h1 className="max-w-5xl text-4xl font-black tracking-tight sm:text-6xl">
+
+                    <h1 className="max-w-5xl text-4xl font-black tracking-tight text-white sm:text-6xl">
                         {currentCopy.title}
                     </h1>
+
                     <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:text-lg">
                         {currentCopy.subtitle}
                     </p>
 
                     <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                        <a
+                        <Link
                             href="/projects/new"
                             className="rounded-2xl bg-cyan-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
                         >
                             {currentCopy.createProject}
-                        </a>
+                        </Link>
 
-                        <a
+                        <Link
                             href="/test"
                             className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
                         >
                             {currentCopy.openTutorial}
-                        </a>
+                        </Link>
                     </div>
                 </header>
 
@@ -225,15 +233,17 @@ export default function ProjectsPage() {
                         tips={[...currentCopy.tips]}
                     />
                 ) : (
-                    <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6">
+                    <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 shadow-2xl shadow-cyan-950/20 sm:p-6">
                         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                             <div>
                                 <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                                     {currentCopy.savedProjects}
                                 </p>
+
                                 <h2 className="text-2xl font-black text-white">
                                     {savedProjectCount} {currentCopy.savedProjects}
                                 </h2>
+
                                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
                                     {currentCopy.savedProjectsDescription}
                                 </p>
@@ -248,26 +258,23 @@ export default function ProjectsPage() {
                             {plans.map((plan, index) => {
                                 const routeId = getProjectRouteId(plan, index);
                                 const progress = getProgress(plan);
-                                const activeTaskCount = getActiveTaskCount(plan);
-                                const visibleTaskCount = plan.tasks.filter(
-                                    (task) => !task.archived,
-                                ).length;
+                                const visibleTaskCount = getVisibleTasks(plan).length;
+                                const activeTaskCount = getActiveTasks(plan).length;
+                                const completedTaskCount = getCompletedTasks(plan).length;
 
                                 return (
                                     <article
                                         key={`${routeId}-${index}`}
-                                        className="rounded-[1.5rem] border border-slate-800 bg-slate-950/70 p-5"
+                                        className="rounded-[1.5rem] border border-slate-800 bg-slate-950/70 p-5 shadow-xl shadow-slate-950/30"
                                     >
                                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                             <div className="min-w-0">
                                                 <h3 className="truncate text-xl font-black text-white">
                                                     {plan.project.title}
                                                 </h3>
+
                                                 <p className="mt-2 text-sm leading-6 text-slate-400">
-                                                    {plan.project.type ||
-                                                        plan.project.courseworkType ||
-                                                        plan.project.subject ||
-                                                        "Coursework project"}
+                                                    {getProjectType(plan, language)}
                                                 </p>
                                             </div>
 
@@ -285,10 +292,12 @@ export default function ProjectsPage() {
                                                 <p className="text-sm font-bold text-slate-400">
                                                     {currentCopy.progress}
                                                 </p>
+
                                                 <p className="text-sm font-black text-cyan-300">
                                                     {progress}%
                                                 </p>
                                             </div>
+
                                             <div className="h-3 overflow-hidden rounded-full bg-slate-800">
                                                 <div
                                                     className="h-full rounded-full bg-cyan-400"
@@ -299,7 +308,7 @@ export default function ProjectsPage() {
                                             </div>
                                         </div>
 
-                                        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                                        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                                             <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
                                                 <p className="text-xs font-bold text-slate-500">
                                                     {currentCopy.deadline}
@@ -326,15 +335,24 @@ export default function ProjectsPage() {
                                                     {activeTaskCount}
                                                 </p>
                                             </div>
+
+                                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                                                <p className="text-xs font-bold text-slate-500">
+                                                    {currentCopy.completedTasks}
+                                                </p>
+                                                <p className="mt-2 text-sm font-black text-white">
+                                                    {completedTaskCount}
+                                                </p>
+                                            </div>
                                         </div>
 
                                         <div className="mt-5">
-                                            <a
+                                            <Link
                                                 href={`/projects/${routeId}`}
                                                 className="inline-block rounded-2xl bg-cyan-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
                                             >
                                                 {currentCopy.openProject}
-                                            </a>
+                                            </Link>
                                         </div>
                                     </article>
                                 );

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useHasMounted } from "@/lib/clientStores";
 
 const feedbackTypes = [
     "Bug report",
@@ -46,11 +47,8 @@ function createFeedbackBody(feedbackType: string, pageUrl: string) {
 
 export default function FeedbackPanel() {
     const [selectedType, setSelectedType] = useState("General feedback");
-    const [pageUrl, setPageUrl] = useState("Coursework Compass");
-
-    useEffect(() => {
-        setPageUrl(window.location.href);
-    }, []);
+    const hasMounted = useHasMounted();
+    const pageUrl = hasMounted ? window.location.href : "Coursework Compass";
 
     const feedbackMailto = useMemo(() => {
         const subject = encodeURIComponent(

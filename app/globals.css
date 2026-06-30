@@ -93,3 +93,38 @@ button {
     cursor: pointer;
   }
 }
+
+.cc-date-input {
+  color-scheme: dark;
+}
+
+.cc-date-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+}
+
+.cc-date-input::-webkit-datetime-edit {
+  color: white;
+}
+
+.cc-date-input::-webkit-datetime-edit-fields-wrapper {
+  color: white;
+}
+
+.cc-date-input::-webkit-datetime-edit-text {
+  color: rgb(148 163 184);
+}
+
+.cc-date-input::-webkit-datetime-edit-month-field,
+.cc-date-input::-webkit-datetime-edit-day-field,
+.cc-date-input::-webkit-datetime-edit-year-field {
+  color: white;
+}
+
+.cc-date-input::-webkit-clear-button {
+  display: none;
+}
+
+.cc-date-input::-webkit-inner-spin-button {
+  display: none;
+}

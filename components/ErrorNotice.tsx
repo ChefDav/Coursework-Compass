@@ -1,11 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useStoredLanguage } from "@/lib/clientStores";
 import {
     createTranslator,
-    getStoredLanguage,
-    listenForLanguageChange,
-    type Language,
     type TranslationKey,
 } from "@/lib/i18n";
 
@@ -24,20 +21,7 @@ export default function ErrorNotice({
                                         messageKey,
                                         tone = "error",
                                     }: ErrorNoticeProps) {
-    const [language, setLanguage] = useState<Language>("en");
-
-    useEffect(() => {
-        setLanguage(getStoredLanguage());
-
-        const unsubscribe = listenForLanguageChange((nextLanguage) => {
-            setLanguage(nextLanguage);
-        });
-
-        return () => {
-            unsubscribe();
-        };
-    }, []);
-
+    const language = useStoredLanguage();
     const t = createTranslator(language);
 
     const displayTitle =

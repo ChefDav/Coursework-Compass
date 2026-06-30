@@ -1,11 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-    getStoredLanguage,
-    listenForLanguageChange,
-    type Language,
-} from "@/lib/i18n";
+import Link from "next/link";
+import { useStoredLanguage } from "@/lib/clientStores";
 
 const copy = {
     en: {
@@ -85,20 +81,7 @@ const copy = {
 } as const;
 
 export default function TesterQuickGuide() {
-    const [language, setLanguage] = useState<Language>("en");
-
-    useEffect(() => {
-        setLanguage(getStoredLanguage());
-
-        const unsubscribe = listenForLanguageChange((nextLanguage) => {
-            setLanguage(nextLanguage);
-        });
-
-        return () => {
-            unsubscribe();
-        };
-    }, []);
-
+    const language = useStoredLanguage();
     const currentCopy = copy[language];
 
     return (
@@ -117,19 +100,19 @@ export default function TesterQuickGuide() {
                 </div>
 
                 <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col">
-                    <a
+                    <Link
                         href="/test"
                         className="rounded-2xl bg-cyan-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
                     >
                         {currentCopy.primaryAction}
-                    </a>
+                    </Link>
 
-                    <a
+                    <Link
                         href="/projects/new"
                         className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
                     >
                         {currentCopy.secondaryAction}
-                    </a>
+                    </Link>
                 </div>
             </div>
 

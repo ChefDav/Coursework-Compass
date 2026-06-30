@@ -1,11 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-    getStoredLanguage,
-    listenForLanguageChange,
-    type Language,
-} from "@/lib/i18n";
+import { useStoredLanguage } from "@/lib/clientStores";
 
 const copy = {
     en: {
@@ -95,20 +90,7 @@ const copy = {
 } as const;
 
 export default function TestingGuideCard() {
-    const [language, setLanguage] = useState<Language>("en");
-
-    useEffect(() => {
-        setLanguage(getStoredLanguage());
-
-        const unsubscribe = listenForLanguageChange((nextLanguage) => {
-            setLanguage(nextLanguage);
-        });
-
-        return () => {
-            unsubscribe();
-        };
-    }, []);
-
+    const language = useStoredLanguage();
     const currentCopy = copy[language];
 
     return (

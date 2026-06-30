@@ -1,35 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useHasMounted } from "@/lib/clientStores";
 
 const ONBOARDING_STORAGE_KEY =
     "coursework-compass-v1-2-onboarding-dismissed";
 
 export default function OnboardingPopup() {
     const pathname = usePathname();
-    const [isReady, setIsReady] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
-
-    useEffect(() => {
-        if (pathname === "/test") {
-            setIsReady(true);
-            setIsOpen(false);
-            return;
-        }
-
-        const hasDismissed = window.localStorage.getItem(ONBOARDING_STORAGE_KEY);
-
-        setIsReady(true);
-        setIsOpen(!hasDismissed);
-    }, [pathname]);
+    const hasMounted = useHasMounted();
+    const [dismissedNow, setDismissedNow] = useState(false);
 
     function handleClose() {
         window.localStorage.setItem(ONBOARDING_STORAGE_KEY, "true");
-        setIsOpen(false);
+        setDismissedNow(true);
     }
 
-    if (!isReady || !isOpen) {
+    const hasDismissed =
+        hasMounted && Boolean(window.localStorage.getItem(ONBOARDING_STORAGE_KEY));
+    const isOpen = hasMounted && pathname !== "/test" && !hasDismissed && !dismissedNow;
+
+    if (!isOpen) {
         return null;
     }
 
@@ -121,21 +114,21 @@ export default function OnboardingPopup() {
                     </div>
 
                     <div className="sticky bottom-0 -mx-4 mt-6 grid gap-3 border-t border-slate-800 bg-slate-950/95 px-4 pt-4 backdrop-blur-md sm:static sm:mx-0 sm:flex sm:flex-wrap sm:border-t-0 sm:bg-transparent sm:px-0 sm:pt-0">
-                        <a
+                        <Link
                             href="/projects/new"
                             onClick={handleClose}
                             className="rounded-2xl bg-cyan-400 px-6 py-4 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
                         >
                             Start planning
-                        </a>
+                        </Link>
 
-                        <a
+                        <Link
                             href="/test"
                             onClick={handleClose}
                             className="rounded-2xl bg-emerald-400 px-6 py-4 text-center text-sm font-bold text-slate-950 transition hover:bg-emerald-300"
                         >
                             Join student test
-                        </a>
+                        </Link>
 
                         <button
                             type="button"

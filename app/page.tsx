@@ -1,3 +1,4 @@
+import Link from "next/link";
 import AppNav from "@/components/AppNav";
 import BetaNotice from "@/components/BetaNotice";
 import ExamCountdownCard from "@/components/ExamCountdownCard";
@@ -83,19 +84,19 @@ export default function HomePage() {
               </p>
 
               <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                <a
+                <Link
                     href="/projects/new"
                     className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
                 >
                   Start planning
-                </a>
+                </Link>
 
-                <a
+                <Link
                     href="/dashboard"
                     className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
                 >
                   Open dashboard
-                </a>
+                </Link>
               </div>
 
               <div className="mt-8">
@@ -189,19 +190,19 @@ export default function HomePage() {
               </div>
 
               <div className="flex flex-col gap-4">
-                <a
+                <Link
                     href="/test"
                     className="rounded-[1.75rem] bg-emerald-400 px-8 py-6 text-center text-lg font-black text-slate-950 shadow-2xl shadow-emerald-950/40 transition hover:bg-emerald-300"
                 >
                   Join student test
-                </a>
+                </Link>
 
-                <a
+                <Link
                     href="/updates"
                     className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
                 >
                   View release notes
-                </a>
+                </Link>
               </div>
             </div>
           </section>
@@ -340,19 +341,19 @@ export default function HomePage() {
               </div>
 
               <div className="flex flex-col gap-4">
-                <a
+                <Link
                     href="/projects/new"
                     className="rounded-2xl bg-emerald-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-emerald-300"
                 >
                   Create project
-                </a>
+                </Link>
 
-                <a
+                <Link
                     href="/test"
                     className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-emerald-400 hover:text-emerald-300"
                 >
                   Join student test
-                </a>
+                </Link>
               </div>
             </div>
           </section>

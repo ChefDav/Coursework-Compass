@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import AppNav from "@/components/AppNav";
 import CalendarDateField from "@/components/CalendarDateField";
@@ -10,17 +10,16 @@ import EstimatedTimeField, {
     normaliseEstimatedTime,
 } from "@/components/EstimatedTimeField";
 import TaskCard from "@/components/TaskCard";
+import { useHasMounted, useProjectPlans } from "@/lib/clientStores";
 import {
     addCustomTask,
     archiveCompletedTasks,
     deleteTask,
     getProjectRouteId,
-    loadProjectPlans,
     updateProjectDetails,
     updateTaskDetails,
     updateTaskStatus,
     type CourseworkTask,
-    type GeneratedProjectPlan,
     type TaskStatus,
 } from "@/lib/localStorage";
 
@@ -185,8 +184,8 @@ export default function ProjectDetailPage() {
     const params = useParams();
     const routeProjectId = getParamAsString(params.projectId);
 
-    const [hasMounted, setHasMounted] = useState(false);
-    const [projectPlans, setProjectPlans] = useState<GeneratedProjectPlan[]>([]);
+    const hasMounted = useHasMounted();
+    const projectPlans = useProjectPlans();
 
     const [isEditingProject, setIsEditingProject] = useState(false);
     const [projectTitle, setProjectTitle] = useState("");
@@ -199,15 +198,6 @@ export default function ProjectDetailPage() {
     const [newTaskDueDate, setNewTaskDueDate] = useState("");
     const [newTaskEstimatedTime, setNewTaskEstimatedTime] = useState("45 min");
     const [newTaskError, setNewTaskError] = useState("");
-
-    function refreshProjectPlans() {
-        setProjectPlans(loadProjectPlans());
-    }
-
-    useEffect(() => {
-        setHasMounted(true);
-        setProjectPlans(loadProjectPlans());
-    }, []);
 
     const projectInfo = useMemo(() => {
         if (!hasMounted) {
@@ -238,15 +228,6 @@ export default function ProjectDetailPage() {
             routeId: getProjectRouteId(projectPlans[foundIndex], foundIndex),
         };
     }, [hasMounted, projectPlans, routeProjectId]);
-
-    useEffect(() => {
-        if (!projectInfo) {
-            return;
-        }
-
-        setProjectTitle(projectInfo.plan.project.title);
-        setProjectDeadline(projectInfo.plan.project.deadline);
-    }, [projectInfo]);
 
     if (!hasMounted) {
         return (
@@ -331,22 +312,18 @@ export default function ProjectDetailPage() {
 
         setProjectError("");
         setIsEditingProject(false);
-        refreshProjectPlans();
     }
 
     function handleUpdateTask(taskId: string, updates: Partial<CourseworkTask>) {
         updateTaskDetails(projectRouteId, taskId, updates);
-        refreshProjectPlans();
     }
 
     function handleUpdateStatus(taskId: string, nextStatus: TaskStatus) {
         updateTaskStatus(projectRouteId, taskId, nextStatus);
-        refreshProjectPlans();
     }
 
     function handleDeleteTask(taskId: string) {
         deleteTask(projectRouteId, taskId);
-        refreshProjectPlans();
     }
 
     function handleAddCustomTask() {
@@ -370,12 +347,10 @@ export default function ProjectDetailPage() {
         setNewTaskDueDate("");
         setNewTaskEstimatedTime("45 min");
         setNewTaskError("");
-        refreshProjectPlans();
     }
 
     function handleArchiveCompletedTasks() {
         archiveCompletedTasks(projectRouteId);
-        refreshProjectPlans();
     }
 
     return (
@@ -483,7 +458,11 @@ export default function ProjectDetailPage() {
                         {!isEditingProject ? (
                             <button
                                 type="button"
-                                onClick={() => setIsEditingProject(true)}
+                                onClick={() => {
+                                    setProjectTitle(projectPlan.project.title);
+                                    setProjectDeadline(projectPlan.project.deadline);
+                                    setIsEditingProject(true);
+                                }}
                                 className="w-fit rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
                             >
                                 Edit project

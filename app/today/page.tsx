@@ -1,27 +1,26 @@
-"use client";
+﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+import Link from "next/link";
 import AppNav from "@/components/AppNav";
 import EmptyState from "@/components/EmptyState";
 import FeedbackPanel from "@/components/FeedbackPanel";
 import {
+    useHasMounted,
+    useProjectPlans,
+    useStoredLanguage,
+} from "@/lib/clientStores";
+import {
     getProjectRouteId,
-    listenForProjectPlanUpdates,
-    loadProjectPlans,
     updateTaskStatus,
     type CourseworkTask,
     type GeneratedProjectPlan,
     type TaskStatus,
 } from "@/lib/localStorage";
-import {
-    getStoredLanguage,
-    listenForLanguageChange,
-    type Language,
-} from "@/lib/i18n";
+import type { Language } from "@/lib/i18n";
 
 type TodayTask = {
     plan: GeneratedProjectPlan;
-    planIndex: number;
     task: CourseworkTask;
     taskIndex: number;
     routeId: string;
@@ -34,9 +33,11 @@ const copy = {
         title: "Your daily coursework action list.",
         subtitle:
             "See active tasks from your saved projects and choose what to work on next.",
-        loading: "Loading today",
+        loading: "Loading today...",
         markDone: "Mark done",
         openProject: "Open project",
+        createProject: "Create first project",
+        tryTutorial: "Try guided tutorial",
         dueDate: "Due date",
         estimatedTime: "Estimated time",
         priority: "Priority",
@@ -58,8 +59,9 @@ const copy = {
         noTasksTitle: "Your Today page is clear.",
         noTasksDescription:
             "You do not have any active tasks due today. Create a project or check your project pages to plan future work.",
-        createProject: "Create first project",
-        tryTutorial: "Try guided tutorial",
+        low: "Low",
+        medium: "Medium",
+        high: "High",
         tipsNoProjects: [
             "Create one project first to activate your Today page.",
             "The tutorial lets you practise without saving real data.",
@@ -78,9 +80,11 @@ const copy = {
         title: "你的每日 coursework 行动清单。",
         subtitle:
             "查看已保存项目中的活跃任务，并决定接下来最应该处理什么。",
-        loading: "正在加载今日任务",
+        loading: "正在加载今日任务...",
         markDone: "标记完成",
         openProject: "打开项目",
+        createProject: "创建第一个项目",
+        tryTutorial: "尝试引导测试",
         dueDate: "任务日期",
         estimatedTime: "预计用时",
         priority: "优先级",
@@ -102,8 +106,9 @@ const copy = {
         noTasksTitle: "你的 Today 页面是空的。",
         noTasksDescription:
             "你今天没有需要处理的活跃任务。你可以创建项目，或打开项目页面规划后续工作。",
-        createProject: "创建第一个项目",
-        tryTutorial: "尝试引导测试",
+        low: "低",
+        medium: "中",
+        high: "高",
         tipsNoProjects: [
             "先创建一个项目，Today 页面才会开始显示内容。",
             "引导测试可以让你先练习流程，不会保存真实项目数据。",
@@ -121,6 +126,15 @@ const copy = {
 
 function isDone(task: CourseworkTask) {
     return String(task.status).toLowerCase() === "done";
+}
+
+function isTaskArchived(task: CourseworkTask) {
+    const archivedTask = task as CourseworkTask & {
+        archived?: boolean;
+        archivedAt?: string | null;
+    };
+
+    return Boolean(archivedTask.archived || archivedTask.archivedAt);
 }
 
 function getDaysLeft(dateValue?: string) {
@@ -172,6 +186,7 @@ function getDueText(daysLeft: number | null, language: Language) {
 
     if (daysLeft < 0) {
         const days = Math.abs(daysLeft);
+
         return language === "zh"
             ? `${currentCopy.overdue} ${days} 天`
             : `${days} ${currentCopy.overdue}`;
@@ -183,7 +198,9 @@ function getDueText(daysLeft: number | null, language: Language) {
 
     return language === "zh"
         ? `${daysLeft} ${currentCopy.daysLeft}`
-        : `${daysLeft} ${daysLeft === 1 ? currentCopy.dayLeft : currentCopy.daysLeft}`;
+        : `${daysLeft} ${
+            daysLeft === 1 ? currentCopy.dayLeft : currentCopy.daysLeft
+        }`;
 }
 
 function getDueTone(daysLeft: number | null) {
@@ -202,7 +219,7 @@ function getDueTone(daysLeft: number | null) {
     return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
 }
 
-function getPriorityTone(priority: string) {
+function getPriorityTone(priority?: string) {
     if (priority === "High") {
         return "border-red-400/30 bg-red-400/10 text-red-300";
     }
@@ -214,35 +231,45 @@ function getPriorityTone(priority: string) {
     return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
 }
 
-export default function TodayPage() {
-    const [language, setLanguage] = useState<Language>("en");
-    const [hasMounted, setHasMounted] = useState(false);
-    const [plans, setPlans] = useState<GeneratedProjectPlan[]>([]);
-
-    const currentCopy = copy[language];
-
-    function refreshPlans() {
-        setPlans(loadProjectPlans());
+function getPriorityLabel(priority: string | undefined, language: Language) {
+    if (language === "en") {
+        return priority || "Low";
     }
 
-    useEffect(() => {
-        setLanguage(getStoredLanguage());
-        refreshPlans();
-        setHasMounted(true);
+    if (priority === "High") {
+        return copy.zh.high;
+    }
 
-        const unsubscribeLanguage = listenForLanguageChange((nextLanguage) => {
-            setLanguage(nextLanguage);
-        });
+    if (priority === "Medium") {
+        return copy.zh.medium;
+    }
 
-        const unsubscribePlans = listenForProjectPlanUpdates(() => {
-            refreshPlans();
-        });
+    return copy.zh.low;
+}
 
-        return () => {
-            unsubscribeLanguage();
-            unsubscribePlans();
-        };
-    }, []);
+function getEstimatedTime(task: CourseworkTask, language: Language) {
+    const estimatedTask = task as CourseworkTask & {
+        estimatedTime?: string | null;
+        time?: string | null;
+        duration?: string | null;
+        estimate?: string | null;
+    };
+
+    return (
+        estimatedTask.estimatedTime ||
+        estimatedTask.time ||
+        estimatedTask.duration ||
+        estimatedTask.estimate ||
+        copy[language].noEstimate
+    );
+}
+
+export default function TodayPage() {
+    const language = useStoredLanguage();
+    const hasMounted = useHasMounted();
+    const plans = useProjectPlans();
+
+    const currentCopy = copy[language];
 
     const todayTasks = useMemo<TodayTask[]>(() => {
         return plans
@@ -251,14 +278,13 @@ export default function TodayPage() {
 
                 return plan.tasks.map((task, taskIndex) => ({
                     plan,
-                    planIndex,
                     task,
                     taskIndex,
                     routeId,
                     daysLeft: getDaysLeft(task.dueDate),
                 }));
             })
-            .filter((item) => !item.task.archived && !isDone(item.task))
+            .filter((item) => !isTaskArchived(item.task) && !isDone(item.task))
             .sort((first, second) => {
                 const firstDays = first.daysLeft ?? 9999;
                 const secondDays = second.daysLeft ?? 9999;
@@ -273,7 +299,6 @@ export default function TodayPage() {
 
     function handleMarkDone(item: TodayTask) {
         updateTaskStatus(item.plan.id, item.task.id, "Done" as TaskStatus);
-        refreshPlans();
     }
 
     return (
@@ -281,13 +306,15 @@ export default function TodayPage() {
             <div className="mx-auto max-w-7xl">
                 <AppNav />
 
-                <header className="mb-8">
+                <header className="mb-8 rounded-[2rem] border border-slate-800 bg-slate-900/70 p-6 shadow-2xl shadow-cyan-950/20 sm:p-8">
                     <p className="mb-3 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                         {currentCopy.eyebrow}
                     </p>
-                    <h1 className="max-w-5xl text-4xl font-black tracking-tight sm:text-6xl">
+
+                    <h1 className="max-w-5xl text-4xl font-black tracking-tight text-white sm:text-6xl">
                         {currentCopy.title}
                     </h1>
+
                     <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:text-lg">
                         {currentCopy.subtitle}
                     </p>
@@ -338,33 +365,43 @@ export default function TodayPage() {
                         tips={[...currentCopy.tipsNoTasks]}
                     />
                 ) : (
-                    <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6">
-                        <div className="mb-6">
-                            <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
-                                {currentCopy.activeTasks}
-                            </p>
-                            <h2 className="text-2xl font-black text-white">
-                                {todayTasks.length} {currentCopy.activeTasks}
-                            </h2>
-                            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
-                                {currentCopy.activeTasksDescription}
-                            </p>
+                    <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 shadow-2xl shadow-cyan-950/20 sm:p-6">
+                        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                            <div>
+                                <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
+                                    {currentCopy.activeTasks}
+                                </p>
+
+                                <h2 className="text-2xl font-black text-white">
+                                    {todayTasks.length} {currentCopy.activeTasks}
+                                </h2>
+
+                                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
+                                    {currentCopy.activeTasksDescription}
+                                </p>
+                            </div>
+
+                            <span className="w-fit rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-emerald-300">
+                {currentCopy.project}
+              </span>
                         </div>
 
                         <div className="grid gap-4 lg:grid-cols-2">
                             {todayTasks.map((item) => (
                                 <article
                                     key={`${item.routeId}-${item.task.id}-${item.taskIndex}`}
-                                    className="rounded-[1.5rem] border border-slate-800 bg-slate-950/70 p-5"
+                                    className="rounded-[1.5rem] border border-slate-800 bg-slate-950/70 p-5 shadow-xl shadow-slate-950/30"
                                 >
                                     <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                         <div className="min-w-0">
                                             <p className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">
                                                 {currentCopy.project}
                                             </p>
+
                                             <h3 className="text-xl font-black text-white">
                                                 {item.task.title}
                                             </h3>
+
                                             <p className="mt-2 text-sm leading-6 text-slate-400">
                                                 {item.plan.project.title}
                                             </p>
@@ -400,7 +437,7 @@ export default function TodayPage() {
                                                 {currentCopy.estimatedTime}
                                             </p>
                                             <p className="mt-2 text-sm font-black text-white">
-                                                {item.task.estimatedTime || currentCopy.noEstimate}
+                                                {getEstimatedTime(item.task, language)}
                                             </p>
                                         </div>
 
@@ -408,12 +445,13 @@ export default function TodayPage() {
                                             <p className="text-xs font-bold text-slate-500">
                                                 {currentCopy.priority}
                                             </p>
+
                                             <p
                                                 className={`mt-2 w-fit rounded-full border px-3 py-1 text-xs font-black ${getPriorityTone(
                                                     item.task.priority,
                                                 )}`}
                                             >
-                                                {item.task.priority}
+                                                {getPriorityLabel(item.task.priority, language)}
                                             </p>
                                         </div>
                                     </div>
@@ -427,12 +465,12 @@ export default function TodayPage() {
                                             {currentCopy.markDone}
                                         </button>
 
-                                        <a
+                                        <Link
                                             href={`/projects/${item.routeId}`}
                                             className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
                                         >
                                             {currentCopy.openProject}
-                                        </a>
+                                        </Link>
                                     </div>
                                 </article>
                             ))}

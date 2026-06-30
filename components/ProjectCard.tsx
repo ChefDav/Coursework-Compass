@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ProgressBar from "@/components/ProgressBar";
 import RiskBadge from "@/components/RiskBadge";
 import type { Project } from "@/types/coursework";
@@ -43,12 +44,12 @@ export default function ProjectCard({ project, detailsHref }: ProjectCardProps) 
 
             {detailsHref ? (
                 <div className="mt-5">
-                    <a
+                    <Link
                         href={detailsHref}
                         className="block rounded-xl border border-slate-700 px-4 py-3 text-center text-sm font-bold transition hover:border-cyan-400 hover:text-cyan-300 sm:inline-block"
                     >
                         View details
-                    </a>
+                    </Link>
                 </div>
             ) : null}
         </div>

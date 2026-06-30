@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 type TimeUnit = "min" | "hours" | "days";
 
@@ -155,14 +155,16 @@ export default function EstimatedTimeField({
                                            }: EstimatedTimeFieldProps) {
     const parsedValue = useMemo(() => parseEstimatedTime(value), [value]);
 
+    const [lastValue, setLastValue] = useState(value);
     const [amount, setAmount] = useState(parsedValue.amount);
     const [unit, setUnit] = useState<TimeUnit>(parsedValue.unit);
 
-    useEffect(() => {
+    if (value !== lastValue) {
         const nextParsedValue = parseEstimatedTime(value);
+        setLastValue(value);
         setAmount(nextParsedValue.amount);
         setUnit(nextParsedValue.unit);
-    }, [value]);
+    }
 
     function commitValue(nextAmount: string, nextUnit: TimeUnit) {
         const cleanedAmount = nextAmount.trim();

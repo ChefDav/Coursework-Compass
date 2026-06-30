@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useHasMounted, useStoredLanguage } from "@/lib/clientStores";
 import {
     createTranslator,
-    getStoredLanguage,
     languages,
     saveStoredLanguage,
     type Language,
@@ -16,18 +15,12 @@ type LanguageSwitcherProps = {
 export default function LanguageSwitcher({
                                              compact = false,
                                          }: LanguageSwitcherProps) {
-    const [language, setLanguage] = useState<Language>("en");
-    const [hasMounted, setHasMounted] = useState(false);
-
-    useEffect(() => {
-        setLanguage(getStoredLanguage());
-        setHasMounted(true);
-    }, []);
+    const language = useStoredLanguage();
+    const hasMounted = useHasMounted();
 
     const t = createTranslator(language);
 
     function handleChangeLanguage(nextLanguage: Language) {
-        setLanguage(nextLanguage);
         saveStoredLanguage(nextLanguage);
     }
 
