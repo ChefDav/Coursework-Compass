@@ -3,9 +3,9 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import AppNav from "@/components/AppNav";
-import BackgroundSwitcher from "@/components/BackgroundSwitcher";
 import EmptyState from "@/components/EmptyState";
 import FeedbackPanel from "@/components/FeedbackPanel";
+import PersonalisationPanel from "@/components/PersonalisationPanel";
 import {
     useHasMounted,
     useProjectPlans,
@@ -46,9 +46,6 @@ const copy = {
         dayLeft: "day left",
         daysLeft: "days left",
         localBrowserStorage: "Local browser storage",
-        personaliseWorkspace: "Personalise workspace",
-        personaliseWorkspaceHelper:
-            "Choose a saved background preset for this browser.",
         emptyEyebrow: "Dashboard is empty",
         emptyTitle: "No coursework projects yet.",
         emptyDescription:
@@ -89,9 +86,6 @@ const copy = {
         dayLeft: "天剩余",
         daysLeft: "天剩余",
         localBrowserStorage: "浏览器本地存储",
-        personaliseWorkspace: "个性化学习空间",
-        personaliseWorkspaceHelper:
-            "为当前浏览器选择一个保存的背景预设。",
         emptyEyebrow: "仪表盘还是空的",
         emptyTitle: "还没有 coursework 项目。",
         emptyDescription:
@@ -297,19 +291,7 @@ export default function DashboardPage() {
                     </p>
                 </header>
 
-                <section className="cc-section cc-motion-fade-up mb-8 rounded-[2rem] p-5 sm:p-6">
-                    <div className="mb-5">
-                        <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
-                            {currentCopy.personaliseWorkspace}
-                        </p>
-
-                        <p className="cc-text-subtle max-w-3xl text-sm leading-6">
-                            {currentCopy.personaliseWorkspaceHelper}
-                        </p>
-                    </div>
-
-                    <BackgroundSwitcher />
-                </section>
+                <PersonalisationPanel />
 
                 {!hasMounted ? (
                     <section className="cc-card cc-motion-fade-up rounded-[2rem] p-6">
