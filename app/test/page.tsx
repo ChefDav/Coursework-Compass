@@ -586,9 +586,9 @@ export default function StudentTestingPage() {
     }
 
     return (
-        <main className="min-h-screen overflow-hidden bg-slate-950 text-white">
+        <main className="cc-page-gradient cc-text-main overflow-hidden">
             <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-                <header className="mb-10 flex flex-col gap-5 rounded-[2rem] border border-slate-800 bg-slate-900/70 p-5 shadow-2xl shadow-cyan-950/20 sm:p-6 md:flex-row md:items-center md:justify-between">
+                <header className="cc-card mb-10 flex flex-col gap-5 rounded-[2rem] p-5 sm:p-6 md:flex-row md:items-center md:justify-between">
                     <div>
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             {currentCopy.headerEyebrow}
@@ -596,14 +596,14 @@ export default function StudentTestingPage() {
                         <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
                             {currentCopy.headerTitle}
                         </h1>
-                        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
+                        <p className="cc-text-muted mt-2 max-w-2xl text-sm leading-6">
                             {currentCopy.headerDescription}
                         </p>
                     </div>
 
                     <Link
                         href="/"
-                        className="w-fit rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                        className="cc-button-secondary w-fit rounded-2xl px-5 py-3 text-sm"
                     >
                         {currentCopy.mainSite}
                     </Link>
@@ -652,14 +652,14 @@ export default function StudentTestingPage() {
                 </section>
 
                 {step === 0 ? (
-                    <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-8">
+                    <section className="cc-card rounded-[2rem] p-5 sm:p-8">
                         <p className="mb-2 text-sm font-bold text-emerald-300">
                             {currentCopy.sampleStep}
                         </p>
                         <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                             {currentCopy.sampleTitle}
                         </h2>
-                        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                        <p className="cc-text-muted mt-3 max-w-3xl text-sm leading-6">
                             {currentCopy.sampleDescription}
                         </p>
 
@@ -721,7 +721,7 @@ export default function StudentTestingPage() {
                             <button
                                 type="button"
                                 onClick={handleResetTutorial}
-                                className="rounded-2xl border border-slate-700 px-6 py-4 font-bold text-white transition hover:border-slate-400"
+                                className="cc-button-secondary rounded-2xl px-6 py-4"
                             >
                                 {currentCopy.reset}
                             </button>
@@ -731,7 +731,7 @@ export default function StudentTestingPage() {
 
                 {step === 1 ? (
                     <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-                        <div className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6">
+                        <div className="cc-card rounded-[2rem] p-5 sm:p-6">
                             <p className="mb-2 text-sm font-bold text-cyan-300">
                                 {currentCopy.plannerStep}
                             </p>

@@ -301,7 +301,7 @@ function getDeadlineClasses(dateValue?: string) {
     const targetDate = parseDateValue(dateValue);
 
     if (!targetDate) {
-        return "border-slate-700 bg-slate-900 text-slate-300";
+        return "cc-badge";
     }
 
     const today = new Date();
@@ -447,7 +447,7 @@ export default function ProjectDetailPage() {
 
     if (!hasMounted) {
         return (
-            <main className="min-h-screen bg-slate-950 text-white">
+            <main className="cc-page-gradient cc-text-main">
                 <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                     <AppNav />
 
@@ -458,7 +458,7 @@ export default function ProjectDetailPage() {
                         <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
                             {currentCopy.loadingTitle}
                         </h1>
-                        <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
+                        <p className="cc-text-muted mt-4 max-w-3xl text-sm leading-6">
                             {currentCopy.loadingDescription}
                         </p>
                     </section>
@@ -469,7 +469,7 @@ export default function ProjectDetailPage() {
 
     if (!projectInfo) {
         return (
-            <main className="min-h-screen bg-slate-950 text-white">
+            <main className="cc-page-gradient cc-text-main">
                 <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                     <AppNav />
 
@@ -576,7 +576,7 @@ export default function ProjectDetailPage() {
     }
 
     return (
-        <main className="min-h-screen bg-slate-950 text-white">
+        <main className="cc-page-gradient cc-text-main">
             <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                 <AppNav />
 
@@ -590,7 +590,7 @@ export default function ProjectDetailPage() {
                             {isEditingProject ? (
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="mb-2 block text-xs font-bold text-slate-300">
+                                        <label className="cc-text-muted mb-2 block text-xs font-bold">
                                             {currentCopy.projectTitle}
                                         </label>
                                         <input
@@ -600,7 +600,7 @@ export default function ProjectDetailPage() {
                                                 setProjectTitle(event.target.value);
                                                 setProjectError("");
                                             }}
-                                            className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
+                                            className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition"
                                         />
                                     </div>
 
@@ -621,7 +621,7 @@ export default function ProjectDetailPage() {
                                         <button
                                             type="button"
                                             onClick={handleSaveProjectDetails}
-                                            className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                                            className="cc-button-primary rounded-2xl px-5 py-3 text-sm"
                                         >
                                             {currentCopy.saveProjectDetails}
                                         </button>
@@ -634,7 +634,7 @@ export default function ProjectDetailPage() {
                                                 setProjectError("");
                                                 setIsEditingProject(false);
                                             }}
-                                            className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
+                                            className="cc-button-secondary rounded-2xl px-5 py-3 text-sm"
                                         >
                                             {currentCopy.cancel}
                                         </button>
@@ -647,11 +647,11 @@ export default function ProjectDetailPage() {
                                     </h1>
 
                                     <div className="mt-5 flex flex-wrap gap-2 text-xs font-bold">
-                    <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1 text-slate-300">
+                                    <span className="cc-pill-muted rounded-full px-3 py-1">
                       {currentCopy.deadline}: {formatDate(projectPlan.project.deadline, language)}
                     </span>
 
-                                        <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1 text-slate-300">
+                                        <span className="cc-pill-muted rounded-full px-3 py-1">
                       {currentCopy.projectType}: {projectTypeDisplay}
                     </span>
 
@@ -689,7 +689,7 @@ export default function ProjectDetailPage() {
                                     setProjectDeadline(projectPlan.project.deadline);
                                     setIsEditingProject(true);
                                 }}
-                                className="w-fit rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                                className="cc-button-secondary w-fit rounded-2xl px-5 py-3 text-sm"
                             >
                                 {currentCopy.editProject}
                             </button>
@@ -698,30 +698,30 @@ export default function ProjectDetailPage() {
 
                     <div className="mt-8">
                         <div className="mb-3 flex items-center justify-between gap-4">
-                            <p className="text-sm font-bold text-slate-300">
+                            <p className="cc-text-muted text-sm font-bold">
                                 {currentCopy.projectProgress}
                             </p>
                             <p className="text-sm font-black text-cyan-300">{progress}%</p>
                         </div>
 
-                        <div className="h-4 overflow-hidden rounded-full bg-slate-800">
+                        <div className="cc-progress-track h-4 overflow-hidden rounded-full">
                             <div
                                 className="h-full rounded-full bg-cyan-400 transition-all"
                                 style={{ width: `${progress}%` }}
                             />
                         </div>
 
-                        <div className="mt-4 grid gap-3 text-sm text-slate-400 sm:grid-cols-3">
+                        <div className="cc-text-subtle mt-4 grid gap-3 text-sm sm:grid-cols-3">
                             <p>
-                                <span className="font-bold text-slate-200">{todoCount}</span>{" "}
+                                <span className="cc-text-main font-bold">{todoCount}</span>{" "}
                                 {currentCopy.todo}
                             </p>
                             <p>
-                                <span className="font-bold text-slate-200">{doneCount}</span>{" "}
+                                <span className="cc-text-main font-bold">{doneCount}</span>{" "}
                                 {currentCopy.done}
                             </p>
                             <p>
-                <span className="font-bold text-slate-200">
+                <span className="cc-text-main font-bold">
                   {repairedTasks.length}
                 </span>{" "}
                                 {currentCopy.total}
@@ -736,7 +736,7 @@ export default function ProjectDetailPage() {
                                     <p className="mb-1 text-sm font-bold text-emerald-300">
                                         {currentCopy.completedTaskCleanup}
                                     </p>
-                                    <p className="text-sm leading-6 text-slate-300">
+                                    <p className="cc-text-muted text-sm leading-6">
                                         {currentCopy.cleanupDescription}
                                     </p>
                                 </div>
@@ -753,20 +753,20 @@ export default function ProjectDetailPage() {
                     ) : null}
                 </section>
 
-                <section className="mb-10 rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6">
+                <section className="cc-card mb-10 rounded-[2rem] p-5 sm:p-6">
                     <p className="mb-2 text-sm font-bold text-emerald-300">
                         {currentCopy.addCustomTask}
                     </p>
                     <h2 className="text-3xl font-black tracking-tight">
                         {currentCopy.addCustomTaskTitle}
                     </h2>
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                    <p className="cc-text-muted mt-3 max-w-3xl text-sm leading-6">
                         {currentCopy.addCustomTaskDescription}
                     </p>
 
                     <div className="mt-6 grid gap-4">
                         <div>
-                            <label className="mb-2 block text-xs font-bold text-slate-300">
+                            <label className="cc-text-muted mb-2 block text-xs font-bold">
                                 {currentCopy.taskTitle}
                             </label>
                             <input
@@ -777,13 +777,13 @@ export default function ProjectDetailPage() {
                                     setNewTaskError("");
                                 }}
                                 placeholder={currentCopy.taskTitlePlaceholder}
-                                className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-300"
+                                className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition"
                             />
                         </div>
 
                         <div className="grid gap-4 md:grid-cols-3">
                             <div>
-                                <label className="mb-2 block text-xs font-bold text-slate-300">
+                                <label className="cc-text-muted mb-2 block text-xs font-bold">
                                     {currentCopy.priority}
                                 </label>
                                 <select
@@ -795,7 +795,7 @@ export default function ProjectDetailPage() {
 
                                         setNewTaskPriority(event.target.value);
                                     }}
-                                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-emerald-300"
+                                    className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition"
                                 >
                                     {priorityOptions.map((priority) => (
                                         <option key={priority} value={priority}>

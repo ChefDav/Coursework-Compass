@@ -172,34 +172,34 @@ export default function ProjectsPage() {
     }
 
     return (
-        <main className="min-h-screen bg-slate-950 px-4 py-6 text-white sm:px-6 lg:px-8">
+        <main className="cc-page-gradient cc-text-main px-4 py-6 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
                 <AppNav />
 
-                <header className="mb-8 rounded-[2rem] border border-slate-800 bg-slate-900/70 p-6 shadow-2xl shadow-cyan-950/20 sm:p-8">
+                <header className="cc-card mb-8 rounded-[2rem] p-6 sm:p-8">
                     <p className="mb-3 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                         {currentCopy.eyebrow}
                     </p>
 
-                    <h1 className="max-w-5xl text-4xl font-black tracking-tight text-white sm:text-6xl">
+                    <h1 className="cc-text-main max-w-5xl text-4xl font-black tracking-tight sm:text-6xl">
                         {currentCopy.title}
                     </h1>
 
-                    <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:text-lg">
+                    <p className="cc-text-muted mt-5 max-w-4xl text-base leading-7 sm:text-lg">
                         {currentCopy.subtitle}
                     </p>
 
                     <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                         <Link
                             href="/projects/new"
-                            className="rounded-2xl bg-cyan-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                            className="cc-button-primary rounded-2xl px-5 py-3 text-center text-sm"
                         >
                             {currentCopy.createProject}
                         </Link>
 
                         <Link
                             href="/test"
-                            className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                            className="cc-button-secondary rounded-2xl px-5 py-3 text-center text-sm"
                         >
                             {currentCopy.openTutorial}
                         </Link>
@@ -207,8 +207,8 @@ export default function ProjectsPage() {
                 </header>
 
                 {!hasMounted ? (
-                    <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-6">
-                        <p className="text-sm font-bold text-slate-400">
+                    <section className="cc-card rounded-[2rem] p-6">
+                        <p className="cc-text-subtle text-sm font-bold">
                             {currentCopy.loading}
                         </p>
                     </section>
@@ -232,18 +232,18 @@ export default function ProjectsPage() {
                         tips={[...currentCopy.tips]}
                     />
                 ) : (
-                    <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 shadow-2xl shadow-cyan-950/20 sm:p-6">
+                    <section className="cc-card rounded-[2rem] p-5 sm:p-6">
                         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                             <div>
                                 <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                                     {currentCopy.savedProjects}
                                 </p>
 
-                                <h2 className="text-2xl font-black text-white">
+                                <h2 className="cc-text-main text-2xl font-black">
                                     {savedProjectCount} {currentCopy.savedProjects}
                                 </h2>
 
-                                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
+                                <p className="cc-text-subtle mt-2 max-w-3xl text-sm leading-6">
                                     {currentCopy.savedProjectsDescription}
                                 </p>
                             </div>
@@ -264,15 +264,15 @@ export default function ProjectsPage() {
                                 return (
                                     <article
                                         key={`${routeId}-${index}`}
-                                        className="rounded-[1.5rem] border border-slate-800 bg-slate-950/70 p-5 shadow-xl shadow-slate-950/30"
+                                        className="cc-surface-inset rounded-[1.5rem] p-5"
                                     >
                                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                             <div className="min-w-0">
-                                                <h3 className="truncate text-xl font-black text-white">
+                                                <h3 className="cc-text-main truncate text-xl font-black">
                                                     {plan.project.title}
                                                 </h3>
 
-                                                <p className="mt-2 text-sm leading-6 text-slate-400">
+                                                <p className="cc-text-subtle mt-2 text-sm leading-6">
                                                     {getProjectType(plan, language)}
                                                 </p>
                                             </div>
@@ -288,7 +288,7 @@ export default function ProjectsPage() {
 
                                         <div className="mt-5">
                                             <div className="mb-2 flex items-center justify-between gap-3">
-                                                <p className="text-sm font-bold text-slate-400">
+                                                <p className="cc-text-subtle text-sm font-bold">
                                                     {currentCopy.progress}
                                                 </p>
 
@@ -297,7 +297,7 @@ export default function ProjectsPage() {
                                                 </p>
                                             </div>
 
-                                            <div className="h-3 overflow-hidden rounded-full bg-slate-800">
+                                            <div className="cc-progress-track h-3 overflow-hidden rounded-full">
                                                 <div
                                                     className="h-full rounded-full bg-cyan-400"
                                                     style={{
@@ -308,38 +308,38 @@ export default function ProjectsPage() {
                                         </div>
 
                                         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-                                                <p className="text-xs font-bold text-slate-500">
+                                            <div className="cc-surface-muted rounded-2xl p-4">
+                                                <p className="cc-text-subtle text-xs font-bold">
                                                     {currentCopy.deadline}
                                                 </p>
-                                                <p className="mt-2 text-sm font-black text-white">
+                                                <p className="cc-text-main mt-2 text-sm font-black">
                                                     {formatDate(plan.project.deadline, language)}
                                                 </p>
                                             </div>
 
-                                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-                                                <p className="text-xs font-bold text-slate-500">
+                                            <div className="cc-surface-muted rounded-2xl p-4">
+                                                <p className="cc-text-subtle text-xs font-bold">
                                                     {currentCopy.tasks}
                                                 </p>
-                                                <p className="mt-2 text-sm font-black text-white">
+                                                <p className="cc-text-main mt-2 text-sm font-black">
                                                     {visibleTaskCount}
                                                 </p>
                                             </div>
 
-                                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-                                                <p className="text-xs font-bold text-slate-500">
+                                            <div className="cc-surface-muted rounded-2xl p-4">
+                                                <p className="cc-text-subtle text-xs font-bold">
                                                     {currentCopy.activeTasks}
                                                 </p>
-                                                <p className="mt-2 text-sm font-black text-white">
+                                                <p className="cc-text-main mt-2 text-sm font-black">
                                                     {activeTaskCount}
                                                 </p>
                                             </div>
 
-                                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
-                                                <p className="text-xs font-bold text-slate-500">
+                                            <div className="cc-surface-muted rounded-2xl p-4">
+                                                <p className="cc-text-subtle text-xs font-bold">
                                                     {currentCopy.completedTasks}
                                                 </p>
-                                                <p className="mt-2 text-sm font-black text-white">
+                                                <p className="cc-text-main mt-2 text-sm font-black">
                                                     {completedTaskCount}
                                                 </p>
                                             </div>
@@ -348,7 +348,7 @@ export default function ProjectsPage() {
                                         <div className="mt-5">
                                             <Link
                                                 href={`/projects/${routeId}`}
-                                                className="inline-block rounded-2xl bg-cyan-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                                                className="cc-button-primary inline-block rounded-2xl px-5 py-3 text-center text-sm"
                                             >
                                                 {currentCopy.openProject}
                                             </Link>

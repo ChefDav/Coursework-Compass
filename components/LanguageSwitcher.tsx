@@ -26,7 +26,7 @@ export default function LanguageSwitcher({
 
     if (!hasMounted) {
         return (
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm font-bold text-slate-500">
+            <div className="cc-surface-inset cc-text-subtle rounded-2xl px-4 py-3 text-sm font-bold">
                 Language
             </div>
         );
@@ -34,8 +34,8 @@ export default function LanguageSwitcher({
 
     if (compact) {
         return (
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-2">
-                <p className="mb-2 px-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+            <div className="cc-surface-inset rounded-2xl p-2">
+                <p className="cc-text-subtle mb-2 px-2 text-xs font-black uppercase tracking-[0.16em]">
                     {t("language")}
                 </p>
 
@@ -50,8 +50,8 @@ export default function LanguageSwitcher({
                                 onClick={() => handleChangeLanguage(item.code)}
                                 className={`rounded-xl px-3 py-2 text-xs font-black transition ${
                                     isActive
-                                        ? "bg-cyan-400 text-slate-950"
-                                        : "border border-slate-800 bg-slate-900 text-slate-300 hover:border-cyan-400 hover:text-cyan-300"
+                                        ? "cc-button-primary"
+                                        : "cc-button-secondary"
                                 }`}
                             >
                                 {item.shortLabel}
@@ -64,9 +64,9 @@ export default function LanguageSwitcher({
     }
 
     return (
-        <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-2">
+        <div className="cc-surface-inset rounded-2xl p-2">
             <div className="flex flex-wrap items-center gap-2">
-        <span className="px-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+        <span className="cc-text-subtle px-2 text-xs font-black uppercase tracking-[0.16em]">
           {t("language")}
         </span>
 
@@ -80,8 +80,8 @@ export default function LanguageSwitcher({
                             onClick={() => handleChangeLanguage(item.code)}
                             className={`rounded-xl px-3 py-2 text-xs font-black transition ${
                                 isActive
-                                    ? "bg-cyan-400 text-slate-950"
-                                    : "border border-slate-800 bg-slate-900 text-slate-300 hover:border-cyan-400 hover:text-cyan-300"
+                                    ? "cc-button-primary"
+                                    : "cc-button-secondary"
                             }`}
                         >
                             {item.label}

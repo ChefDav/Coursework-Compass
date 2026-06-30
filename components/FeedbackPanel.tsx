@@ -140,11 +140,11 @@ export default function FeedbackPanel() {
                 <h2 className="text-2xl font-black sm:text-3xl">
                     {currentCopy.title}
                 </h2>
-                <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                <p className="cc-text-muted mt-3 max-w-3xl text-sm leading-6">
                     {currentCopy.description}
                 </p>
 
-                <div className="mt-4 rounded-3xl border border-fuchsia-400/30 bg-slate-950/60 p-4">
+                <div className="mt-4 rounded-3xl border border-fuchsia-400/30 bg-fuchsia-400/10 p-4">
                     <p className="text-sm font-bold leading-6 text-fuchsia-200">
                         {currentCopy.note}
                     </p>
@@ -152,8 +152,8 @@ export default function FeedbackPanel() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
-                <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
-                    <p className="mb-3 text-sm font-bold text-white">
+                <div className="cc-surface-inset rounded-3xl p-4">
+                    <p className="cc-text-main mb-3 text-sm font-bold">
                         {currentCopy.chooseType}
                     </p>
 
@@ -166,7 +166,7 @@ export default function FeedbackPanel() {
                                 className={`w-full rounded-2xl border px-4 py-3 text-left text-sm font-bold transition ${
                                     selectedType === type.value
                                         ? "border-fuchsia-300 bg-fuchsia-400 text-slate-950"
-                                        : "border-slate-800 bg-slate-900 text-slate-300 hover:border-fuchsia-400 hover:text-fuchsia-300"
+                                        : "cc-button-secondary hover:border-fuchsia-400 hover:text-fuchsia-300"
                                 }`}
                             >
                                 {type[language]}
@@ -175,12 +175,12 @@ export default function FeedbackPanel() {
                     </div>
                 </div>
 
-                <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
-                    <p className="mb-3 text-sm font-bold text-white">
+                <div className="cc-surface-inset rounded-3xl p-4">
+                    <p className="cc-text-main mb-3 text-sm font-bold">
                         {currentCopy.promptsTitle}
                     </p>
 
-                    <ul className="space-y-2 text-sm leading-6 text-slate-400">
+                    <ul className="cc-text-subtle space-y-2 text-sm leading-6">
                         {currentCopy.prompts.map((prompt) => (
                             <li key={prompt}>- {prompt}</li>
                         ))}
@@ -193,7 +193,7 @@ export default function FeedbackPanel() {
                         {currentCopy.action}
                     </a>
 
-                    <p className="mt-3 text-xs leading-5 text-slate-500">
+                    <p className="cc-text-subtle mt-3 text-xs leading-5">
                         {currentCopy.helper}
                     </p>
                 </div>

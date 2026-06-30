@@ -193,7 +193,7 @@ export default function SaveSuccessToast() {
         : localiseText(toast.actionLabel, language);
 
     return (
-        <section className="fixed bottom-4 left-3 right-3 z-[70] rounded-[1.5rem] border border-emerald-400/30 bg-slate-950/95 p-4 text-white shadow-2xl shadow-emerald-950/40 backdrop-blur-md sm:bottom-6 sm:left-auto sm:right-6 sm:w-[28rem] sm:rounded-[1.75rem]">
+        <section className="cc-panel-strong fixed bottom-4 left-3 right-3 z-[70] rounded-[1.5rem] border-emerald-400/30 p-4 backdrop-blur-md sm:bottom-6 sm:left-auto sm:right-6 sm:w-[28rem] sm:rounded-[1.75rem]">
             <div className="flex gap-3 sm:gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-400/10 text-lg sm:h-12 sm:w-12 sm:text-xl">
                     ✓
@@ -205,7 +205,7 @@ export default function SaveSuccessToast() {
                             <p className="text-sm font-black text-emerald-300">
                                 {displayTitle}
                             </p>
-                            <p className="mt-1 text-sm leading-5 text-slate-300 sm:leading-6">
+                            <p className="cc-text-muted mt-1 text-sm leading-5 sm:leading-6">
                                 {displayMessage}
                             </p>
                         </div>
@@ -213,7 +213,7 @@ export default function SaveSuccessToast() {
                         <button
                             type="button"
                             onClick={() => setToast(null)}
-                            className="shrink-0 rounded-xl border border-slate-700 px-3 py-2 text-xs font-bold text-slate-400 transition hover:border-slate-400 hover:text-white"
+                            className="cc-button-secondary shrink-0 rounded-xl px-3 py-2 text-xs"
                         >
                             {t("close")}
                         </button>
@@ -228,7 +228,7 @@ export default function SaveSuccessToast() {
                         </Link>
                     ) : null}
 
-                    <div className="mt-4 h-1 overflow-hidden rounded-full bg-slate-800">
+                    <div className="cc-progress-track mt-4 h-1 overflow-hidden rounded-full">
                         <div className="h-full w-full origin-left animate-[saveToastBar_4.2s_linear_forwards] rounded-full bg-emerald-400" />
                     </div>
                 </div>

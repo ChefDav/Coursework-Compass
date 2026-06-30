@@ -1132,7 +1132,7 @@ export default function NewProjectForm() {
 
     return (
         <section className="space-y-6">
-            <header className="relative overflow-hidden rounded-[2.5rem] border border-slate-800 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/30 sm:p-8 lg:p-10">
+            <header className="cc-card relative overflow-hidden rounded-[2.5rem] p-6 sm:p-8 lg:p-10">
                 <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" />
                 <div className="pointer-events-none absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-emerald-400/10 blur-3xl" />
 
@@ -1142,11 +1142,11 @@ export default function NewProjectForm() {
                             {currentCopy.pageEyebrow}
                         </p>
 
-                        <h1 className="max-w-5xl text-4xl font-black tracking-tight text-white sm:text-6xl">
+                        <h1 className="cc-text-main max-w-5xl text-4xl font-black tracking-tight sm:text-6xl">
                             {currentCopy.pageTitle}
                         </h1>
 
-                        <p className="mt-5 max-w-4xl text-base leading-7 text-slate-300 sm:text-lg">
+                        <p className="cc-text-muted mt-5 max-w-4xl text-base leading-7 sm:text-lg">
                             {currentCopy.pageSubtitle}
                         </p>
                     </div>
@@ -1159,7 +1159,7 @@ export default function NewProjectForm() {
                         ].map((badge) => (
                             <div
                                 key={badge}
-                                className="rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm font-black text-slate-200"
+                                className="cc-pill-muted rounded-2xl px-4 py-3 text-sm font-black"
                             >
                                 {badge}
                             </div>
@@ -1170,13 +1170,13 @@ export default function NewProjectForm() {
 
             <div className="grid gap-6 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
                 <div className="space-y-6">
-                    <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 shadow-2xl shadow-slate-950/30 sm:p-6">
+                    <section className="cc-card rounded-[2rem] p-5 sm:p-6">
                         <div className="mb-6">
                             <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                                 {currentCopy.templateStep}
                             </p>
 
-                            <h2 className="text-2xl font-black text-white">
+                            <h2 className="cc-text-main text-2xl font-black">
                                 {currentCopy.templateLabel}
                             </h2>
                         </div>
@@ -1196,7 +1196,7 @@ export default function NewProjectForm() {
                                         className={`group relative min-h-48 overflow-hidden rounded-[1.75rem] border p-5 text-left transition ${
                                             isActive
                                                 ? "border-cyan-400 bg-cyan-400/10 shadow-xl shadow-cyan-950/30"
-                                                : "border-slate-800 bg-slate-950/70 hover:border-cyan-400/50"
+                                                : "cc-surface-inset hover:border-cyan-400/50"
                                         }`}
                                     >
                                         <div
@@ -1211,7 +1211,7 @@ export default function NewProjectForm() {
 
                                         <div className="relative z-10 flex h-full flex-col">
                                             <div className="mb-5 flex items-center justify-between gap-3">
-                                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-700 bg-slate-950/70 text-2xl">
+                                                <div className="cc-surface-inset flex h-14 w-14 items-center justify-center rounded-2xl text-2xl">
                                                     {template.icon}
                                                 </div>
 
@@ -1222,11 +1222,11 @@ export default function NewProjectForm() {
                                                 ) : null}
                                             </div>
 
-                                            <h3 className="text-xl font-black text-white">
+                                            <h3 className="cc-text-main text-xl font-black">
                                                 {template.shortName[language]}
                                             </h3>
 
-                                            <p className="mt-3 text-sm leading-6 text-slate-400">
+                                            <p className="cc-text-subtle mt-3 text-sm leading-6">
                                                 {template.description[language]}
                                             </p>
                                         </div>
@@ -1236,24 +1236,24 @@ export default function NewProjectForm() {
                         </div>
                     </section>
 
-                    <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 shadow-2xl shadow-slate-950/30 sm:p-6">
+                    <section className="cc-card rounded-[2rem] p-5 sm:p-6">
                         <div className="mb-6">
                             <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                                 {currentCopy.setupStep}
                             </p>
 
-                            <h2 className="text-2xl font-black text-white">
+                            <h2 className="cc-text-main text-2xl font-black">
                                 {currentCopy.setupTitle}
                             </h2>
 
-                            <p className="mt-2 text-sm leading-6 text-slate-400">
+                            <p className="cc-text-subtle mt-2 text-sm leading-6">
                                 {currentCopy.setupDescription}
                             </p>
                         </div>
 
                         <div className="space-y-5">
                             <label className="block">
-                <span className="mb-2 block text-sm font-black text-slate-300">
+                <span className="cc-text-muted mb-2 block text-sm font-black">
                   {currentCopy.projectTitleLabel}
                 </span>
 
@@ -1264,7 +1264,7 @@ export default function NewProjectForm() {
                                         clearGeneratedState();
                                     }}
                                     placeholder={currentCopy.projectTitlePlaceholder}
-                                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-4 text-sm font-bold text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400"
+                                    className="cc-input w-full rounded-2xl px-4 py-4 text-sm font-bold transition"
                                 />
                             </label>
 
@@ -1280,7 +1280,7 @@ export default function NewProjectForm() {
                             />
 
                             <div>
-                                <p className="mb-3 text-sm font-black text-slate-300">
+                                <p className="cc-text-muted mb-3 text-sm font-black">
                                     {currentCopy.intensityLabel}
                                 </p>
 
@@ -1299,18 +1299,18 @@ export default function NewProjectForm() {
                                                 className={`rounded-2xl border p-4 text-left transition ${
                                                     isActive
                                                         ? "border-emerald-400 bg-emerald-400/10"
-                                                        : "border-slate-800 bg-slate-950/70 hover:border-emerald-400/50"
+                                                        : "cc-surface-inset hover:border-emerald-400/50"
                                                 }`}
                                             >
                                                 <p
                                                     className={`text-sm font-black ${
-                                                        isActive ? "text-emerald-300" : "text-white"
+                                                        isActive ? "text-emerald-300" : "cc-text-main"
                                                     }`}
                                                 >
                                                     {currentCopy[option.labelKey]}
                                                 </p>
 
-                                                <p className="mt-1 text-sm leading-6 text-slate-400">
+                                                <p className="cc-text-subtle mt-1 text-sm leading-6">
                                                     {currentCopy[option.descriptionKey]}
                                                 </p>
                                             </button>
@@ -1329,7 +1329,7 @@ export default function NewProjectForm() {
                                 <button
                                     type="button"
                                     onClick={handleGeneratePlan}
-                                    className="rounded-2xl bg-cyan-400 px-5 py-4 text-sm font-black text-slate-950 transition hover:bg-cyan-300"
+                                    className="cc-button-primary rounded-2xl px-5 py-4 text-sm"
                                 >
                                     {generatedPlan
                                         ? currentCopy.regeneratePlan
@@ -1343,7 +1343,7 @@ export default function NewProjectForm() {
                                     className={`rounded-2xl px-5 py-4 text-sm font-black transition ${
                                         generatedPlan
                                             ? "bg-emerald-400 text-slate-950 hover:bg-emerald-300"
-                                            : "cursor-not-allowed border border-slate-800 bg-slate-950 text-slate-600"
+                                            : "cc-button-secondary cursor-not-allowed opacity-60"
                                     }`}
                                 >
                                     {currentCopy.saveProject}
@@ -1356,7 +1356,7 @@ export default function NewProjectForm() {
                                         {currentCopy.savedTitle}
                                     </p>
 
-                                    <p className="mt-2 text-sm leading-6 text-slate-300">
+                                    <p className="cc-text-muted mt-2 text-sm leading-6">
                                         {currentCopy.savedDescription}
                                     </p>
 
@@ -1373,36 +1373,36 @@ export default function NewProjectForm() {
                 </div>
 
                 <aside className="xl:sticky xl:top-6 xl:self-start">
-                    <section className="overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-900 shadow-2xl shadow-cyan-950/30">
-                        <div className="border-b border-slate-800 bg-slate-950/70 p-5 sm:p-6">
+                    <section className="cc-card overflow-hidden rounded-[2rem]">
+                        <div className="cc-surface-inset border-b p-5 sm:p-6">
                             <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                                 {currentCopy.previewStep}
                             </p>
 
-                            <h2 className="text-2xl font-black text-white">
+                            <h2 className="cc-text-main text-2xl font-black">
                                 {currentCopy.previewTitle}
                             </h2>
 
-                            <p className="mt-2 text-sm leading-6 text-slate-400">
+                            <p className="cc-text-subtle mt-2 text-sm leading-6">
                                 {generatedPlan
                                     ? currentCopy.previewReadyDescription
                                     : currentCopy.previewEmptyDescription}
                             </p>
                         </div>
 
-                        <div className="grid gap-3 border-b border-slate-800 p-5 sm:grid-cols-3 sm:p-6">
-                            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-                                <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">
+                        <div className="cc-border grid gap-3 border-b p-5 sm:grid-cols-3 sm:p-6">
+                            <div className="cc-surface-inset rounded-2xl p-4">
+                                <p className="cc-text-subtle text-xs font-black uppercase tracking-[0.14em]">
                                     {selectedTemplate.shortName[language]}
                                 </p>
 
-                                <p className="mt-2 text-2xl font-black text-white">
+                                <p className="cc-text-main mt-2 text-2xl font-black">
                                     {selectedTemplate.icon}
                                 </p>
                             </div>
 
-                            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-                                <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">
+                            <div className="cc-surface-inset rounded-2xl p-4">
+                                <p className="cc-text-subtle text-xs font-black uppercase tracking-[0.14em]">
                                     {currentCopy.timeline}
                                 </p>
 
@@ -1411,12 +1411,12 @@ export default function NewProjectForm() {
                                 </p>
                             </div>
 
-                            <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-                                <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">
+                            <div className="cc-surface-inset rounded-2xl p-4">
+                                <p className="cc-text-subtle text-xs font-black uppercase tracking-[0.14em]">
                                     {currentCopy.deadlineLabel}
                                 </p>
 
-                                <p className="mt-2 text-sm font-black text-white">
+                                <p className="cc-text-main mt-2 text-sm font-black">
                                     {deadline
                                         ? `${daysAvailable} ${
                                             language === "zh"
@@ -1434,23 +1434,23 @@ export default function NewProjectForm() {
                             {generatedPlan ? (
                                 <div className="space-y-4">
                                     <div>
-                                        <h3 className="text-xl font-black text-white">
+                                        <h3 className="cc-text-main text-xl font-black">
                                             {generatedPlan.tasks.length}{" "}
                                             {currentCopy.tasksGenerated}
                                         </h3>
 
-                                        <p className="mt-2 text-sm leading-6 text-slate-400">
+                                        <p className="cc-text-subtle mt-2 text-sm leading-6">
                                             {generatedPlan.project.title}
                                         </p>
                                     </div>
 
                                     <div className="relative space-y-4">
-                                        <div className="absolute bottom-4 left-[1.35rem] top-4 w-px bg-slate-800" />
+                                        <div className="cc-progress-track absolute bottom-4 left-[1.35rem] top-4 w-px" />
 
                                         {generatedPlan.tasks.map((item, index) => (
                                             <article
                                                 key={item.id || `${item.title}-${index}`}
-                                                className="relative grid gap-4 rounded-[1.5rem] border border-slate-800 bg-slate-950/70 p-4 sm:grid-cols-[2.75rem_minmax(0,1fr)]"
+                                                className="cc-surface-inset relative grid gap-4 rounded-[1.5rem] p-4 sm:grid-cols-[2.75rem_minmax(0,1fr)]"
                                             >
                                                 <div className="relative z-10 flex h-11 w-11 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 text-sm font-black text-cyan-300">
                                                     {index + 1}
@@ -1459,12 +1459,12 @@ export default function NewProjectForm() {
                                                 <div className="min-w-0">
                                                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                                         <div>
-                                                            <h4 className="text-base font-black text-white">
+                                                            <h4 className="cc-text-main text-base font-black">
                                                                 {item.title}
                                                             </h4>
 
                                                             {item.description ? (
-                                                                <p className="mt-2 text-sm leading-6 text-slate-400">
+                                                                <p className="cc-text-subtle mt-2 text-sm leading-6">
                                                                     {item.description}
                                                                 </p>
                                                             ) : null}
@@ -1483,22 +1483,22 @@ export default function NewProjectForm() {
                                                     </div>
 
                                                     <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                                                        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-3">
-                                                            <p className="text-xs font-bold text-slate-500">
+                                                        <div className="cc-surface-muted rounded-2xl p-3">
+                                                            <p className="cc-text-subtle text-xs font-bold">
                                                                 {currentCopy.due}
                                                             </p>
 
-                                                            <p className="mt-1 text-sm font-black text-white">
+                                                            <p className="cc-text-main mt-1 text-sm font-black">
                                                                 {formatDate(String(item.dueDate || ""), language)}
                                                             </p>
                                                         </div>
 
-                                                        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-3">
-                                                            <p className="text-xs font-bold text-slate-500">
+                                                        <div className="cc-surface-muted rounded-2xl p-3">
+                                                            <p className="cc-text-subtle text-xs font-bold">
                                                                 {currentCopy.estimatedTime}
                                                             </p>
 
-                                                            <p className="mt-1 text-sm font-black text-white">
+                                                            <p className="cc-text-main mt-1 text-sm font-black">
                                                                 {getTaskEstimatedTime(item)}
                                                             </p>
                                                         </div>
@@ -1509,17 +1509,17 @@ export default function NewProjectForm() {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex min-h-[26rem] items-center justify-center rounded-[1.5rem] border border-dashed border-slate-700 bg-slate-950/70 p-6 text-center">
+                                <div className="cc-surface-inset flex min-h-[26rem] items-center justify-center rounded-[1.5rem] border-dashed p-6 text-center">
                                     <div>
                                         <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border border-cyan-400/30 bg-cyan-400/10 text-4xl">
                                             🧩
                                         </div>
 
-                                        <p className="text-xl font-black text-white">
+                                        <p className="cc-text-main text-xl font-black">
                                             {currentCopy.previewEmptyTitle}
                                         </p>
 
-                                        <p className="mt-3 max-w-md text-sm leading-6 text-slate-400">
+                                        <p className="cc-text-subtle mt-3 max-w-md text-sm leading-6">
                                             {currentCopy.previewEmptyDescription}
                                         </p>
                                     </div>
@@ -1527,13 +1527,13 @@ export default function NewProjectForm() {
                             )}
                         </div>
 
-                        <div className="border-t border-slate-800 bg-slate-950/70 p-5 sm:p-6">
+                        <div className="cc-surface-inset border-t p-5 sm:p-6">
                             <div className="rounded-[1.5rem] border border-amber-400/30 bg-amber-400/10 p-4">
                                 <p className="mb-2 text-sm font-black text-amber-300">
                                     {currentCopy.browserNoteTitle}
                                 </p>
 
-                                <p className="text-sm leading-6 text-slate-300">
+                                <p className="cc-text-muted text-sm leading-6">
                                     {currentCopy.browserNote}
                                 </p>
                             </div>

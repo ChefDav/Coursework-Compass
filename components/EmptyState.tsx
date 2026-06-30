@@ -281,10 +281,10 @@ function localiseText(value: string, language: Language) {
 
 function getActionClasses(variant: "primary" | "secondary" | undefined) {
     if (variant === "secondary") {
-        return "rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300";
+        return "cc-button-secondary rounded-2xl px-5 py-3 text-center text-sm";
     }
 
-    return "rounded-2xl bg-cyan-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300";
+    return "cc-button-primary rounded-2xl px-5 py-3 text-center text-sm";
 }
 
 export default function EmptyState({
@@ -318,7 +318,7 @@ export default function EmptyState({
             : tips.map((tip) => localiseText(tip, language));
 
     return (
-        <section className="overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-900 p-5 shadow-2xl shadow-cyan-950/20 sm:p-8">
+        <section className="cc-card overflow-hidden rounded-[2rem] p-5 sm:p-8">
             <div className="relative">
                 <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-400/10 blur-3xl" />
                 <div className="absolute -bottom-28 -left-28 h-56 w-56 rounded-full bg-emerald-400/10 blur-3xl" />
@@ -332,11 +332,11 @@ export default function EmptyState({
                         {displayEyebrow}
                     </p>
 
-                    <h2 className="max-w-3xl text-3xl font-black tracking-tight text-white sm:text-4xl">
+                    <h2 className="cc-text-main max-w-3xl text-3xl font-black tracking-tight sm:text-4xl">
                         {displayTitle}
                     </h2>
 
-                    <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
+                    <p className="cc-text-muted mt-4 max-w-3xl text-sm leading-6 sm:text-base sm:leading-7">
                         {displayDescription}
                     </p>
 
@@ -361,8 +361,8 @@ export default function EmptyState({
                     ) : null}
 
                     {displayTips.length > 0 ? (
-                        <div className="mt-7 rounded-[1.5rem] border border-slate-800 bg-slate-950/70 p-4 sm:rounded-[2rem] sm:p-5">
-                            <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+                        <div className="cc-surface-inset mt-7 rounded-[1.5rem] p-4 sm:rounded-[2rem] sm:p-5">
+                            <p className="cc-text-subtle mb-3 text-xs font-black uppercase tracking-[0.18em]">
                                 {language === "zh" ? "测试提示" : "Testing tips"}
                             </p>
 
@@ -370,9 +370,9 @@ export default function EmptyState({
                                 {displayTips.map((tip) => (
                                     <div
                                         key={tip}
-                                        className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4"
+                                        className="cc-surface-muted rounded-2xl p-4"
                                     >
-                                        <p className="text-sm leading-6 text-slate-300">{tip}</p>
+                                        <p className="cc-text-muted text-sm leading-6">{tip}</p>
                                     </div>
                                 ))}
                             </div>

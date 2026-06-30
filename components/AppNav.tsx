@@ -71,14 +71,14 @@ export default function AppNav() {
     }
 
     return (
-        <header className="mb-6 rounded-[1.5rem] border border-slate-800 bg-slate-900/85 p-3 shadow-2xl shadow-cyan-950/20 backdrop-blur-md sm:mb-8 sm:rounded-[2rem] sm:p-5">
+        <header className="cc-panel mb-6 rounded-[1.5rem] p-3 backdrop-blur-md sm:mb-8 sm:rounded-[2rem] sm:p-5">
             <div className="grid gap-5 xl:grid-cols-[minmax(15rem,22rem)_1fr] xl:items-start">
                 <div className="flex items-start justify-between gap-3 xl:block">
                     <Link href="/" className="group min-w-0">
-                        <p className="max-w-[18rem] truncate text-lg font-black tracking-tight text-white transition group-hover:text-cyan-300 sm:max-w-none sm:text-xl xl:whitespace-normal">
+                        <p className="cc-text-main max-w-[18rem] truncate text-lg font-black tracking-tight transition group-hover:text-cyan-300 sm:max-w-none sm:text-xl xl:whitespace-normal">
                             {t("appName")}
                         </p>
-                        <p className="mt-1 max-w-[12rem] text-[0.65rem] font-black uppercase tracking-[0.18em] text-slate-500 transition group-hover:text-cyan-400 sm:max-w-none sm:text-xs sm:tracking-[0.2em] xl:leading-5">
+                        <p className="cc-text-subtle mt-1 max-w-[12rem] text-[0.65rem] font-black uppercase tracking-[0.18em] transition group-hover:text-cyan-400 sm:max-w-none sm:text-xs sm:tracking-[0.2em] xl:leading-5">
                             {t("versionLabel")}
                         </p>
                     </Link>
@@ -88,7 +88,7 @@ export default function AppNav() {
                             {t("mainMenu")}
                         </summary>
 
-                        <div className="absolute right-0 z-40 mt-3 w-[min(20rem,calc(100vw-2rem))] rounded-[1.5rem] border border-slate-800 bg-slate-950 p-3 shadow-2xl shadow-cyan-950/40">
+                        <div className="cc-panel-strong absolute right-0 z-40 mt-3 w-[min(20rem,calc(100vw-2rem))] rounded-[1.5rem] p-3">
                             <nav className="grid gap-2">
                                 {navItems.map((item) => {
                                     const isActive = isActivePath(pathname, item.href);
@@ -99,10 +99,10 @@ export default function AppNav() {
                                             href={item.href}
                                             className={`rounded-2xl px-4 py-3 text-sm font-bold transition ${
                                                 isActive
-                                                    ? "bg-cyan-400 text-slate-950"
+                                                    ? "cc-button-primary"
                                                     : item.href === "/"
                                                         ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                                                        : "border border-slate-800 bg-slate-900 text-slate-300"
+                                                        : "cc-button-secondary"
                                             }`}
                                         >
                                             {t(item.labelKey)}
@@ -126,7 +126,7 @@ export default function AppNav() {
                 </div>
 
                 <div className="hidden xl:grid xl:justify-items-end xl:gap-4">
-                    <nav className="flex flex-wrap justify-end gap-2">
+                    <nav className="flex flex-nowrap justify-end gap-2">
                         {navItems.map((item) => {
                             const isActive = isActivePath(pathname, item.href);
 
@@ -134,12 +134,12 @@ export default function AppNav() {
                                 <Link
                                     key={item.href}
                                     href={item.href}
-                                    className={`whitespace-nowrap rounded-2xl px-4 py-3 text-sm font-bold transition 2xl:px-5 ${
-                                        isActive
-                                            ? "bg-cyan-400 text-slate-950"
+                                    className={`min-w-[6.75rem] whitespace-nowrap rounded-2xl px-3 py-3 text-center text-sm font-bold transition ${
+                                            isActive
+                                            ? "cc-button-primary"
                                             : item.href === "/"
                                                 ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/20"
-                                                : "border border-slate-800 bg-slate-950/70 text-slate-300 hover:border-cyan-400 hover:text-cyan-300"
+                                                : "cc-button-secondary"
                                     }`}
                                 >
                                     {t(item.labelKey)}
@@ -148,7 +148,7 @@ export default function AppNav() {
                         })}
                     </nav>
 
-                    <div className="flex flex-wrap items-center justify-end gap-3">
+                    <div className="flex flex-nowrap items-center justify-end gap-3">
                         <LanguageSwitcher />
                         <ThemeSwitcher />
 
@@ -168,7 +168,7 @@ export default function AppNav() {
                     {t("browserOnlyStorageTitle")}
                 </summary>
 
-                <p className="mt-2 text-xs leading-5 text-slate-300">
+                <p className="cc-text-muted mt-2 text-xs leading-5">
                     {t("browserOnlyStorageShort")}
                 </p>
             </details>
@@ -179,12 +179,12 @@ export default function AppNav() {
                         <p className="mb-1 text-sm font-black text-amber-300">
                             {t("browserOnlyStorageTitle")}
                         </p>
-                        <p className="max-w-4xl text-sm leading-6 text-slate-300">
+                        <p className="cc-text-muted max-w-4xl text-sm leading-6">
                             {t("browserOnlyStorageLong")}
                         </p>
                     </div>
 
-                    <span className="w-fit whitespace-nowrap rounded-full border border-amber-400/30 bg-slate-950/60 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-amber-300">
+                    <span className="w-fit whitespace-nowrap rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-amber-300">
             {t("localOnly")}
           </span>
                 </div>

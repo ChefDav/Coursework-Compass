@@ -85,16 +85,16 @@ export default function TesterQuickGuide() {
     const currentCopy = copy[language];
 
     return (
-        <section className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 shadow-2xl shadow-cyan-950/20 sm:p-6">
+        <section className="cc-card rounded-[2rem] p-5 sm:p-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                     <p className="mb-2 text-sm font-black uppercase tracking-[0.18em] text-cyan-300">
                         {currentCopy.eyebrow}
                     </p>
-                    <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+                    <h2 className="cc-text-main text-2xl font-black tracking-tight sm:text-3xl">
                         {currentCopy.title}
                     </h2>
-                    <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
+                    <p className="cc-text-muted mt-3 max-w-4xl text-sm leading-6 sm:text-base sm:leading-7">
                         {currentCopy.description}
                     </p>
                 </div>
@@ -102,14 +102,14 @@ export default function TesterQuickGuide() {
                 <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col">
                     <Link
                         href="/test"
-                        className="rounded-2xl bg-cyan-400 px-5 py-3 text-center text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                        className="cc-button-primary rounded-2xl px-5 py-3 text-center text-sm"
                     >
                         {currentCopy.primaryAction}
                     </Link>
 
                     <Link
                         href="/projects/new"
-                        className="rounded-2xl border border-slate-700 px-5 py-3 text-center text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                        className="cc-button-secondary rounded-2xl px-5 py-3 text-center text-sm"
                     >
                         {currentCopy.secondaryAction}
                     </Link>
@@ -120,13 +120,13 @@ export default function TesterQuickGuide() {
                 {currentCopy.steps.map((step) => (
                     <article
                         key={step.number}
-                        className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4"
+                        className="cc-surface-inset rounded-3xl p-4"
                     >
                         <p className="mb-3 text-sm font-black text-cyan-300">
                             {step.number}
                         </p>
-                        <h3 className="font-bold text-white">{step.title}</h3>
-                        <p className="mt-2 text-sm leading-6 text-slate-400">
+                        <h3 className="cc-text-main font-bold">{step.title}</h3>
+                        <p className="cc-text-subtle mt-2 text-sm leading-6">
                             {step.description}
                         </p>
                     </article>
@@ -137,7 +137,7 @@ export default function TesterQuickGuide() {
                 <p className="mb-2 text-sm font-bold text-amber-300">
                     {currentCopy.noteTitle}
                 </p>
-                <p className="text-sm leading-6 text-slate-300">{currentCopy.note}</p>
+                <p className="cc-text-muted text-sm leading-6">{currentCopy.note}</p>
             </div>
         </section>
     );

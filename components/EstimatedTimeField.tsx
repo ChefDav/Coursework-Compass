@@ -198,7 +198,7 @@ export default function EstimatedTimeField({
 
     return (
         <div>
-            <label className="mb-2 block text-xs font-bold text-slate-300">
+            <label className="cc-text-muted mb-2 block text-xs font-bold">
                 {label}
             </label>
 
@@ -215,14 +215,14 @@ export default function EstimatedTimeField({
                         }
                     }}
                     placeholder="e.g. 60"
-                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-60"
                 />
 
                 <select
                     value={unit}
                     disabled={disabled}
                     onChange={(event) => handleUnitChange(event.target.value as TimeUnit)}
-                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {unitOptions.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -232,7 +232,7 @@ export default function EstimatedTimeField({
                 </select>
             </div>
 
-            <p className="mt-2 text-xs leading-5 text-slate-500">
+            <p className="cc-text-subtle mt-2 text-xs leading-5">
                 Examples: 60 min becomes 1 hour, 120 min becomes 2 hours, and 24 hours
                 becomes 1 day.
             </p>

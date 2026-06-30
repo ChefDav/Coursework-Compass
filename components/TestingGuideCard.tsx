@@ -94,7 +94,7 @@ export default function TestingGuideCard() {
     const currentCopy = copy[language];
 
     return (
-        <section className="relative overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950 p-5 text-white shadow-2xl shadow-cyan-950/30 sm:p-6 lg:p-8">
+        <section className="cc-panel-strong relative overflow-hidden rounded-[2rem] p-5 sm:p-6 lg:p-8">
             <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-28 -left-28 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
 
@@ -104,11 +104,11 @@ export default function TestingGuideCard() {
                         {currentCopy.eyebrow}
                     </div>
 
-                    <h2 className="max-w-4xl text-3xl font-black tracking-tight text-white sm:text-4xl">
+                    <h2 className="cc-text-main max-w-4xl text-3xl font-black tracking-tight sm:text-4xl">
                         {currentCopy.title}
                     </h2>
 
-                    <p className="mt-4 max-w-5xl text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
+                    <p className="cc-text-muted mt-4 max-w-5xl text-sm leading-6 sm:text-base sm:leading-7">
                         {currentCopy.description}
                     </p>
                 </div>
@@ -117,9 +117,9 @@ export default function TestingGuideCard() {
                     {currentCopy.sections.map((section) => (
                         <article
                             key={section.title}
-                            className="rounded-[1.75rem] border border-slate-800 bg-slate-900/90 p-5 shadow-xl shadow-slate-950/30"
+                            className="cc-card rounded-[1.75rem] p-5"
                         >
-                            <h3 className="mb-5 text-xl font-black text-white">
+                            <h3 className="cc-text-main mb-5 text-xl font-black">
                                 {section.title}
                             </h3>
 
@@ -130,7 +130,7 @@ export default function TestingGuideCard() {
                       {index + 1}
                     </span>
 
-                                        <p className="pt-1 text-sm leading-6 text-slate-300">
+                                        <p className="cc-text-muted pt-1 text-sm leading-6">
                                             {item}
                                         </p>
                                     </li>
@@ -140,8 +140,8 @@ export default function TestingGuideCard() {
                     ))}
                 </div>
 
-                <div className="mt-5 rounded-[1.75rem] border border-slate-800 bg-slate-900/90 p-5 shadow-xl shadow-slate-950/30">
-                    <h3 className="mb-5 text-xl font-black text-white">
+                <div className="cc-card mt-5 rounded-[1.75rem] p-5">
+                    <h3 className="cc-text-main mb-5 text-xl font-black">
                         {currentCopy.sampleTitle}
                     </h3>
 
@@ -149,7 +149,7 @@ export default function TestingGuideCard() {
                         {currentCopy.samples.map((sample) => (
                             <div
                                 key={sample}
-                                className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm font-bold leading-6 text-slate-200"
+                                className="cc-pill-muted rounded-2xl px-4 py-3 text-sm font-bold leading-6"
                             >
                                 {sample}
                             </div>
@@ -162,7 +162,7 @@ export default function TestingGuideCard() {
                         {currentCopy.noteTitle}
                     </p>
 
-                    <p className="text-sm leading-6 text-slate-300">
+                    <p className="cc-text-muted text-sm leading-6">
                         {currentCopy.note}
                     </p>
                 </div>

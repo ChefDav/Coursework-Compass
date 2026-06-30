@@ -69,7 +69,7 @@ export default function CalendarDateField({
             {label ? (
                 <label
                     htmlFor={id}
-                    className="mb-2 block text-sm font-black text-slate-300"
+                    className="cc-text-muted mb-2 block text-sm font-black"
                 >
                     {label}
                 </label>
@@ -85,10 +85,10 @@ export default function CalendarDateField({
                         openDatePicker();
                     }
                 }}
-                className={`group relative flex min-h-16 cursor-pointer items-center rounded-2xl border bg-slate-950 transition ${
+                className={`group cc-input relative flex min-h-16 cursor-pointer items-center rounded-2xl transition ${
                     disabled
-                        ? "cursor-not-allowed border-slate-800 opacity-60"
-                        : "border-slate-700 hover:border-cyan-400/70 hover:bg-slate-900 focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-400/10"
+                        ? "cursor-not-allowed opacity-60"
+                        : "hover:border-cyan-400/70 focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-400/10"
                 }`}
             >
                 <input
@@ -102,7 +102,7 @@ export default function CalendarDateField({
                     disabled={disabled}
                     onChange={(event) => handleValueChange(event.target.value)}
                     placeholder={placeholder}
-                    className="cc-date-input h-full min-h-16 w-full cursor-pointer rounded-2xl bg-transparent px-4 py-4 pr-16 text-sm font-black text-white outline-none placeholder:text-slate-600 sm:text-base"
+                    className="cc-date-input h-full min-h-16 w-full cursor-pointer rounded-2xl bg-transparent px-4 py-4 pr-16 text-sm font-black outline-none sm:text-base"
                 />
 
                 <button
@@ -140,7 +140,7 @@ export default function CalendarDateField({
             </div>
 
             {helperText ? (
-                <p className="mt-2 text-xs font-bold leading-5 text-slate-500">
+                <p className="cc-text-subtle mt-2 text-xs font-bold leading-5">
                     {helperText}
                 </p>
             ) : null}

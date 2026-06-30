@@ -82,8 +82,8 @@ export default function CompletionWatcher() {
     ).length;
 
     return (
-        <section className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/80 px-4 py-6 backdrop-blur-md">
-            <div className="relative w-full max-w-2xl overflow-hidden rounded-[2rem] border border-emerald-400/30 bg-slate-950 p-5 text-white shadow-2xl shadow-emerald-950/50 sm:p-8">
+        <section className="cc-modal-overlay fixed inset-0 z-[80] flex items-center justify-center px-4 py-6 backdrop-blur-md">
+            <div className="cc-panel-strong relative w-full max-w-2xl overflow-hidden rounded-[2rem] border-emerald-400/30 p-5 sm:p-8">
                 <div className="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-emerald-400/20 blur-3xl" />
                 <div className="absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
 
@@ -96,17 +96,17 @@ export default function CompletionWatcher() {
                         {currentCopy.title}
                     </h2>
 
-                    <p className="mt-4 text-sm leading-6 text-slate-300">
+                    <p className="cc-text-muted mt-4 text-sm leading-6">
                         {currentCopy.descriptionBefore}{" "}
-                        <span className="font-bold text-white">
+                        <span className="cc-text-main font-bold">
               {completedPlan.project.title}
             </span>{" "}
                         {currentCopy.descriptionAfter}
                     </p>
 
                     <div className="mt-5 grid gap-4 sm:grid-cols-3">
-                        <div className="rounded-3xl border border-slate-800 bg-slate-900 p-4">
-                            <p className="text-sm font-bold text-slate-400">
+                        <div className="cc-surface-muted rounded-3xl p-4">
+                            <p className="cc-text-subtle text-sm font-bold">
                                 {currentCopy.completed}
                             </p>
                             <p className="mt-2 text-3xl font-black text-emerald-300">
@@ -114,17 +114,17 @@ export default function CompletionWatcher() {
                             </p>
                         </div>
 
-                        <div className="rounded-3xl border border-slate-800 bg-slate-900 p-4">
-                            <p className="text-sm font-bold text-slate-400">
+                        <div className="cc-surface-muted rounded-3xl p-4">
+                            <p className="cc-text-subtle text-sm font-bold">
                                 {currentCopy.project}
                             </p>
-                            <p className="mt-2 text-lg font-black text-white">
+                            <p className="cc-text-main mt-2 text-lg font-black">
                                 {completedPlan.project.title}
                             </p>
                         </div>
 
-                        <div className="rounded-3xl border border-slate-800 bg-slate-900 p-4">
-                            <p className="text-sm font-bold text-slate-400">
+                        <div className="cc-surface-muted rounded-3xl p-4">
+                            <p className="cc-text-subtle text-sm font-bold">
                                 {currentCopy.status}
                             </p>
                             <p className="mt-2 text-lg font-black text-emerald-300">
@@ -151,7 +151,7 @@ export default function CompletionWatcher() {
                         <button
                             type="button"
                             onClick={handleKeepCompletedTasks}
-                            className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-emerald-400 hover:text-emerald-300"
+                            className="cc-button-secondary rounded-2xl px-6 py-4 text-center hover:border-emerald-400 hover:text-emerald-300"
                         >
                             {currentCopy.keep}
                         </button>
@@ -159,7 +159,7 @@ export default function CompletionWatcher() {
                         <button
                             type="button"
                             onClick={handleCloseTemporarily}
-                            className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-slate-300 transition hover:border-slate-400 hover:text-white"
+                            className="cc-button-secondary rounded-2xl px-6 py-4 text-center"
                         >
                             {currentCopy.decideLater}
                         </button>

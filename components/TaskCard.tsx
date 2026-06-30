@@ -111,7 +111,7 @@ function getPriorityClasses(priority?: string) {
         return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
     }
 
-    return "border-slate-700 bg-slate-900 text-slate-300";
+    return "cc-badge";
 }
 
 function getDefaultEstimatedTime(priority?: string) {
@@ -223,7 +223,7 @@ function getDaysLeftClasses(dateValue?: string) {
     const targetDate = parseDateValue(dateValue);
 
     if (!targetDate) {
-        return "border-slate-700 bg-slate-900 text-slate-300";
+        return "cc-badge";
     }
 
     const today = new Date();
@@ -338,7 +338,7 @@ export default function TaskCard({
             className={`rounded-[2rem] border p-5 transition sm:p-6 ${
                 isDone
                     ? "border-emerald-400/30 bg-emerald-400/10"
-                    : "border-slate-800 bg-slate-900"
+                    : "cc-card"
             }`}
         >
             {isEditing ? (
@@ -347,14 +347,14 @@ export default function TaskCard({
                         <p className="mb-2 text-sm font-bold text-cyan-300">
                             {currentCopy.editTask}
                         </p>
-                        <h3 className="text-2xl font-black text-white">
+                        <h3 className="cc-text-main text-2xl font-black">
                             {currentCopy.updateTask}
                         </h3>
                     </div>
 
                     <div className="grid gap-4">
                         <div>
-                            <label className="mb-2 block text-xs font-bold text-slate-300">
+                            <label className="cc-text-muted mb-2 block text-xs font-bold">
                                 {currentCopy.taskTitle}
                             </label>
                             <input
@@ -364,13 +364,13 @@ export default function TaskCard({
                                     setEditTitle(event.target.value);
                                     setEditError("");
                                 }}
-                                className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
+                                className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition"
                             />
                         </div>
 
                         <div className="grid gap-4 md:grid-cols-3">
                             <div>
-                                <label className="mb-2 block text-xs font-bold text-slate-300">
+                                <label className="cc-text-muted mb-2 block text-xs font-bold">
                                     {currentCopy.priority}
                                 </label>
                                 <select
@@ -378,7 +378,7 @@ export default function TaskCard({
                                     onChange={(event) => {
                                         setEditPriority(normalisePriority(event.target.value));
                                     }}
-                                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold text-white outline-none transition focus:border-cyan-300"
+                                    className="cc-input w-full rounded-2xl px-4 py-3 text-sm font-bold transition"
                                 >
                                     {priorityOptions.map((priority) => (
                                         <option key={priority} value={priority}>
@@ -415,7 +415,7 @@ export default function TaskCard({
                         <button
                             type="button"
                             onClick={handleSaveEdit}
-                            className="rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                            className="cc-button-primary rounded-2xl px-5 py-3 text-sm"
                         >
                             {currentCopy.saveChanges}
                         </button>
@@ -423,7 +423,7 @@ export default function TaskCard({
                         <button
                             type="button"
                             onClick={handleCancelEdit}
-                            className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
+                            className="cc-button-secondary rounded-2xl px-5 py-3 text-sm"
                         >
                             {currentCopy.cancel}
                         </button>
@@ -435,18 +435,18 @@ export default function TaskCard({
                         <div className="min-w-0">
                             <h3
                                 className={`text-2xl font-black ${
-                                    isDone ? "text-emerald-200 line-through" : "text-white"
+                                    isDone ? "text-emerald-300 line-through" : "cc-text-main"
                                 }`}
                             >
                                 {task.title}
                             </h3>
 
                             <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold">
-                <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1 text-slate-300">
+                <span className="cc-pill-muted rounded-full px-3 py-1">
                   {currentCopy.estimatedTime}: {displayEstimatedTime}
                 </span>
 
-                                <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1 text-slate-300">
+                                <span className="cc-pill-muted rounded-full px-3 py-1">
                   {currentCopy.dueDate}: {dueDate || currentCopy.notSet}
                 </span>
 
@@ -477,7 +477,7 @@ export default function TaskCard({
                                     setIsEditing(true);
                                     setIsConfirmingDelete(false);
                                 }}
-                                className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+                                className="cc-button-secondary rounded-2xl px-5 py-3 text-sm"
                             >
                                 {currentCopy.edit}
                             </button>
@@ -499,7 +499,7 @@ export default function TaskCard({
                                 className={
                                     isDone
                                         ? "rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-5 py-3 text-sm font-bold text-emerald-200 transition hover:bg-emerald-400/20"
-                                        : "rounded-2xl bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-300"
+                                        : "cc-button-primary rounded-2xl px-5 py-3 text-sm"
                                 }
                             >
                                 {isDone ? currentCopy.markAsTodo : currentCopy.markDone}
@@ -525,7 +525,7 @@ export default function TaskCard({
                                 <button
                                     type="button"
                                     onClick={() => setIsConfirmingDelete(false)}
-                                    className="rounded-2xl border border-slate-700 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-400"
+                                    className="cc-button-secondary rounded-2xl px-5 py-3 text-sm"
                                 >
                                     {currentCopy.cancel}
                                 </button>

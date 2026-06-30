@@ -196,7 +196,7 @@ export default function HomePage() {
     const currentCopy = copy[language];
 
     return (
-        <main className="min-h-screen bg-slate-950 text-white">
+        <main className="cc-page-gradient cc-text-main">
             <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                 <AppNav />
 
@@ -210,21 +210,21 @@ export default function HomePage() {
                             {currentCopy.title}
                         </h1>
 
-                        <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+                        <p className="cc-text-muted mt-6 max-w-2xl text-base leading-8 sm:text-lg">
                             {currentCopy.subtitle}
                         </p>
 
                         <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                             <Link
                                 href="/projects/new"
-                                className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
+                                className="cc-button-primary rounded-2xl px-6 py-4 text-center"
                             >
                                 {currentCopy.startPlanning}
                             </Link>
 
                             <Link
                                 href="/dashboard"
-                                className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
+                                className="cc-button-secondary rounded-2xl px-6 py-4 text-center"
                             >
                                 {currentCopy.openDashboard}
                             </Link>
@@ -235,7 +235,7 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    <div className="rounded-[2rem] border border-cyan-400/20 bg-slate-900/80 p-5 shadow-2xl shadow-cyan-950/30 sm:p-6">
+                    <div className="cc-card rounded-[2rem] border-cyan-400/20 p-5 sm:p-6">
                         <div className="mb-5">
                             <p className="mb-2 text-sm font-bold text-cyan-300">
                                 {currentCopy.missionEyebrow}
@@ -243,15 +243,15 @@ export default function HomePage() {
                             <h2 className="text-2xl font-black">
                                 {currentCopy.missionTitle}
                             </h2>
-                            <p className="mt-2 text-sm leading-6 text-slate-300">
+                            <p className="cc-text-muted mt-2 text-sm leading-6">
                                 {currentCopy.missionText}
                             </p>
                         </div>
 
                         <div className="space-y-4">
-                            <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div className="cc-surface-inset rounded-3xl p-4">
                                 <div className="mb-3 flex items-center justify-between">
-                                    <p className="font-bold text-white">
+                                    <p className="cc-text-main font-bold">
                                         {currentCopy.sampleProject}
                                     </p>
                                     <span className="rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-bold text-cyan-300">
@@ -259,35 +259,35 @@ export default function HomePage() {
                                     </span>
                                 </div>
 
-                                <div className="h-3 overflow-hidden rounded-full bg-slate-800">
+                                <div className="cc-progress-track h-3 overflow-hidden rounded-full">
                                     <div className="h-full w-[72%] rounded-full bg-cyan-400" />
                                 </div>
 
-                                <p className="mt-2 text-xs text-slate-400">
+                                <p className="cc-text-subtle mt-2 text-xs">
                                     {currentCopy.completeText}
                                 </p>
                             </div>
 
-                            <div className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
-                                <p className="mb-3 text-sm font-bold text-slate-300">
+                            <div className="cc-surface-inset rounded-3xl p-4">
+                                <p className="cc-text-muted mb-3 text-sm font-bold">
                                     {currentCopy.generatedPlan}
                                 </p>
 
                                 <div className="space-y-3">
-                                    <div className="rounded-2xl bg-slate-900 px-4 py-3">
-                                        <p className="font-bold text-white">
+                                    <div className="cc-surface-muted rounded-2xl px-4 py-3">
+                                        <p className="cc-text-main font-bold">
                                             {currentCopy.taskOne}
                                         </p>
-                                        <p className="mt-1 text-xs text-slate-400">
+                                        <p className="cc-text-subtle mt-1 text-xs">
                                             {currentCopy.taskOneMeta}
                                         </p>
                                     </div>
 
-                                    <div className="rounded-2xl bg-slate-900 px-4 py-3">
-                                        <p className="font-bold text-white">
+                                    <div className="cc-surface-muted rounded-2xl px-4 py-3">
+                                        <p className="cc-text-main font-bold">
                                             {currentCopy.taskTwo}
                                         </p>
-                                        <p className="mt-1 text-xs text-slate-400">
+                                        <p className="cc-text-subtle mt-1 text-xs">
                                             {currentCopy.taskTwoMeta}
                                         </p>
                                     </div>
@@ -315,7 +315,7 @@ export default function HomePage() {
                             <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                                 {currentCopy.testingTitle}
                             </h2>
-                            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+                            <p className="cc-text-muted mt-3 max-w-2xl text-sm leading-6">
                                 {currentCopy.testingText}
                             </p>
                         </div>
@@ -330,7 +330,7 @@ export default function HomePage() {
 
                             <Link
                                 href="/updates"
-                                className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
+                                className="cc-button-secondary rounded-2xl px-6 py-4 text-center"
                             >
                                 {currentCopy.releaseNotes}
                             </Link>
@@ -362,7 +362,7 @@ export default function HomePage() {
                         <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                             {currentCopy.countdownTitle}
                         </h2>
-                        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+                        <p className="cc-text-muted mt-3 max-w-2xl text-sm leading-6">
                             {currentCopy.countdownText}
                         </p>
                     </div>
@@ -384,15 +384,15 @@ export default function HomePage() {
                         {currentCopy.workflowSteps.map((step) => (
                             <div
                                 key={step.number}
-                                className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6"
+                                className="cc-card-hover rounded-[2rem] p-5 sm:p-6"
                             >
                                 <p className="mb-4 text-sm font-black text-cyan-300">
                                     {step.number}
                                 </p>
-                                <h3 className="mb-3 text-xl font-black text-white">
+                                <h3 className="cc-text-main mb-3 text-xl font-black">
                                     {step.title}
                                 </h3>
-                                <p className="text-sm leading-6 text-slate-400">
+                                <p className="cc-text-subtle text-sm leading-6">
                                     {step.description}
                                 </p>
                             </div>
@@ -416,10 +416,10 @@ export default function HomePage() {
                                 key={feature.title}
                                 className="rounded-[2rem] border border-cyan-400/20 bg-cyan-400/10 p-5 sm:p-6"
                             >
-                                <h3 className="mb-3 text-xl font-black text-white">
+                                <h3 className="cc-text-main mb-3 text-xl font-black">
                                     {feature.title}
                                 </h3>
-                                <p className="text-sm leading-6 text-slate-300">
+                                <p className="cc-text-muted text-sm leading-6">
                                     {feature.description}
                                 </p>
                             </div>
@@ -435,7 +435,7 @@ export default function HomePage() {
                         <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                             {currentCopy.templatesTitle}
                         </h2>
-                        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+                        <p className="cc-text-muted mt-3 max-w-2xl text-sm leading-6">
                             {currentCopy.templatesText}
                         </p>
                     </div>
@@ -444,7 +444,7 @@ export default function HomePage() {
                         {templateHighlights.map((template) => (
                             <span
                                 key={template}
-                                className="rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-bold text-slate-200"
+                                className="cc-pill-muted rounded-full px-4 py-2 text-sm font-bold"
                             >
                                 {template}
                             </span>
@@ -461,7 +461,7 @@ export default function HomePage() {
                             <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                                 {currentCopy.readyTitle}
                             </h2>
-                            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+                            <p className="cc-text-muted mt-3 max-w-2xl text-sm leading-6">
                                 {currentCopy.readyText}
                             </p>
                         </div>
@@ -476,7 +476,7 @@ export default function HomePage() {
 
                             <Link
                                 href="/test"
-                                className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-emerald-400 hover:text-emerald-300"
+                                className="cc-button-secondary rounded-2xl px-6 py-4 text-center hover:border-emerald-400 hover:text-emerald-300"
                             >
                                 {currentCopy.joinTest}
                             </Link>

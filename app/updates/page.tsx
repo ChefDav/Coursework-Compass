@@ -188,7 +188,7 @@ export default function UpdatesPage() {
     const currentCopy = copy[language];
 
     return (
-        <main className="min-h-screen bg-slate-950 text-white">
+        <main className="cc-page-gradient cc-text-main">
             <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
                 <AppNav />
 
@@ -201,7 +201,7 @@ export default function UpdatesPage() {
                         {currentCopy.title}
                     </h1>
 
-                    <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
+                    <p className="cc-text-muted mt-6 max-w-3xl text-base leading-8 sm:text-lg">
                         {currentCopy.subtitle}
                     </p>
 
@@ -215,14 +215,14 @@ export default function UpdatesPage() {
 
                         <Link
                             href="/projects/new"
-                            className="rounded-2xl bg-cyan-400 px-6 py-4 text-center font-bold text-slate-950 transition hover:bg-cyan-300"
+                            className="cc-button-primary rounded-2xl px-6 py-4 text-center"
                         >
                             {currentCopy.createProject}
                         </Link>
 
                         <Link
                             href="/"
-                            className="rounded-2xl border border-slate-700 px-6 py-4 text-center font-bold text-white transition hover:border-slate-400"
+                            className="cc-button-secondary rounded-2xl px-6 py-4 text-center"
                         >
                             {currentCopy.backHome}
                         </Link>
@@ -236,7 +236,7 @@ export default function UpdatesPage() {
                     <h2 className="text-3xl font-black sm:text-4xl">
                         {currentCopy.currentTitle}
                     </h2>
-                    <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300">
+                    <p className="cc-text-muted mt-4 max-w-3xl text-sm leading-6">
                         {currentCopy.currentDescription}
                     </p>
                 </section>
@@ -250,9 +250,9 @@ export default function UpdatesPage() {
                         {currentCopy.highlights.map((item) => (
                             <div
                                 key={item}
-                                className="rounded-3xl border border-slate-800 bg-slate-950/70 p-4"
+                                className="cc-surface-inset rounded-3xl p-4"
                             >
-                                <p className="text-sm font-bold leading-6 text-slate-200">
+                                <p className="cc-text-main text-sm font-bold leading-6">
                                     {item}
                                 </p>
                             </div>
@@ -264,7 +264,7 @@ export default function UpdatesPage() {
                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
                         {currentCopy.testingTitle}
                     </h2>
-                    <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                    <p className="cc-text-muted mt-3 max-w-3xl text-sm leading-6">
                         {currentCopy.testingDescription}
                     </p>
                 </section>
@@ -279,9 +279,9 @@ export default function UpdatesPage() {
                             {currentCopy.limitations.map((item) => (
                                 <div
                                     key={item}
-                                    className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4"
+                                    className="cc-surface-inset rounded-2xl p-4"
                                 >
-                                    <p className="text-sm leading-6 text-slate-300">{item}</p>
+                                    <p className="cc-text-muted text-sm leading-6">{item}</p>
                                 </div>
                             ))}
                         </div>
@@ -296,9 +296,9 @@ export default function UpdatesPage() {
                             {currentCopy.next.map((item) => (
                                 <div
                                     key={item}
-                                    className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4"
+                                    className="cc-surface-inset rounded-2xl p-4"
                                 >
-                                    <p className="text-sm leading-6 text-slate-300">{item}</p>
+                                    <p className="cc-text-muted text-sm leading-6">{item}</p>
                                 </div>
                             ))}
                         </div>
@@ -319,7 +319,7 @@ export default function UpdatesPage() {
                         {releaseHistory.map((update) => (
                             <div
                                 key={update.version}
-                                className="rounded-[2rem] border border-slate-800 bg-slate-900 p-5 sm:p-6"
+                                className="cc-card rounded-[2rem] p-5 sm:p-6"
                             >
                                 <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
@@ -336,7 +336,7 @@ export default function UpdatesPage() {
                                     </span>
                                 </div>
 
-                                <p className="max-w-4xl text-sm leading-6 text-slate-300">
+                                <p className="cc-text-muted max-w-4xl text-sm leading-6">
                                     {update.description[language]}
                                 </p>
                             </div>

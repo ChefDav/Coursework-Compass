@@ -283,6 +283,34 @@ button {
   color: var(--cc-text-subtle);
 }
 
+.cc-text-accent {
+  color: var(--cc-accent);
+}
+
+.cc-surface-inset {
+  border: 1px solid var(--cc-border);
+  background: var(--cc-panel-strong);
+}
+
+.cc-surface-muted {
+  border: 1px solid var(--cc-border);
+  background: var(--cc-panel-soft);
+}
+
+.cc-progress-track {
+  background: var(--cc-bg-strong);
+}
+
+.cc-modal-overlay {
+  background: color-mix(in srgb, var(--cc-bg-strong) 82%, transparent);
+}
+
+.cc-pill-muted {
+  border: 1px solid var(--cc-border);
+  background: var(--cc-panel-soft);
+  color: var(--cc-text-muted);
+}
+
 .cc-button-primary,
 .cc-button-secondary,
 .cc-button-danger {
@@ -324,6 +352,13 @@ button {
 .cc-button-danger:hover {
   border-color: var(--cc-danger);
   background: color-mix(in srgb, var(--cc-danger-soft) 78%, var(--cc-danger));
+}
+
+.cc-button-primary:disabled,
+.cc-button-secondary:disabled,
+.cc-button-danger:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
 }
 
 .cc-input {
@@ -449,4 +484,49 @@ html[data-theme="light"] .cc-date-input {
 
 .cc-date-input::-webkit-inner-spin-button {
   display: none;
+}
+
+/* Light-theme compatibility for older dark-only Tailwind utility surfaces. */
+html[data-theme="light"] :where(
+  .bg-slate-950,
+  .bg-slate-900,
+  .bg-slate-800,
+  [class~="bg-slate-950/95"],
+  [class~="bg-slate-950/80"],
+  [class~="bg-slate-950/70"],
+  [class~="bg-slate-950/60"],
+  [class~="bg-slate-900/90"],
+  [class~="bg-slate-900/85"],
+  [class~="bg-slate-900/80"],
+  [class~="bg-slate-900/70"]
+) {
+  background-color: var(--cc-card) !important;
+}
+
+html[data-theme="light"] :where(
+  .border-slate-800,
+  .border-slate-700,
+  .border-slate-400,
+  [class~="border-slate-800"],
+  [class~="border-slate-700"],
+  [class~="border-slate-400"]
+) {
+  border-color: var(--cc-border) !important;
+}
+
+html[data-theme="light"] :where(.text-white, .text-slate-200) {
+  color: var(--cc-text) !important;
+}
+
+html[data-theme="light"] :where(.text-slate-300, .text-slate-400) {
+  color: var(--cc-text-muted) !important;
+}
+
+html[data-theme="light"] :where(.text-slate-500, .text-slate-600) {
+  color: var(--cc-text-subtle) !important;
+}
+
+html[data-theme="light"] .placeholder\:text-slate-500::placeholder,
+html[data-theme="light"] .placeholder\:text-slate-600::placeholder {
+  color: var(--cc-text-subtle) !important;
 }
