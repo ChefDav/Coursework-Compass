@@ -701,12 +701,20 @@ export default function ProjectDetailPage() {
                             <p className="cc-text-muted text-sm font-bold">
                                 {currentCopy.projectProgress}
                             </p>
-                            <p className="text-sm font-black text-cyan-300">{progress}%</p>
+                            <p
+                                className={`text-sm font-black ${
+                                    progress >= 100 ? "text-emerald-300" : "text-cyan-300"
+                                }`}
+                            >
+                                {progress}%
+                            </p>
                         </div>
 
                         <div className="cc-progress-track h-4 overflow-hidden rounded-full">
                             <div
-                                className="cc-progress-fill h-full rounded-full bg-cyan-400 transition-all"
+                                className={`cc-progress-fill cc-progress-fill-updated h-full rounded-full ${
+                                    progress >= 100 ? "cc-progress-fill-complete" : ""
+                                }`}
                                 style={{ width: `${progress}%` }}
                             />
                         </div>

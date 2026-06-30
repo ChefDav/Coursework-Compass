@@ -292,14 +292,24 @@ export default function ProjectsPage() {
                                                     {currentCopy.progress}
                                                 </p>
 
-                                                <p className="text-sm font-black text-cyan-300">
+                                                <p
+                                                    className={`text-sm font-black ${
+                                                        progress >= 100
+                                                            ? "text-emerald-300"
+                                                            : "text-cyan-300"
+                                                    }`}
+                                                >
                                                     {progress}%
                                                 </p>
                                             </div>
 
                                             <div className="cc-progress-track h-3 overflow-hidden rounded-full">
                                                 <div
-                                                    className="cc-progress-fill h-full rounded-full bg-cyan-400"
+                                                    className={`cc-progress-fill cc-progress-fill-updated h-full rounded-full ${
+                                                        progress >= 100
+                                                            ? "cc-progress-fill-complete"
+                                                            : ""
+                                                    }`}
                                                     style={{
                                                         width: `${progress}%`,
                                                     }}

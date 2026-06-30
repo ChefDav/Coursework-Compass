@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CalendarDateField from "@/components/CalendarDateField";
 import ErrorNotice from "@/components/ErrorNotice";
 import EstimatedTimeField, {
@@ -275,6 +275,8 @@ export default function TaskCard({
         getDisplayEstimatedTime(task.estimatedTime, task.priority),
     );
     const [editError, setEditError] = useState("");
+    const [recentlyCompleted, setRecentlyCompleted] = useState(false);
+    const completionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const isDone = task.status === "Done";
     const displayEstimatedTime = getDisplayEstimatedTime(
@@ -282,6 +284,14 @@ export default function TaskCard({
         task.priority,
     );
     const dueDate = task.dueDate || "";
+
+    useEffect(() => {
+        return () => {
+            if (completionTimerRef.current) {
+                clearTimeout(completionTimerRef.current);
+            }
+        };
+    }, []);
 
     if (taskEditKey !== lastTaskEditKey) {
         setLastTaskEditKey(taskEditKey);
@@ -325,6 +335,21 @@ export default function TaskCard({
     }
 
     function handleToggleStatus() {
+        if (completionTimerRef.current) {
+            clearTimeout(completionTimerRef.current);
+        }
+
+        if (!isDone) {
+            setRecentlyCompleted(true);
+            completionTimerRef.current = setTimeout(() => {
+                setRecentlyCompleted(false);
+                completionTimerRef.current = null;
+            }, 680);
+        } else {
+            setRecentlyCompleted(false);
+            completionTimerRef.current = null;
+        }
+
         onUpdateStatus(task.id, isDone ? "Todo" : "Done");
     }
 
@@ -335,11 +360,11 @@ export default function TaskCard({
 
     return (
         <article
-            className={`cc-interactive-card cc-motion-fade-up rounded-[1.5rem] border p-5 transition sm:p-6 ${
+            className={`cc-task-card cc-interactive-card cc-motion-fade-up rounded-[1.5rem] border p-5 transition sm:p-6 ${
                 isDone
-                    ? "cc-card border-emerald-400/40 bg-emerald-400/10"
+                    ? "cc-card cc-task-card-completed cc-task-done-ring"
                     : "cc-card"
-            }`}
+            } ${recentlyCompleted ? "cc-task-complete-flash" : ""}`}
         >
             {isEditing ? (
                 <div>
@@ -433,13 +458,21 @@ export default function TaskCard({
                 <div>
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0">
-                            <h3
-                                className={`text-xl font-black sm:text-2xl ${
-                                    isDone ? "text-emerald-300 line-through" : "cc-text-main"
-                                }`}
-                            >
-                                {task.title}
-                            </h3>
+                            <div className="flex flex-wrap items-center gap-3">
+                                <h3
+                                    className={`text-xl font-black sm:text-2xl ${
+                                        isDone ? "cc-task-title-completed" : "cc-text-main"
+                                    }`}
+                                >
+                                    {task.title}
+                                </h3>
+
+                                {isDone ? (
+                                    <span className="cc-badge-success cc-task-done-ring shrink-0">
+                                        {currentCopy.done}
+                                    </span>
+                                ) : null}
+                            </div>
 
                             <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold">
                 <span className="cc-pill-muted rounded-full px-3 py-1">
@@ -499,7 +532,9 @@ export default function TaskCard({
                                 className={
                                     isDone
                                         ? "cc-button-secondary w-full rounded-2xl px-5 py-3 text-sm hover:border-emerald-400 hover:text-emerald-300 sm:w-auto"
-                                        : "cc-button-success w-full rounded-2xl px-5 py-3 text-sm sm:w-auto"
+                                        : `cc-button-success w-full rounded-2xl px-5 py-3 text-sm sm:w-auto ${
+                                            recentlyCompleted ? "cc-task-check-pop" : ""
+                                        }`
                                 }
                             >
                                 {isDone ? currentCopy.markAsTodo : currentCopy.markDone}

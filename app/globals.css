@@ -386,7 +386,153 @@ html[data-theme="light"][data-background="exam-focus"] {
   transform-origin: left center;
   transition:
     width var(--cc-duration-slow) var(--cc-ease-emphasized),
-    background-color var(--cc-duration-standard) var(--cc-ease-standard);
+    background-color var(--cc-duration-standard) var(--cc-ease-standard),
+    box-shadow var(--cc-duration-standard) var(--cc-ease-standard);
+}
+
+/* Coursework Compass task completion microinteractions */
+@keyframes ccTaskCompleteFlash {
+  0% {
+    box-shadow:
+      var(--cc-shadow),
+      0 0 0 0 color-mix(in srgb, var(--cc-success) 30%, transparent);
+  }
+
+  42% {
+    box-shadow:
+      var(--cc-shadow),
+      0 0 0 5px color-mix(in srgb, var(--cc-success) 13%, transparent),
+      0 0 28px color-mix(in srgb, var(--cc-success) 16%, transparent);
+  }
+
+  100% {
+    box-shadow:
+      var(--cc-shadow),
+      0 0 0 0 transparent;
+  }
+}
+
+@keyframes ccTaskSuccessSheen {
+  from {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+
+  to {
+    transform: translateX(220%) skewX(-18deg);
+  }
+}
+
+@keyframes ccTaskCheckPop {
+  0% {
+    transform: scale(0.96);
+  }
+
+  45% {
+    transform: scale(1.04);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ccCompletionSoftBurst {
+  0% {
+    opacity: 0;
+    transform: translateY(0.4rem) scale(0.985);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cc-task-card {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform var(--cc-duration-standard) var(--cc-ease-standard),
+    background-color var(--cc-duration-standard) var(--cc-ease-standard),
+    border-color var(--cc-duration-standard) var(--cc-ease-standard),
+    box-shadow var(--cc-duration-standard) var(--cc-ease-standard),
+    opacity var(--cc-duration-standard) var(--cc-ease-standard);
+}
+
+.cc-task-card-completed {
+  border-color: color-mix(in srgb, var(--cc-success) 44%, var(--cc-border));
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--cc-success-soft) 76%, transparent),
+      transparent 46%
+    ),
+    color-mix(in srgb, var(--cc-card) 92%, var(--cc-success-soft));
+}
+
+.cc-task-card-completed:hover {
+  border-color: color-mix(in srgb, var(--cc-success) 58%, var(--cc-border));
+  box-shadow:
+    var(--cc-shadow),
+    0 0 22px color-mix(in srgb, var(--cc-success) 12%, transparent);
+}
+
+.cc-task-complete-flash {
+  animation: ccTaskCompleteFlash 620ms var(--cc-ease-emphasized) both;
+}
+
+.cc-task-complete-flash::after,
+.cc-completion-success-sheen::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: -20%;
+  width: 45%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, white 24%, transparent),
+    transparent
+  );
+  animation: ccTaskSuccessSheen 680ms var(--cc-ease-emphasized) both;
+}
+
+.cc-task-done-ring {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cc-success) 18%, transparent);
+}
+
+.cc-task-check-pop {
+  animation: ccTaskCheckPop 460ms var(--cc-ease-emphasized) both;
+}
+
+.cc-task-title-completed {
+  color: color-mix(in srgb, var(--cc-success) 68%, var(--cc-text));
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--cc-success) 54%, transparent);
+  text-decoration-thickness: 0.11em;
+  text-underline-offset: 0.16em;
+}
+
+.cc-progress-fill-updated {
+  background: linear-gradient(90deg, var(--cc-accent), var(--cc-accent-hover));
+}
+
+.cc-progress-fill-complete {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--cc-success) 86%, var(--cc-accent)),
+    var(--cc-success)
+  );
+  box-shadow: 0 0 18px color-mix(in srgb, var(--cc-success) 18%, transparent);
+}
+
+.cc-completion-soft-burst {
+  animation: ccCompletionSoftBurst 520ms var(--cc-ease-emphasized) both;
+}
+
+.cc-completion-success-sheen {
+  position: relative;
+  overflow: hidden;
 }
 
 .cc-toast-motion {
@@ -524,8 +670,17 @@ textarea {
   .cc-toast-motion,
   .cc-modal-motion,
   .cc-soft-pulse,
-  .cc-ambient-drift {
+  .cc-ambient-drift,
+  .cc-task-complete-flash,
+  .cc-task-check-pop,
+  .cc-completion-soft-burst {
     animation: none !important;
+  }
+
+  .cc-task-complete-flash::after,
+  .cc-completion-success-sheen::after {
+    animation: none !important;
+    opacity: 0 !important;
   }
 
   .cc-interactive,

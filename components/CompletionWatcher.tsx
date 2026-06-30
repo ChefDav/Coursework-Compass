@@ -83,10 +83,19 @@ export default function CompletionWatcher() {
 
     return (
         <section className="cc-modal-overlay cc-motion-fade-in fixed inset-0 z-[80] flex items-center justify-center px-4 py-6 backdrop-blur-md">
-            <div className="cc-panel-strong cc-modal-motion relative w-full max-w-2xl overflow-hidden rounded-[2rem] border-emerald-400/30 p-5 sm:p-8">
+            <div className="cc-panel-strong cc-modal-motion cc-completion-soft-burst cc-completion-success-sheen relative w-full max-w-2xl overflow-hidden rounded-[2rem] border-emerald-400/30 p-5 sm:p-8">
                 <div className="relative z-10">
-                    <div className="mb-5 inline-flex rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
-                        {currentCopy.eyebrow}
+                    <div className="mb-5 flex flex-wrap items-center gap-3">
+                        <div
+                            aria-hidden="true"
+                            className="cc-task-done-ring flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-400/30 bg-emerald-400/10 text-sm font-black text-emerald-300"
+                        >
+                            100%
+                        </div>
+
+                        <div className="inline-flex rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-300">
+                            {currentCopy.eyebrow}
+                        </div>
                     </div>
 
                     <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
@@ -102,7 +111,7 @@ export default function CompletionWatcher() {
                     </p>
 
                     <div className="mt-5 grid gap-4 sm:grid-cols-3">
-                        <div className="cc-surface-muted rounded-3xl p-4">
+                        <div className="cc-surface-muted cc-task-done-ring rounded-3xl p-4">
                             <p className="cc-text-subtle text-sm font-bold">
                                 {currentCopy.completed}
                             </p>
@@ -120,7 +129,7 @@ export default function CompletionWatcher() {
                             </p>
                         </div>
 
-                        <div className="cc-surface-muted rounded-3xl p-4">
+                        <div className="cc-surface-muted cc-task-done-ring rounded-3xl p-4">
                             <p className="cc-text-subtle text-sm font-bold">
                                 {currentCopy.status}
                             </p>

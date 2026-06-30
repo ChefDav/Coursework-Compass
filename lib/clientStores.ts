@@ -7,7 +7,6 @@ import {
     type Language,
 } from "@/lib/i18n";
 import {
-    findCompletedPlanWaitingForPrompt,
     listenForProjectPlanUpdates,
     loadProjectPlans,
     PROJECT_STORAGE_KEYS,
@@ -19,6 +18,8 @@ const NO_COMPLETED_PLAN: GeneratedProjectPlan | null = null;
 
 let cachedProjectSignature = "";
 let cachedProjectPlans: GeneratedProjectPlan[] = EMPTY_PROJECT_PLANS;
+let cachedCompletedPlanSignature = "";
+let cachedCompletedPlan: GeneratedProjectPlan | null = NO_COMPLETED_PLAN;
 
 function subscribeToMount(callback: () => void) {
     callback();
@@ -70,8 +71,39 @@ function getServerProjectPlansSnapshot() {
     return EMPTY_PROJECT_PLANS;
 }
 
+function findCompletedPlanInSnapshot(projectPlans: GeneratedProjectPlan[]) {
+    return (
+        projectPlans.find((plan) => {
+            if (plan.completionPromptDismissed) {
+                return false;
+            }
+
+            if (plan.project.status === "Complete") {
+                return false;
+            }
+
+            if (plan.tasks.length === 0) {
+                return false;
+            }
+
+            return plan.tasks.every((task) => task.status === "Done");
+        }) ?? NO_COMPLETED_PLAN
+    );
+}
+
 function getCompletedPlanSnapshot() {
-    return findCompletedPlanWaitingForPrompt() ?? NO_COMPLETED_PLAN;
+    if (typeof window === "undefined") {
+        return NO_COMPLETED_PLAN;
+    }
+
+    const projectPlans = getProjectPlansSnapshot();
+
+    if (cachedProjectSignature !== cachedCompletedPlanSignature) {
+        cachedCompletedPlanSignature = cachedProjectSignature;
+        cachedCompletedPlan = findCompletedPlanInSnapshot(projectPlans);
+    }
+
+    return cachedCompletedPlan;
 }
 
 function getServerCompletedPlanSnapshot() {
