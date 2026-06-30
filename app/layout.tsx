@@ -5,6 +5,7 @@ import SaveSuccessToast from "@/components/SaveSuccessToast";
 import GlobalClock from "@/components/GlobalClock";
 import CompletionWatcher from "@/components/CompletionWatcher";
 import ThemeBootstrap from "@/components/ThemeBootstrap";
+import BackgroundBootstrap from "@/components/BackgroundBootstrap";
 
 export const metadata: Metadata = {
     title: "Coursework Compass",
@@ -21,9 +22,17 @@ const themeBootstrapScript = `
     }
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
+
+    var background = window.localStorage.getItem("coursework-compass-background");
+    var validBackgrounds = ["default", "deep-ocean", "paper-light", "aurora", "minimal-slate", "exam-focus"];
+    if (validBackgrounds.indexOf(background) === -1) {
+      background = "default";
+    }
+    document.documentElement.dataset.background = background;
   } catch (error) {
     document.documentElement.dataset.theme = "dark";
     document.documentElement.style.colorScheme = "dark";
+    document.documentElement.dataset.background = "default";
   }
 })();
 `;
@@ -34,10 +43,11 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" data-theme="dark" style={{ colorScheme: "dark" }} suppressHydrationWarning>
+        <html lang="en" data-theme="dark" data-background="default" style={{ colorScheme: "dark" }} suppressHydrationWarning>
         <body>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
         <ThemeBootstrap />
+        <BackgroundBootstrap />
         {children}
         <OnboardingPopup />
         <SaveSuccessToast />

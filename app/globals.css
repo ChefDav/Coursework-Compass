@@ -28,6 +28,10 @@
   --cc-ring: rgba(34, 211, 238, 0.24);
   --cc-shadow: 0 24px 70px rgba(2, 6, 23, 0.42);
   --cc-glow: 0 0 34px rgba(34, 211, 238, 0.2);
+  --cc-background-radial-1: rgba(34, 211, 238, 0.14);
+  --cc-background-radial-2: rgba(52, 211, 153, 0.08);
+  --cc-background-radial-3: rgba(15, 23, 42, 0);
+  --cc-background-grid-opacity: 0.08;
   --background: var(--cc-bg);
   --foreground: var(--cc-text);
 }
@@ -61,6 +65,10 @@ html[data-theme="dark"] {
   --cc-ring: rgba(34, 211, 238, 0.24);
   --cc-shadow: 0 24px 70px rgba(2, 6, 23, 0.42);
   --cc-glow: 0 0 34px rgba(34, 211, 238, 0.2);
+  --cc-background-radial-1: rgba(34, 211, 238, 0.14);
+  --cc-background-radial-2: rgba(52, 211, 153, 0.08);
+  --cc-background-radial-3: rgba(15, 23, 42, 0);
+  --cc-background-grid-opacity: 0.08;
   --background: var(--cc-bg);
   --foreground: var(--cc-text);
   color-scheme: dark;
@@ -94,9 +102,111 @@ html[data-theme="light"] {
   --cc-ring: rgba(8, 145, 178, 0.2);
   --cc-shadow: 0 22px 60px rgba(15, 23, 42, 0.11);
   --cc-glow: 0 0 30px rgba(8, 145, 178, 0.14);
+  --cc-background-radial-1: rgba(8, 145, 178, 0.12);
+  --cc-background-radial-2: rgba(5, 150, 105, 0.08);
+  --cc-background-radial-3: rgba(255, 255, 255, 0);
+  --cc-background-grid-opacity: 0.11;
   --background: var(--cc-bg);
   --foreground: var(--cc-text);
   color-scheme: light;
+}
+
+/* Coursework Compass background presets */
+html[data-background="default"] {
+  --cc-background-radial-1: rgba(34, 211, 238, 0.14);
+  --cc-background-radial-2: rgba(52, 211, 153, 0.08);
+  --cc-background-radial-3: rgba(15, 23, 42, 0);
+  --cc-background-grid-opacity: 0.08;
+}
+
+html[data-background="deep-ocean"] {
+  --cc-background-radial-1: rgba(14, 165, 233, 0.18);
+  --cc-background-radial-2: rgba(6, 182, 212, 0.1);
+  --cc-background-radial-3: rgba(30, 64, 175, 0.1);
+  --cc-background-grid-opacity: 0.07;
+}
+
+html[data-background="paper-light"] {
+  --cc-background-radial-1: rgba(251, 191, 36, 0.08);
+  --cc-background-radial-2: rgba(148, 163, 184, 0.1);
+  --cc-background-radial-3: rgba(255, 255, 255, 0.04);
+  --cc-background-grid-opacity: 0.05;
+}
+
+html[data-background="aurora"] {
+  --cc-background-radial-1: rgba(34, 211, 238, 0.16);
+  --cc-background-radial-2: rgba(167, 139, 250, 0.11);
+  --cc-background-radial-3: rgba(52, 211, 153, 0.1);
+  --cc-background-grid-opacity: 0.07;
+}
+
+html[data-background="minimal-slate"] {
+  --cc-background-radial-1: rgba(148, 163, 184, 0.08);
+  --cc-background-radial-2: rgba(71, 85, 105, 0.07);
+  --cc-background-radial-3: rgba(15, 23, 42, 0);
+  --cc-background-grid-opacity: 0.045;
+}
+
+html[data-background="exam-focus"] {
+  --cc-background-radial-1: rgba(251, 191, 36, 0.08);
+  --cc-background-radial-2: rgba(20, 184, 166, 0.06);
+  --cc-background-radial-3: rgba(148, 163, 184, 0.04);
+  --cc-background-grid-opacity: 0.045;
+}
+
+html[data-theme="light"][data-background="default"] {
+  --cc-background-radial-1: rgba(8, 145, 178, 0.12);
+  --cc-background-radial-2: rgba(5, 150, 105, 0.08);
+  --cc-background-radial-3: rgba(255, 255, 255, 0);
+  --cc-background-grid-opacity: 0.11;
+}
+
+html[data-theme="light"][data-background="deep-ocean"] {
+  --cc-background-radial-1: rgba(14, 116, 144, 0.13);
+  --cc-background-radial-2: rgba(59, 130, 246, 0.1);
+  --cc-background-radial-3: rgba(15, 23, 42, 0.04);
+  --cc-background-grid-opacity: 0.1;
+}
+
+html[data-theme="light"][data-background="paper-light"] {
+  --cc-bg: #fbfaf6;
+  --cc-bg-soft: #f1f5f0;
+  --cc-bg-strong: #e7ece5;
+  --cc-panel: rgba(255, 255, 255, 0.91);
+  --cc-panel-soft: rgba(248, 250, 252, 0.88);
+  --cc-card: rgba(255, 255, 255, 0.95);
+  --cc-background-radial-1: rgba(245, 158, 11, 0.1);
+  --cc-background-radial-2: rgba(100, 116, 139, 0.08);
+  --cc-background-radial-3: rgba(255, 255, 255, 0.08);
+  --cc-background-grid-opacity: 0.08;
+  --background: var(--cc-bg);
+}
+
+html[data-theme="light"][data-background="aurora"] {
+  --cc-background-radial-1: rgba(8, 145, 178, 0.13);
+  --cc-background-radial-2: rgba(124, 58, 237, 0.09);
+  --cc-background-radial-3: rgba(5, 150, 105, 0.09);
+  --cc-background-grid-opacity: 0.1;
+}
+
+html[data-theme="light"][data-background="minimal-slate"] {
+  --cc-bg: #f6f8fb;
+  --cc-bg-soft: #edf2f7;
+  --cc-background-radial-1: rgba(100, 116, 139, 0.08);
+  --cc-background-radial-2: rgba(148, 163, 184, 0.08);
+  --cc-background-radial-3: rgba(255, 255, 255, 0);
+  --cc-background-grid-opacity: 0.07;
+  --background: var(--cc-bg);
+}
+
+html[data-theme="light"][data-background="exam-focus"] {
+  --cc-bg: #fbfaf7;
+  --cc-bg-soft: #f3f6ef;
+  --cc-background-radial-1: rgba(180, 83, 9, 0.08);
+  --cc-background-radial-2: rgba(8, 145, 178, 0.05);
+  --cc-background-radial-3: rgba(255, 255, 255, 0.08);
+  --cc-background-grid-opacity: 0.06;
+  --background: var(--cc-bg);
 }
 
 @theme inline {
@@ -188,15 +298,36 @@ button {
 
 .cc-page {
   min-height: 100vh;
-  background: var(--cc-bg);
+  background:
+    radial-gradient(circle at 8% 0%, var(--cc-background-radial-1), transparent 31rem),
+    radial-gradient(circle at 92% 10%, var(--cc-background-radial-2), transparent 28rem),
+    linear-gradient(180deg, var(--cc-bg), var(--cc-bg-soft));
   color: var(--cc-text);
 }
 
 .cc-page-gradient {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, var(--cc-accent-soft), transparent 32rem),
+    linear-gradient(rgba(148, 163, 184, var(--cc-background-grid-opacity)) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, var(--cc-background-grid-opacity)) 1px, transparent 1px),
+    radial-gradient(circle at 8% 0%, var(--cc-background-radial-1), transparent 32rem),
+    radial-gradient(circle at 86% 12%, var(--cc-background-radial-2), transparent 30rem),
+    radial-gradient(circle at 52% 100%, var(--cc-background-radial-3), transparent 34rem),
     linear-gradient(180deg, var(--cc-bg), var(--cc-bg-soft));
+  background-position:
+    -1px -1px,
+    -1px -1px,
+    0 0,
+    0 0,
+    0 0,
+    0 0;
+  background-size:
+    2rem 2rem,
+    2rem 2rem,
+    auto,
+    auto,
+    auto,
+    auto;
   color: var(--cc-text);
 }
 
@@ -435,6 +566,56 @@ button {
     linear-gradient(90deg, var(--cc-border) 1px, transparent 1px);
   background-position: -1px -1px;
   background-size: 2rem 2rem;
+}
+
+.cc-background-swatch {
+  border: 1px solid var(--cc-border);
+  background:
+    radial-gradient(circle at 18% 18%, var(--swatch-one), transparent 54%),
+    radial-gradient(circle at 82% 22%, var(--swatch-two), transparent 50%),
+    linear-gradient(135deg, var(--swatch-base), var(--swatch-end));
+}
+
+.cc-background-swatch[data-background-preview="default"] {
+  --swatch-one: rgba(34, 211, 238, 0.76);
+  --swatch-two: rgba(52, 211, 153, 0.48);
+  --swatch-base: #020617;
+  --swatch-end: #0f172a;
+}
+
+.cc-background-swatch[data-background-preview="deep-ocean"] {
+  --swatch-one: rgba(14, 165, 233, 0.74);
+  --swatch-two: rgba(6, 182, 212, 0.46);
+  --swatch-base: #031826;
+  --swatch-end: #082f49;
+}
+
+.cc-background-swatch[data-background-preview="paper-light"] {
+  --swatch-one: rgba(251, 191, 36, 0.34);
+  --swatch-two: rgba(148, 163, 184, 0.42);
+  --swatch-base: #fbfaf6;
+  --swatch-end: #e7ece5;
+}
+
+.cc-background-swatch[data-background-preview="aurora"] {
+  --swatch-one: rgba(34, 211, 238, 0.62);
+  --swatch-two: rgba(167, 139, 250, 0.58);
+  --swatch-base: #04111f;
+  --swatch-end: #062a2d;
+}
+
+.cc-background-swatch[data-background-preview="minimal-slate"] {
+  --swatch-one: rgba(148, 163, 184, 0.35);
+  --swatch-two: rgba(71, 85, 105, 0.34);
+  --swatch-base: #0f172a;
+  --swatch-end: #1e293b;
+}
+
+.cc-background-swatch[data-background-preview="exam-focus"] {
+  --swatch-one: rgba(251, 191, 36, 0.34);
+  --swatch-two: rgba(20, 184, 166, 0.28);
+  --swatch-base: #111827;
+  --swatch-end: #1f2937;
 }
 
 .cc-date-input {
