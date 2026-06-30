@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { useHasMounted, useStoredLanguage } from "@/lib/clientStores";
 import { createTranslator } from "@/lib/i18n";
 import { clearProjectPlans } from "@/lib/localStorage";
@@ -110,6 +111,7 @@ export default function AppNav() {
                                 })}
 
                                 <LanguageSwitcher compact />
+                                <ThemeSwitcher compact />
 
                                 <button
                                     type="button"
@@ -148,6 +150,7 @@ export default function AppNav() {
 
                     <div className="flex flex-wrap items-center justify-end gap-3">
                         <LanguageSwitcher />
+                        <ThemeSwitcher />
 
                         <button
                             type="button"
