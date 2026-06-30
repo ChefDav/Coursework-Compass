@@ -95,45 +95,80 @@ const copy = {
 const releaseHistory = [
     {
         version: "v1.2",
-        title: "Student Testing Polish",
-        description:
-            "Completed the v1.2 student testing release. This version unified product version labels, added first-visit onboarding, improved empty states, clarified browser-only local storage, added clearer save success messages, improved mobile layout foundations, restored stable project deletion, repaired estimated time display and conversion, restored days-left indicators, fixed project detail hydration issues, unified inline error messages, and prepared the product for a more stable student testing session.",
+        title: {
+            en: "Student Testing Polish",
+            zh: "学生测试打磨版",
+        },
+        description: {
+            en: "Completed the v1.2 student testing release. This version unified product version labels, added first-visit onboarding, improved empty states, clarified browser-only local storage, added clearer save success messages, improved mobile layout foundations, restored stable project deletion, repaired estimated time display and conversion, restored days-left indicators, fixed project detail hydration issues, unified inline error messages, and prepared the product for a more stable student testing session.",
+            zh: "完成 v1.2 学生测试版本。这个版本统一了产品版本标签，加入首次访问引导，改进空状态，明确浏览器本地存储说明，加入更清晰的保存成功提示，改善移动端布局基础，恢复稳定的项目删除，修复预计用时显示与换算，恢复剩余天数提示，修复项目详情页 hydration 问题，统一表单错误提示，并让产品更适合稳定的学生测试。",
+        },
     },
     {
         version: "v1.1.3",
-        title: "Guided Test Flow + Homepage Restore",
-        description:
-            "Restored the homepage to a normal product entry, added a larger Join student test button, redesigned /test as an isolated tutorial sandbox, added a feedback loading screen, and added a final congratulations screen after testing.",
+        title: {
+            en: "Guided Test Flow + Homepage Restore",
+            zh: "引导测试流程 + 首页恢复",
+        },
+        description: {
+            en: "Restored the homepage to a normal product entry, added a larger Join student test button, redesigned /test as an isolated tutorial sandbox, added a feedback loading screen, and added a final congratulations screen after testing.",
+            zh: "将首页恢复为正常产品入口，加入更醒目的“参加学生测试”按钮，把 /test 重新设计为独立教程沙盒，加入反馈加载页面，并在测试结束后加入完成祝贺页面。",
+        },
     },
     {
         version: "v1.1.2",
-        title: "Student Testing Guide",
-        description:
-            "Added a dedicated /test student testing page, a three-step testing route, suggested sample projects, clearer feedback instructions, and student testing labels in feedback email subjects.",
+        title: {
+            en: "Student Testing Guide",
+            zh: "学生测试指南",
+        },
+        description: {
+            en: "Added a dedicated /test student testing page, a three-step testing route, suggested sample projects, clearer feedback instructions, and student testing labels in feedback email subjects.",
+            zh: "新增独立的 /test 学生测试页面、三步测试路线、推荐示例项目、更清晰的反馈说明，并在反馈邮件主题中加入学生测试标签。",
+        },
     },
     {
         version: "v1.1.1",
-        title: "Pre-Test Polish",
-        description:
-            "Added clearer tester guidance, short feedback prompts, a focused What to test checklist, and mobile testing guidance before the Year 12 testing session.",
+        title: {
+            en: "Pre-Test Polish",
+            zh: "测试前打磨",
+        },
+        description: {
+            en: "Added clearer tester guidance, short feedback prompts, a focused What to test checklist, and mobile testing guidance before the Year 12 testing session.",
+            zh: "在 Year 12 学生测试前，加入更清晰的测试者说明、简短反馈提示、聚焦的“测试内容”清单，以及移动端测试指引。",
+        },
     },
     {
         version: "v1.1",
-        title: "Editable Planner",
-        description:
-            "Coursework Compass added support for adding, editing, deleting, completing, restoring, and archiving tasks. This made the app usable as a real planning workspace, not just a task generator.",
+        title: {
+            en: "Editable Planner",
+            zh: "可编辑规划器",
+        },
+        description: {
+            en: "Coursework Compass added support for adding, editing, deleting, completing, restoring, and archiving tasks. This made the app usable as a real planning workspace, not just a task generator.",
+            zh: "Coursework Compass 支持添加、编辑、删除、完成、恢复和归档任务。这个版本让应用从单纯的任务生成器，变成可以实际使用的规划工作区。",
+        },
     },
     {
         version: "v1.0.x",
-        title: "Student Testing Preparation",
-        description:
-            "Added more templates, custom dropdown UI, calendar date picker, IB exam countdown, movable world clock, testing guide, beta notice, and structured feedback panel.",
+        title: {
+            en: "Student Testing Preparation",
+            zh: "学生测试准备",
+        },
+        description: {
+            en: "Added more templates, custom dropdown UI, calendar date picker, IB exam countdown, movable world clock, testing guide, beta notice, and structured feedback panel.",
+            zh: "加入更多模板、自定义下拉选择、日历日期选择器、IB 考试倒计时、可移动世界时钟、测试指南、beta 提示和结构化反馈面板。",
+        },
     },
     {
         version: "v1.0",
-        title: "Public MVP",
-        description:
-            "The first public version allowed students to create coursework plans, save them locally, track progress, and use Dashboard, Today, Projects, and Project Details.",
+        title: {
+            en: "Public MVP",
+            zh: "公开 MVP",
+        },
+        description: {
+            en: "The first public version allowed students to create coursework plans, save them locally, track progress, and use Dashboard, Today, Projects, and Project Details.",
+            zh: "第一个公开版本支持学生创建 coursework 计划、保存到本地、追踪进度，并使用仪表盘、今日任务、项目列表和项目详情页面。",
+        },
     },
 ];
 
@@ -280,7 +315,9 @@ export default function UpdatesPage() {
                                         <p className="mb-1 text-sm font-black text-cyan-300">
                                             {update.version}
                                         </p>
-                                        <h3 className="text-2xl font-black">{update.title}</h3>
+                                        <h3 className="text-2xl font-black">
+                                            {update.title[language]}
+                                        </h3>
                                     </div>
 
                                     <span className="w-fit rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
@@ -289,7 +326,7 @@ export default function UpdatesPage() {
                                 </div>
 
                                 <p className="max-w-4xl text-sm leading-6 text-slate-300">
-                                    {update.description}
+                                    {update.description[language]}
                                 </p>
                             </div>
                         ))}
